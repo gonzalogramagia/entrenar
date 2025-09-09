@@ -20,8 +20,8 @@ Aplicación web para registrar entrenamientos (peso, repeticiones, series, tiemp
 
 ### URLs de producción:
 - **Frontend**: https://www.entrenar.app
-- **Backend API**: https://api.goalritmo.com
-- **Documentación**: https://github.com/goalritmo/gym
+- **Backend API**: https://entrenar.up.railway.app
+- **Documentación**: https://github.com/gonzalogramagia/entrenar
 
 ## Documentación
 - Especificaciones funcionales (detalladas): `docs/especificaciones.md`

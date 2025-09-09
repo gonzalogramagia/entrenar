@@ -36,7 +36,7 @@ SUPABASE_DB_URL=postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postg
 SUPABASE_URL=https://PROJECT.supabase.co
 SUPABASE_ANON_KEY=tu_publishable_key_aqui
 GO_VERSION=1.21
-CORS_ALLOWED_ORIGINS=http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app,https://gym.goalritmo.com
+CORS_ALLOWED_ORIGINS=http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app
 ```
 
 ### 4. Configurar Dominio Custom (Opcional)
@@ -67,7 +67,7 @@ En el dashboard de Vercel → Settings → Environment Variables:
 ```env
 VITE_SUPABASE_URL=https://PROJECT.supabase.co
 VITE_SUPABASE_ANON_KEY=tu_publishable_key_aqui
-VITE_API_BASE_URL=https://api.goalritmo.com
+VITE_API_BASE_URL=https://entrenar.up.railway.app
 ```
 
 ### 4. Configurar Dominio Custom (Opcional)
@@ -100,7 +100,7 @@ VITE_API_BASE_URL=https://api.goalritmo.com
 
 ### 1. Health Check Backend
 ```bash
-curl https://api.goalritmo.com/api/health
+curl https://entrenar.up.railway.app/api/health
 ```
 
 ### 2. Frontend
@@ -134,7 +134,7 @@ curl https://api.goalritmo.com/api/health
 ### Variables por Ambiente
 ```env
 # Production
-VITE_API_BASE_URL=https://api.goalritmo.com
+VITE_API_BASE_URL=https://entrenar.up.railway.app
 
 # Development  
 VITE_API_BASE_URL=http://localhost:3210/api
@@ -202,8 +202,8 @@ railway status
 
 ```
 Frontend: https://www.entrenar.app
-Backend:  https://api.goalritmo.com
-API:      https://api.goalritmo.com/api/health
+Backend:  https://entrenar.up.railway.app/
+API:      https://entrenar.up.railway.app/api/health
 ```
 
 ## 📁 Estructura de Archivos Importantes

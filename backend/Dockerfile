@@ -22,8 +22,8 @@ RUN apk --no-cache add ca-certificates
 # Copy the binary from builder stage
 COPY --from=builder /app/main /app/main
 
-# Expose port
-EXPOSE 3210
+# Expose port (Railway will use PORT env var)
+EXPOSE $PORT
 
 # Command to run
 CMD ["/app/main"]

@@ -2,7 +2,7 @@ import { supabase } from './supabase'
 
 const getApiBaseUrl = () => {
   // Temporal: hardcode para Railway deployment
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://gym-production-3333.up.railway.app'
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://entrenar.up.railway.app'
   // Asegurar que siempre termine con /api
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`
 }

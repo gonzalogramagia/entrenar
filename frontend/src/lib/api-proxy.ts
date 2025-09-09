@@ -1,5 +1,5 @@
 // API Proxy para evitar problemas de CORS con Railway
-const BACKEND_URL = 'https://entrenar-backend.railway.app';
+const BACKEND_URL = 'https://entrenar.up.railway.app';
 
 export async function apiProxy(endpoint: string, options: RequestInit = {}) {
   const url = `${BACKEND_URL}${endpoint}`;

@@ -10,13 +10,11 @@ name = "entrenar-backend"
 source = "."
 
 [services.variables]
-PORT = "3210"
 GO_VERSION = "1.21"
-CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://gym.goalritmo.com"
+CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app"
 
 # Healthcheck
 [services.healthcheck]
 path = "/api/health"
-port = 3210
 intervalSeconds = 30
 timeoutSeconds = 10
