@@ -1,0 +1,25 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "env": {
+    "VITE_SUPABASE_URL": "https://kqilsdwiqzkfdsqtissv.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "sb_publishable_C1lUiTyWNpFJjXtigA_Llw_Oq1cUOlM",
+    "VITE_API_BASE_URL": "https://api.goalritmo.com"
+  },
+  "build": {
+    "env": {
+      "VITE_SUPABASE_URL": "https://kqilsdwiqzkfdsqtissv.supabase.co",
+      "VITE_SUPABASE_ANON_KEY": "sb_publishable_C1lUiTyWNpFJjXtigA_Llw_Oq1cUOlM", 
+      "VITE_API_BASE_URL": "https://api.goalritmo.com"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
