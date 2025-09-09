@@ -4,11 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"sync"
 
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var (
+	DB   *sql.DB
+	once sync.Once
+)
 
 // InitDB inicializa la conexión con la base de datos
 func InitDB() error {
@@ -18,21 +22,38 @@ func InitDB() error {
 	}
 
 	var err error
-	DB, err = sql.Open("postgres", supabaseURL)
-	if err != nil {
-		return fmt.Errorf("error conectando a la base de datos: %v", err)
+	once.Do(func() {
+		DB, err = sql.Open("postgres", supabaseURL)
+		if err != nil {
+			err = fmt.Errorf("error conectando a la base de datos: %v", err)
+			return
+		}
+
+		// Verificar que la conexión funciona
+		if err = DB.Ping(); err != nil {
+			err = fmt.Errorf("error haciendo ping a la base de datos: %v", err)
+			return
+		}
+
+		// Configurar pool de conexiones para serverless
+		// En serverless, las conexiones se crean y destruyen rápidamente
+		DB.SetMaxOpenConns(5)  // Reducido para serverless
+		DB.SetMaxIdleConns(1)  // Mínimo para serverless
+		DB.SetConnMaxLifetime(0) // Sin límite de tiempo de vida
+		DB.SetConnMaxIdleTime(0) // Sin límite de tiempo idle
+	})
+
+	return err
+}
+
+// GetDB retorna la conexión de base de datos, inicializándola si es necesario
+func GetDB() (*sql.DB, error) {
+	if DB == nil {
+		if err := InitDB(); err != nil {
+			return nil, err
+		}
 	}
-
-	// Verificar que la conexión funciona
-	if err = DB.Ping(); err != nil {
-		return fmt.Errorf("error haciendo ping a la base de datos: %v", err)
-	}
-
-	// Configurar pool de conexiones
-	DB.SetMaxOpenConns(25)
-	DB.SetMaxIdleConns(5)
-
-	return nil
+	return DB, nil
 }
 
 // CloseDB cierra la conexión con la base de datos

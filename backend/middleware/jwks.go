@@ -11,6 +11,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -38,9 +39,12 @@ type JWK struct {
 	X5c []string `json:"x5c"`
 }
 
-// jwksCache almacena las claves en caché
-var jwksCache *JWKS
-var jwksCacheTime time.Time
+// jwksCache almacena las claves en caché (thread-safe para serverless)
+var (
+	jwksCache     *JWKS
+	jwksCacheTime time.Time
+	jwksMutex     sync.RWMutex
+)
 
 // validateSupabaseJWTWithJWKS valida un JWT usando JWKS de Supabase
 func validateSupabaseJWTWithJWKS(tokenString string) (string, error) {
@@ -110,9 +114,22 @@ func validateSupabaseJWTWithJWKS(tokenString string) (string, error) {
 	return "", fmt.Errorf("user_id no encontrado en token")
 }
 
-// getSupabaseJWKS obtiene las claves JWKS de Supabase
+// getSupabaseJWKS obtiene las claves JWKS de Supabase (thread-safe para serverless)
 func getSupabaseJWKS() (*JWKS, error) {
-	// Usar caché si es reciente (5 minutos)
+	// Verificar caché con lock de lectura
+	jwksMutex.RLock()
+	if jwksCache != nil && time.Since(jwksCacheTime) < 5*time.Minute {
+		cached := jwksCache
+		jwksMutex.RUnlock()
+		return cached, nil
+	}
+	jwksMutex.RUnlock()
+
+	// Obtener lock de escritura para actualizar caché
+	jwksMutex.Lock()
+	defer jwksMutex.Unlock()
+
+	// Verificar nuevamente en caso de que otro goroutine haya actualizado el caché
 	if jwksCache != nil && time.Since(jwksCacheTime) < 5*time.Minute {
 		return jwksCache, nil
 	}
