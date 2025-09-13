@@ -54,7 +54,7 @@ export default function LoginComponent() {
             color: '#FFB732' 
           }}
         >
-          entrenar.app
+          Entrenar.app
         </Typography>
         
         {/* Google OAuth Login */}
@@ -88,7 +88,7 @@ export default function LoginComponent() {
       {/* Loader completo para login */}
       <Backdrop
         sx={{
-          color: 'primary.main',
+          color: 'white',
           zIndex: (theme) => theme.zIndex.modal + 1,
           backgroundColor: 'rgba(255, 215, 0, 0.9)', // Amarillo dorado con transparencia
           backdropFilter: 'blur(4px)',
@@ -111,8 +111,8 @@ export default function LoginComponent() {
             gap: 2
           }}
         >
-          <CircularProgress size={48} thickness={4} />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+          <CircularProgress size={48} thickness={4} sx={{ color: 'white' }} />
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
             Iniciando sesión...
           </Typography>
         </Box>

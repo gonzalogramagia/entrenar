@@ -16,11 +16,11 @@ describe('Navigation', () => {
     
     // Esperar a que aparezcan los elementos
     await screen.findByLabelText('abrir menú')
-    await screen.findByText('entrenar.app')
+    await screen.findByText('Entrenar.app')
     await screen.findByLabelText('cerrar sesión')
     
     expect(screen.getByLabelText('abrir menú')).toBeInTheDocument()
-    expect(screen.getByText('entrenar.app')).toBeInTheDocument()
+    expect(screen.getByText('Entrenar.app')).toBeInTheDocument()
     expect(screen.getByLabelText('cerrar sesión')).toBeInTheDocument()
   })
 

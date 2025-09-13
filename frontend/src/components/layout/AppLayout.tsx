@@ -57,18 +57,8 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
   const [showFooter, setShowFooter] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      // En login, mostrar footer inmediatamente y fijo
-      setShowFooter(true)
-    } else {
-      // En app autenticada, animar con delay
-      setShowFooter(false)
-      const timer = setTimeout(() => {
-        setShowFooter(true)
-      }, 100)
-      
-      return () => clearTimeout(timer)
-    }
+    // Mostrar footer en todas las pantallas (login y autenticado)
+    setShowFooter(true)
   }, [activeTab, isAuthenticated])
 
   return (
@@ -173,13 +163,13 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
                 rel="noopener noreferrer"
                 sx={{ 
                   textDecoration: 'none',
-                  color: 'rgba(25, 118, 210, 0.7)',
+                  color: '#eab308', // yellow-500
                   fontWeight: 500,
-                  opacity: showFooter ? 1 : 0,
+                  opacity: 1,
                   display: 'inline-block',
-                  transition: showFooter ? 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'all 0.05s ease-out',
+                  transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   '&:hover': {
-                    color: '#ff9800'
+                    color: '#ca8a04' // yellow-600
                   }
                 }}
               >
