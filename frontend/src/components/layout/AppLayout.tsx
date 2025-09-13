@@ -1,6 +1,5 @@
 import { Box, Container, CssBaseline, ThemeProvider, createTheme, Typography, Link } from '@mui/material'
 import type { ReactNode } from 'react'
-import { useState, useEffect } from 'react'
 
 const theme = createTheme({
   palette: {
@@ -49,17 +48,9 @@ const theme = createTheme({
 
 type AppLayoutProps = {
   children: ReactNode
-  activeTab?: number
-  isAuthenticated?: boolean
 }
 
-export default function AppLayout({ children, activeTab = 0, isAuthenticated = false }: AppLayoutProps) {
-  const [showFooter, setShowFooter] = useState(false)
-
-  useEffect(() => {
-    // Mostrar footer en todas las pantallas (login y autenticado)
-    setShowFooter(true)
-  }, [activeTab, isAuthenticated])
+export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <ThemeProvider theme={theme}>
@@ -97,6 +88,8 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
           boxShadow: '0 0 20px rgba(0,0,0,0.3)',
           height: '667px',
           backgroundColor: 'white',
+          overflow: 'hidden',
+          touchAction: 'none',
         },
         // Keyframes para la animación del footer
         '@keyframes slideInFromBottom': {
@@ -137,8 +130,9 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
         >
           <Box sx={{ 
             flexGrow: 1, 
-            overflow: 'auto', 
+            overflow: 'hidden', 
             minHeight: 0,
+            touchAction: 'none',
             '&::-webkit-scrollbar': {
               display: 'none'
             },

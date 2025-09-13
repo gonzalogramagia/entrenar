@@ -7,11 +7,8 @@ import ApiTestPage from './pages/ApiTestPage'
 import './App.css'
 
 function AppContent() {
-  const { isAuthenticated } = useAuth()
-  const { activeTab } = useTab()
-  
   return (
-    <AppLayout isAuthenticated={isAuthenticated} activeTab={activeTab}>
+    <AppLayout>
       <AppContentInner />
     </AppLayout>
   )
