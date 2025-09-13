@@ -30,7 +30,7 @@ export default function LoginComponent() {
       justifyContent: 'center', 
       alignItems: 'center', 
       height: '100%',
-      backgroundColor: 'primary.main',
+      backgroundColor: '#FFD700', // Amarillo dorado
       borderRadius: 1,
       mx: 1,
       my: 1
@@ -90,7 +90,7 @@ export default function LoginComponent() {
         sx={{
           color: 'primary.main',
           zIndex: (theme) => theme.zIndex.modal + 1,
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backgroundColor: 'rgba(255, 215, 0, 0.9)', // Amarillo dorado con transparencia
           backdropFilter: 'blur(4px)',
           position: 'fixed',
           top: 0,

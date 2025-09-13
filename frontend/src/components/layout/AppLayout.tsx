@@ -86,6 +86,7 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
         left: 0,
         right: 0,
         bottom: 0,
+        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)', // Gradiente azul de marca
         '&::-webkit-scrollbar': {
           display: 'none'
         },
@@ -167,7 +168,7 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
               }}
             >
               <Link 
-                href="https://www.moovimiento.com" 
+                href="https://gonza.gr" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 sx={{ 
@@ -183,7 +184,7 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
                 }}
               >
                 <Typography variant="caption" sx={{ fontSize: '0.8rem', letterSpacing: '0.5px' }}>
-                  ⚡ Powered by Moovimiento
+                  💻 🧉 Desarrollado por Gonza
                 </Typography>
               </Link>
             </Box>
