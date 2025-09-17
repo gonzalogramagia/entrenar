@@ -286,9 +286,23 @@ export function AdminNotifications() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setOpenDialog(true)}
-            sx={{ fontWeight: 600 }}
+            sx={{ 
+              fontWeight: 600,
+              // En mobile, solo mostrar el ícono
+              '@media (max-width: 767px)': {
+                minWidth: 'auto',
+                px: 1,
+                '& .MuiButton-startIcon': {
+                  margin: 0
+                }
+              }
+            }}
           >
-            Agregar
+            <Box sx={{ 
+              display: { xs: 'none', sm: 'inline' } // Ocultar texto en mobile
+            }}>
+              Agregar
+            </Box>
           </Button>
         )}
       </Box>

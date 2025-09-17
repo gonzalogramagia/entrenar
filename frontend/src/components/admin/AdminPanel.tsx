@@ -34,7 +34,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === tabValue && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 1, sm: 2 } }}>
           {children}
         </Box>
       )}
@@ -97,13 +97,14 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="lg"
+      maxWidth="xl"
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: 2,
           maxHeight: '90vh',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          width: { xs: '95vw', sm: '90vw', md: '80vw' }
         }
       }}
     >
@@ -119,7 +120,7 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
             {userRole === 'staff' ? '🛠️ Panel de Staff' : 
              userRole === 'profe' ? '👍 Panel de Profesor' : 
-             '🛠️ Panel de Administrador'}
+             '🛠️ Panel de Admin'}
           </Typography>
         </Box>
         <IconButton
