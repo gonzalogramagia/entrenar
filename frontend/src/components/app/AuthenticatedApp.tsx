@@ -564,7 +564,7 @@ function AuthenticatedAppContent() {
             minHeight: 'calc(100vh - 200px)',
             px: 4, // Más padding horizontal
             '@media (max-width: 767px)': {
-              px: 3 // Padding horizontal en mobile
+              px: 2.5 // Padding horizontal en mobile
             }
           }}>
             <WorkoutForm 
