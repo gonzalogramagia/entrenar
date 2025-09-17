@@ -208,8 +208,8 @@ export function AdminUsers() {
         flexDirection: 'column',
         gap: 2
       }}>
-        <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
-        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+        <CircularProgress size={60} thickness={4} sx={{ color: '#1976d2' }} />
+        <Typography variant="body1" sx={{ fontWeight: 500, color: '#1976d2' }}>
           Cargando usuarios...
         </Typography>
       </Box>
@@ -388,7 +388,7 @@ export function AdminUsers() {
                               title="Editar nombre"
                             >
                               {updatingName === user.id ? (
-                                <CircularProgress size={16} />
+                                <CircularProgress size={16} sx={{ color: '#1976d2' }} />
                               ) : (
                                 <EditIcon />
                               )}
@@ -401,7 +401,7 @@ export function AdminUsers() {
                               title="Eliminar usuario"
                             >
                               {deleting === user.id ? (
-                                <CircularProgress size={16} />
+                                <CircularProgress size={16} sx={{ color: '#d32f2f' }} />
                               ) : (
                                 <DeleteIcon />
                               )}

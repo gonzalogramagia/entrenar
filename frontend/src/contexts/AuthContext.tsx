@@ -132,8 +132,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await auth.signOut()
       setUser(null)
       setSession(null)
+      setIsAdmin(false)
+      setUserRole('user')
+      // Forzar recarga para limpiar completamente el estado
+      window.location.reload()
     } catch (error) {
       console.error('Logout error:', error)
+      // Aún así forzar recarga en caso de error
+      window.location.reload()
     } finally {
       setIsLoggingOut(false)
     }

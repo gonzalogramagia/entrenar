@@ -774,10 +774,10 @@ function AuthenticatedAppContent() {
       {/* Loader completo para carga inicial y logout */}
       <Backdrop
         sx={{
-          color: 'primary.main',
+          color: 'white',
           zIndex: 99999,
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(25, 118, 210, 0.95)', // Azul de marca con transparencia
+          backdropFilter: 'blur(2px)',
           position: 'fixed',
           top: 0,
           left: 0,
@@ -785,7 +785,8 @@ function AuthenticatedAppContent() {
           bottom: 0,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          transition: 'all 0.2s ease-in-out'
         }}
         open={isLoading || isLoggingOut || isSigningIn}
       >
@@ -794,11 +795,12 @@ function AuthenticatedAppContent() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 2
+            gap: 2,
+            marginTop: '-60px' // Posicionar más arriba como en el login
           }}
         >
-          <CircularProgress size={48} thickness={4} />
-          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+          <CircularProgress size={48} thickness={4} sx={{ color: 'white' }} />
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
             {isLoggingOut ? 'Cerrando sesión...' : isSigningIn ? 'Iniciando sesión...' : 'Cargando...'}
           </Typography>
         </Box>

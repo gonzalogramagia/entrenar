@@ -142,11 +142,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
             overflow: 'hidden', 
             minHeight: 0,
             touchAction: 'none',
-            backgroundColor: 'transparent',
-            borderRadius: '0px',
+            backgroundColor: 'white',
+            borderRadius: '20px !important',
+            borderTopLeftRadius: '20px !important',
+            borderTopRightRadius: '20px !important',
             '@media (max-width: 767px)': {
-              backgroundColor: 'transparent',
-              borderRadius: '0px'
+              backgroundColor: 'white',
+              borderRadius: '0px !important'
             },
             '&::-webkit-scrollbar': {
               display: 'none'
@@ -181,13 +183,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 rel="noopener noreferrer"
                 sx={{ 
                   textDecoration: 'none',
-                  color: 'black',
+                  color: '#FFB732',
                   fontWeight: 500,
                   opacity: 1,
                   display: 'inline-block',
                   transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   '&:hover': {
-                    color: 'rgba(0, 0, 0, 0.7)'
+                    color: '#FFD700'
                   }
                 }}
               >
