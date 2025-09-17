@@ -1,4 +1,4 @@
-import { Box, Container, CssBaseline, ThemeProvider, createTheme, Typography, Link } from '@mui/material'
+import { Box, CssBaseline, ThemeProvider, createTheme, Typography, Link } from '@mui/material'
 import type { ReactNode } from 'react'
 
 const theme = createTheme({
@@ -88,9 +88,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
           top: '50%',
           transform: 'translate(-50%, -50%)',
           border: 'none',
-          borderRadius: '0px',
-          boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)',
-          height: '667px',
+          borderRadius: '20px',
+          boxShadow: '0 0 30px rgba(255, 255, 255, 0.9)',
+          height: 'auto',
+          minHeight: '667px',
+          maxHeight: '90vh',
           backgroundColor: 'transparent',
           overflow: 'hidden',
           touchAction: 'none',
@@ -119,44 +121,32 @@ export default function AppLayout({ children }: AppLayoutProps) {
           }
         }
       }}>
-        <Container 
-          maxWidth={false}
-          sx={{ 
-            flexGrow: 1, 
-            py: 0,
-            px: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            overflow: 'hidden',
-            backgroundColor: 'transparent',
-            '@media (max-width: 767px)': {
-              py: 0,
-              px: 0,
-              backgroundColor: 'transparent'
-            }
-          }}
-        >
+        <Box sx={{ 
+          flexGrow: 1, 
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          overflow: 'hidden',
+          backgroundColor: 'white',
+          borderRadius: '20px !important',
+          '@media (max-width: 767px)': {
+            backgroundColor: 'white',
+            borderRadius: '0px !important'
+          },
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          '&::-moz-scrollbar': {
+            display: 'none'
+          },
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}>
           <Box sx={{ 
             flexGrow: 1, 
             overflow: 'hidden', 
             minHeight: 0,
-            touchAction: 'none',
-            backgroundColor: 'white',
-            borderTopLeftRadius: '20px !important',
-            borderTopRightRadius: '20px !important',
-            '@media (max-width: 767px)': {
-              backgroundColor: 'white',
-              borderRadius: '0px !important'
-            },
-            '&::-webkit-scrollbar': {
-              display: 'none'
-            },
-            '&::-moz-scrollbar': {
-              display: 'none'
-            },
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
+            touchAction: 'none'
           }}>
             {children}
           </Box>
@@ -166,8 +156,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 textAlign: 'center',
                 flexShrink: 0,
                 backgroundColor: 'white',
-                borderBottomLeftRadius: '20px !important',
-                borderBottomRightRadius: '20px !important',
                 '@media (max-width: 767px)': {
                   py: 1.5,
                   '& *': {
@@ -197,7 +185,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </Typography>
               </Link>
             </Box>
-        </Container>
+        </Box>
       </Box>
     </ThemeProvider>
   )
