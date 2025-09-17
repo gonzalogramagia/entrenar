@@ -44,6 +44,20 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := parts[1]
 
+		// Permitir setup de usuario sin verificar existencia en DB (para usuarios nuevos)
+		if strings.HasSuffix(r.URL.Path, "/setup") {
+			// Validar JWT pero no verificar existencia en DB
+			userID, err := validateSupabaseJWT(tokenString)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Token inválido: %v", err), http.StatusUnauthorized)
+				return
+			}
+			// Agregar user_id al contexto sin verificar existencia en DB
+			ctx := context.WithValue(r.Context(), "user_id", userID)
+			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
 		// Validar JWT de Supabase
 		userID, err := validateSupabaseJWT(tokenString)
 		if err != nil {
