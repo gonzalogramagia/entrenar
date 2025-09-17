@@ -66,6 +66,9 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(userMetadataJSON, &user.Metadata)
 	}
 
+	// Asignar profile_name
+	user.ProfileName = profileName
+
 	json.NewEncoder(w).Encode(user)
 }
 
