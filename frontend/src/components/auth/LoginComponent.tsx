@@ -29,11 +29,33 @@ export default function LoginComponent() {
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center', 
-      height: '100%',
+      height: '100vh',
       backgroundColor: '#FFD700', // Amarillo dorado
-      borderRadius: 1,
-      mx: 1,
-      my: 1
+      borderRadius: { xs: 0, sm: 1 }, // Sin bordes en mobile, con bordes en desktop
+      mx: { xs: 0, sm: 1 }, // Sin márgenes en mobile, con márgenes en desktop
+      my: { xs: 0, sm: 1 }, // Sin márgenes en mobile, con márgenes en desktop
+      width: '100vw',
+      minHeight: '100vh',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 9999,
+      // En mobile, ocupar toda la pantalla
+      '@media (max-width: 767px)': {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        margin: 0,
+        padding: 0,
+        borderRadius: 0,
+        zIndex: 9999
+      }
     }}>
       <Box sx={{ 
         bgcolor: 'white', 

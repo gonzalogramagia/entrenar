@@ -126,6 +126,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
             height: '100%',
             overflow: 'hidden',
             backgroundColor: 'white',
+            // En mobile, quitar padding cuando es login
+            '@media (max-width: 767px)': {
+              py: 0,
+              px: 0,
+            }
           }}
         >
           <Box sx={{ 
