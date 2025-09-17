@@ -52,9 +52,10 @@ const theme = createTheme({
 
 type AppLayoutProps = {
   children: ReactNode
+  showFooter?: boolean
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default function AppLayout({ children, showFooter = true }: AppLayoutProps) {
 
   return (
     <ThemeProvider theme={theme}>
@@ -150,7 +151,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           }}>
             {children}
           </Box>
-                      <Box 
+                      {showFooter && (
+            <Box 
               sx={{ 
                 py: 1.5,
                 textAlign: 'center',
@@ -185,6 +187,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </Typography>
               </Link>
             </Box>
+          )}
         </Box>
       </Box>
     </ThemeProvider>

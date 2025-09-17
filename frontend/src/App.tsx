@@ -7,8 +7,10 @@ import ApiTestPage from './pages/ApiTestPage'
 import './App.css'
 
 function AppContent() {
+  const { isAuthenticated } = useAuth()
+  
   return (
-    <AppLayout>
+    <AppLayout showFooter={isAuthenticated}>
       <AppContentInner />
     </AppLayout>
   )
