@@ -799,7 +799,17 @@ function AuthenticatedAppContent() {
             marginTop: '-60px' // Posicionar más arriba como en el login
           }}
         >
-          <CircularProgress size={48} thickness={4} sx={{ color: 'white' }} />
+          <CircularProgress 
+            size={48} 
+            thickness={4} 
+            sx={{ 
+              color: 'white',
+              backgroundColor: 'transparent',
+              '& .MuiCircularProgress-circle': {
+                strokeLinecap: 'round'
+              }
+            }} 
+          />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
             {isLoggingOut ? 'Cerrando sesión...' : isSigningIn ? 'Iniciando sesión...' : 'Cargando...'}
           </Typography>
