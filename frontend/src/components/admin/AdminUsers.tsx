@@ -422,7 +422,7 @@ export function AdminUsers() {
             Esta acción no se puede deshacer y eliminará todos los datos del usuario.
           </Typography>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ pb: 2, pr: 2 }}>
           <Button onClick={handleCancelDelete}>Cancelar</Button>
           <Button 
             onClick={handleConfirmDelete} 
@@ -453,7 +453,7 @@ export function AdminUsers() {
             sx={{ mt: 1 }}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ pb: 2, pr: 2 }}>
           <Button onClick={handleCancelEditName}>Cancelar</Button>
           <Button 
             onClick={handleConfirmEditName} 

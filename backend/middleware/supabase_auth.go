@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/goalritmo/gym/backend/database"
 )
 
 // SupabaseAuthMiddleware valida JWT tokens de Supabase
@@ -47,6 +48,12 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 		userID, err := validateSupabaseJWT(tokenString)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Token inválido: %v", err), http.StatusUnauthorized)
+			return
+		}
+
+		// Verificar que el usuario existe en la base de datos
+		if !userExistsInDatabase(userID) {
+			http.Error(w, "Usuario no encontrado o ha sido eliminado", http.StatusUnauthorized)
 			return
 		}
 
@@ -202,4 +209,20 @@ type SupabaseUser struct {
 	Email    string          `json:"email"`
 	Metadata json.RawMessage `json:"user_metadata"`
 	AppData  json.RawMessage `json:"app_metadata"`
+}
+
+// userExistsInDatabase verifica si un usuario existe en la base de datos
+func userExistsInDatabase(userID string) bool {
+	if database.DB == nil {
+		return false
+	}
+	
+	var count int
+	err := database.DB.QueryRow("SELECT COUNT(*) FROM user_profiles WHERE user_id = $1", userID).Scan(&count)
+	if err != nil {
+		fmt.Printf("Error verificando existencia de usuario %s: %v\n", userID, err)
+		return false
+	}
+	
+	return count > 0
 }
