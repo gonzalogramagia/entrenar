@@ -143,12 +143,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
             minHeight: 0,
             touchAction: 'none',
             backgroundColor: 'white',
-            borderRadius: '20px !important',
             borderTopLeftRadius: '20px !important',
             borderTopRightRadius: '20px !important',
+            boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)',
             '@media (max-width: 767px)': {
               backgroundColor: 'white',
-              borderRadius: '0px !important'
+              borderRadius: '0px !important',
+              boxShadow: 'none'
             },
             '&::-webkit-scrollbar': {
               display: 'none'
