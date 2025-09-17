@@ -336,6 +336,13 @@ class ApiClient {
     })
   }
 
+  async updateAdminUserName(id: string, name: string) {
+    return this.request(`/admin/users/${id}/name`, {
+      method: 'PUT',
+      body: { name }
+    })
+  }
+
   // Routines API
   async getUserRoutines() {
     return this.request('/routines')

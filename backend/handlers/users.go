@@ -400,3 +400,74 @@ func UpdateAdminUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 		"message": "Rol de usuario actualizado exitosamente",
 	})
 }
+
+// UpdateUserNameRequest representa la solicitud para actualizar el nombre de un usuario
+type UpdateUserNameRequest struct {
+	Name string `json:"name"`
+}
+
+// UpdateAdminUserNameHandler actualiza el nombre de un usuario (solo para administradores)
+func UpdateAdminUserNameHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Obtener el ID del usuario de la URL
+	vars := mux.Vars(r)
+	userID := vars["id"]
+
+	if userID == "" {
+		http.Error(w, "ID de usuario requerido", http.StatusBadRequest)
+		return
+	}
+
+	// Decodificar el cuerpo de la solicitud
+	var req UpdateUserNameRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	// Validar que el nombre no esté vacío
+	if req.Name == "" {
+		http.Error(w, "El nombre no puede estar vacío", http.StatusBadRequest)
+		return
+	}
+
+	// Actualizar el nombre del usuario
+	query := `
+		UPDATE user_profiles 
+		SET name = $1, updated_at = NOW()
+		WHERE user_id = $2
+	`
+
+	result, err := database.DB.Exec(query, req.Name, userID)
+	if err != nil {
+		http.Error(w, "Error actualizando nombre de usuario", http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		http.Error(w, "Error verificando actualización", http.StatusInternalServerError)
+		return
+	}
+
+	if rowsAffected == 0 {
+		// Si no se actualizó ningún registro, crear el perfil
+		_, err = database.DB.Exec(`
+			INSERT INTO user_profiles (user_id, name, updated_at) 
+			VALUES ($1, $2, NOW()) 
+			ON CONFLICT (user_id) DO UPDATE SET name = $2, updated_at = NOW()
+		`, userID, req.Name)
+		
+		if err != nil {
+			http.Error(w, "Error creando/actualizando perfil de usuario", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Responder con éxito
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Nombre de usuario actualizado exitosamente",
+	})
+}

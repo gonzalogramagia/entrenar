@@ -108,6 +108,7 @@ func main() {
 	api.HandleFunc("/admin/users", handlers.AdminMiddleware(handlers.GetAdminUsersHandler)).Methods("GET")
 	api.HandleFunc("/admin/users/{id}", handlers.AdminMiddleware(handlers.DeleteAdminUserHandler)).Methods("DELETE")
 	api.HandleFunc("/admin/users/{id}/role", handlers.AdminMiddleware(handlers.UpdateAdminUserRoleHandler)).Methods("PUT")
+	api.HandleFunc("/admin/users/{id}/name", handlers.AdminMiddleware(handlers.UpdateAdminUserNameHandler)).Methods("PUT")
 
 	// Routines endpoints
 	api.HandleFunc("/routines", handlers.GetUserRoutinesHandler).Methods("GET")

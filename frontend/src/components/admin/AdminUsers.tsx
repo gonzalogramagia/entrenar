@@ -22,7 +22,7 @@ import {
   FormControl,
   InputLabel
 } from '@mui/material'
-import { Search as SearchIcon, Person as PersonIcon, Delete as DeleteIcon } from '@mui/icons-material'
+import { Search as SearchIcon, Person as PersonIcon, Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -34,10 +34,6 @@ type AdminUser = {
   role: string
   created_at: string
   last_login: string | null
-  settings: {
-    show_own_workouts_in_social: boolean
-    unc_notifications_enabled: boolean
-  } | null
 }
 
 export function AdminUsers() {
@@ -51,7 +47,9 @@ export function AdminUsers() {
   const [success, setSuccess] = useState('')
   const [filterText, setFilterText] = useState('')
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ open: boolean; user: AdminUser | null }>({ open: false, user: null })
+  const [editNameDialog, setEditNameDialog] = useState<{ open: boolean; user: AdminUser | null; newName: string }>({ open: false, user: null, newName: '' })
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
+  const [updatingName, setUpdatingName] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
 
   const loadUsers = useCallback(async () => {
@@ -116,6 +114,48 @@ export function AdminUsers() {
 
   const handleCancelDelete = () => {
     setDeleteConfirmation({ open: false, user: null })
+  }
+
+  const handleEditNameClick = (user: AdminUser) => {
+    setEditNameDialog({ open: true, user, newName: user.name || '' })
+  }
+
+  const handleEditNameChange = (newName: string) => {
+    setEditNameDialog(prev => ({ ...prev, newName }))
+  }
+
+  const handleConfirmEditName = async () => {
+    if (!editNameDialog.user || !editNameDialog.newName.trim()) return
+    
+    try {
+      setUpdatingName(editNameDialog.user.id)
+      setError('')
+      await apiClient.updateAdminUserName(editNameDialog.user.id, editNameDialog.newName.trim())
+      
+      // Actualizar la lista local
+      setUsers(users.map(u => 
+        u.id === editNameDialog.user!.id 
+          ? { ...u, name: editNameDialog.newName.trim() }
+          : u
+      ))
+      
+      setEditNameDialog({ open: false, user: null, newName: '' })
+      setSuccess(`Nombre de usuario actualizado a "${editNameDialog.newName.trim()}"`)
+      
+      // Limpiar mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        setSuccess('')
+      }, 5000)
+    } catch (error) {
+      console.error('Error actualizando nombre:', error)
+      setError('Error al actualizar el nombre del usuario')
+    } finally {
+      setUpdatingName(null)
+    }
+  }
+
+  const handleCancelEditName = () => {
+    setEditNameDialog({ open: false, user: null, newName: '' })
   }
 
   const handleUpdateRole = async (userId: string, newRole: string) => {
@@ -295,26 +335,6 @@ export function AdminUsers() {
                             />
                           )}
                         </Box>
-                        
-                        {/* User Settings */}
-                        {user.settings && (
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Chip 
-                              label={user.settings.show_own_workouts_in_social ? "Social activado" : "Social desactivado"}
-                              size="small"
-                              color={user.settings.show_own_workouts_in_social ? "success" : "default"}
-                              variant="outlined"
-                              sx={{ fontSize: '0.7rem' }}
-                            />
-                            <Chip 
-                              label={user.settings.unc_notifications_enabled ? "Notificaciones activadas" : "Notificaciones desactivadas"}
-                              size="small"
-                              color={user.settings.unc_notifications_enabled ? "success" : "default"}
-                              variant="outlined"
-                              sx={{ fontSize: '0.7rem' }}
-                            />
-                          </Box>
-                        )}
                       </Box>
                       
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -338,18 +358,34 @@ export function AdminUsers() {
                         </FormControl>
 
                         {isAdmin && (
-                          <IconButton
-                            onClick={() => handleDeleteClick(user)}
-                            disabled={deleting === user.id}
-                            color="error"
-                            size="small"
-                          >
-                            {deleting === user.id ? (
-                              <CircularProgress size={16} />
-                            ) : (
-                              <DeleteIcon />
-                            )}
-                          </IconButton>
+                          <>
+                            <IconButton
+                              onClick={() => handleEditNameClick(user)}
+                              disabled={updatingName === user.id}
+                              color="primary"
+                              size="small"
+                              title="Editar nombre"
+                            >
+                              {updatingName === user.id ? (
+                                <CircularProgress size={16} />
+                              ) : (
+                                <EditIcon />
+                              )}
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleDeleteClick(user)}
+                              disabled={deleting === user.id}
+                              color="error"
+                              size="small"
+                              title="Eliminar usuario"
+                            >
+                              {deleting === user.id ? (
+                                <CircularProgress size={16} />
+                              ) : (
+                                <DeleteIcon />
+                              )}
+                            </IconButton>
+                          </>
                         )}
                       </Box>
 
@@ -395,6 +431,36 @@ export function AdminUsers() {
             disabled={deleting === deleteConfirmation.user?.id}
           >
             {deleting === deleteConfirmation.user?.id ? 'Eliminando...' : 'Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Name Dialog */}
+      <Dialog open={editNameDialog.open} onClose={handleCancelEditName} maxWidth="sm" fullWidth>
+        <DialogTitle>Editar nombre de usuario</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Editando nombre para: <strong>{editNameDialog.user?.email}</strong>
+          </Typography>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Nombre del usuario"
+            value={editNameDialog.newName}
+            onChange={(e) => handleEditNameChange(e.target.value)}
+            placeholder="Ingresa el nuevo nombre"
+            variant="outlined"
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelEditName}>Cancelar</Button>
+          <Button 
+            onClick={handleConfirmEditName} 
+            variant="contained"
+            disabled={!editNameDialog.newName.trim() || updatingName === editNameDialog.user?.id}
+          >
+            {updatingName === editNameDialog.user?.id ? 'Actualizando...' : 'Actualizar'}
           </Button>
         </DialogActions>
       </Dialog>
