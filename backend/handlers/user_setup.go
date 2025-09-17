@@ -117,7 +117,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 3. Crear notificación de bienvenida (solo si no existe)
 	fmt.Printf("Creando notificación de bienvenida para usuario %s\n", req.UserID)
-	result, err := tx.Exec(`
+	result, err = tx.Exec(`
 		INSERT INTO notifications (user_id, title, message, type, created_at)
 		SELECT $1, $2, $3, $4, $5
 		WHERE NOT EXISTS (

@@ -16,14 +16,18 @@ import (
 // SupabaseAuthMiddleware valida JWT tokens de Supabase
 func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("🔐 Auth Middleware - %s %s\n", r.Method, r.URL.Path)
+		
 		// Permitir preflight requests
 		if r.Method == "OPTIONS" {
+			fmt.Printf("✅ OPTIONS request permitida\n")
 			next.ServeHTTP(w, r)
 			return
 		}
 
 		// Permitir health check sin autenticación
 		if strings.HasSuffix(r.URL.Path, "/health") {
+			fmt.Printf("✅ Health check permitido\n")
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -46,12 +50,15 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 
 		// Permitir setup de usuario sin verificar existencia en DB (para usuarios nuevos)
 		if strings.HasSuffix(r.URL.Path, "/setup") {
+			fmt.Printf("🔧 Setup endpoint detectado - validando JWT sin verificar DB\n")
 			// Validar JWT pero no verificar existencia en DB
 			userID, err := validateSupabaseJWT(tokenString)
 			if err != nil {
+				fmt.Printf("❌ JWT inválido en setup: %v\n", err)
 				http.Error(w, fmt.Sprintf("Token inválido: %v", err), http.StatusUnauthorized)
 				return
 			}
+			fmt.Printf("✅ JWT válido para setup - UserID: %s\n", userID)
 			// Agregar user_id al contexto sin verificar existencia en DB
 			ctx := context.WithValue(r.Context(), "user_id", userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
@@ -59,18 +66,23 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Validar JWT de Supabase
+		fmt.Printf("🔍 Validando JWT para endpoint: %s\n", r.URL.Path)
 		userID, err := validateSupabaseJWT(tokenString)
 		if err != nil {
+			fmt.Printf("❌ JWT inválido: %v\n", err)
 			http.Error(w, fmt.Sprintf("Token inválido: %v", err), http.StatusUnauthorized)
 			return
 		}
+		fmt.Printf("✅ JWT válido - UserID: %s\n", userID)
 
 		// Verificar que el usuario existe en la base de datos
 		if !userExistsInDatabase(userID) {
+			fmt.Printf("🚫 Usuario %s no existe en DB - bloqueando acceso a %s\n", userID, r.URL.Path)
 			http.Error(w, "Usuario no encontrado o ha sido eliminado", http.StatusUnauthorized)
 			return
 		}
 
+		fmt.Printf("✅ Usuario %s autorizado para %s\n", userID, r.URL.Path)
 		// Agregar user_id al contexto
 		ctx := context.WithValue(r.Context(), "user_id", userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
