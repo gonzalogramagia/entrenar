@@ -126,6 +126,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
             height: '100%',
             overflow: 'hidden',
             backgroundColor: 'white',
+            // En mobile eliminar padding y borde blanco
+            '@media (max-width: 767px)': {
+              py: 0,
+              px: 0,
+              backgroundColor: 'transparent'
+            }
           }}
         >
           <Box sx={{ 
@@ -148,7 +154,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
               sx={{ 
                 py: 1.5,
                 textAlign: 'center',
-                flexShrink: 0
+                flexShrink: 0,
+                // En mobile solo mostrar espacio en blanco
+                '@media (max-width: 767px)': {
+                  py: 1.5,
+                  '& *': {
+                    display: 'none'
+                  }
+                }
               }}
             >
               <Link 
