@@ -62,7 +62,12 @@ export default function LoginComponent() {
         borderRadius: 2, 
         boxShadow: 3,
         maxWidth: '90%',
-        width: '100%'
+        width: '100%',
+        '@media (min-width: 768px)': {
+          bgcolor: 'transparent',
+          boxShadow: 'none',
+          p: 0
+        }
       }}>
         <Typography 
           variant="h4" 
@@ -72,7 +77,10 @@ export default function LoginComponent() {
           sx={{ 
             mb: 3, 
             fontWeight: 'bold', 
-            color: '#FFB732' 
+            color: '#FFB732',
+            '@media (min-width: 768px)': {
+              color: '#FFB732'
+            }
           }}
         >
           Entrenar.app

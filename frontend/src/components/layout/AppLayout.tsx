@@ -125,7 +125,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             flexDirection: 'column',
             height: '100%',
             overflow: 'hidden',
-            backgroundColor: 'white',
+            backgroundColor: 'transparent',
             '@media (max-width: 767px)': {
               py: 0,
               px: 0,
@@ -138,6 +138,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
             overflow: 'hidden', 
             minHeight: 0,
             touchAction: 'none',
+            backgroundColor: 'white',
+            '@media (max-width: 767px)': {
+              backgroundColor: 'white'
+            },
             '&::-webkit-scrollbar': {
               display: 'none'
             },
@@ -169,13 +173,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 rel="noopener noreferrer"
                 sx={{ 
                   textDecoration: 'none',
-                  color: '#eab308', // yellow-500
+                  color: 'white',
                   fontWeight: 500,
                   opacity: 1,
                   display: 'inline-block',
                   transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   '&:hover': {
-                    color: '#ca8a04' // yellow-600
+                    color: 'rgba(255, 255, 255, 0.8)'
                   }
                 }}
               >

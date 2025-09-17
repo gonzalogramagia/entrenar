@@ -562,10 +562,7 @@ function AuthenticatedAppContent() {
             position: 'relative', 
             zIndex: 1, 
             minHeight: 'calc(100vh - 200px)',
-            px: 4, // Más padding horizontal
-            '@media (max-width: 767px)': {
-              px: 2.5 // Padding horizontal en mobile
-            }
+            px: 2
           }}>
             <WorkoutForm 
               exercises={exercises} 
