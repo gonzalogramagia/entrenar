@@ -85,10 +85,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Configurar usuario solo si no tiene perfil (usuario nuevo) y no tiene rol específico
         if (!userInfo.profile_name && !userInfo.is_admin && userInfo.role === 'user') {
           try {
-            const userName = user.user_metadata?.name || user.user_metadata?.full_name
-            await apiClient.setupUser(user.id, user.email || '', userName)
+            const userName = user.user_metadata?.name || user.user_metadata?.full_name || user.user_metadata?.given_name || user.user_metadata?.display_name
+            // Si no hay nombre en metadata, usar el email como fallback
+            const finalName = userName || user.email?.split('@')[0] || 'Usuario'
+            await apiClient.setupUser(user.id, user.email || '', finalName)
           } catch (error) {
-            // No es crítico si falla, solo log
+            console.error('Error setting up user:', error)
           }
         }
       } catch (error) {
