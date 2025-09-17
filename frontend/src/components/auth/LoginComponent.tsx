@@ -28,7 +28,7 @@ export default function LoginComponent() {
     <Box sx={{ 
       display: 'flex', 
       justifyContent: 'center', 
-      alignItems: 'center', 
+      alignItems: 'center', // Centrado en todos los dispositivos
       height: '100%',
       backgroundColor: '#FFD700', // Amarillo dorado
       borderRadius: { xs: 0, sm: 1 }, // Sin bordes en mobile, con bordes en desktop
@@ -36,6 +36,12 @@ export default function LoginComponent() {
       my: { xs: 0, sm: 1 }, // Sin márgenes en mobile, con márgenes en desktop
       width: '100%',
       minHeight: '100vh',
+      justifyContent: 'center',
+      // En desktop, mover un poco hacia arriba del centro
+      '@media (min-width: 768px)': {
+        alignItems: 'flex-start',
+        paddingTop: '32vh' // 32% del viewport height desde arriba
+      },
       // Solo en mobile, ocupar toda la pantalla
       '@media (max-width: 767px)': {
         position: 'fixed',
