@@ -562,7 +562,7 @@ function AuthenticatedAppContent() {
             position: 'relative', 
             zIndex: 1, 
             minHeight: 'calc(100vh - 200px)',
-            px: 1.5
+            px: { xs: 2, sm: 1 }
           }}>
             <WorkoutForm 
               exercises={exercises} 

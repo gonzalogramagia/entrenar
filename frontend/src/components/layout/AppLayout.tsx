@@ -89,7 +89,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           transform: 'translate(-50%, -50%)',
           border: 'none',
           borderRadius: '0px',
-          boxShadow: 'none',
+          boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)',
           height: '667px',
           backgroundColor: 'transparent',
           overflow: 'hidden',
@@ -145,11 +145,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             backgroundColor: 'white',
             borderTopLeftRadius: '20px !important',
             borderTopRightRadius: '20px !important',
-            boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)',
             '@media (max-width: 767px)': {
               backgroundColor: 'white',
-              borderRadius: '0px !important',
-              boxShadow: 'none'
+              borderRadius: '0px !important'
             },
             '&::-webkit-scrollbar': {
               display: 'none'
