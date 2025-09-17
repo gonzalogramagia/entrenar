@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/goalritmo/gym/backend/database"
@@ -109,7 +110,8 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 3. Crear notificación de bienvenida (solo si no existe)
-	_, err = tx.Exec(`
+	fmt.Printf("Creando notificación de bienvenida para usuario %s\n", req.UserID)
+	result, err := tx.Exec(`
 		INSERT INTO notifications (user_id, title, message, type, created_at)
 		SELECT $1, $2, $3, $4, $5
 		WHERE NOT EXISTS (
@@ -117,10 +119,13 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 			WHERE user_id = $1 AND type = 'welcome'
 		)
 	`, req.UserID, "¡Te damos la bienvenida! 🎉", "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, ver tu progreso y conectar con otros usuarios de la UNC. ¡Buen entrenamiento!", "welcome", time.Now())
-
+	
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)
 		// No es crítico si falla la notificación
+	} else {
+		rowsAffected, _ := result.RowsAffected()
+		fmt.Printf("Notificación de bienvenida creada: %d filas afectadas\n", rowsAffected)
 	}
 
 	// Confirmar transacción
@@ -151,13 +156,25 @@ func extractNameFromEmail(email string) string {
 	return email
 }
 
-// extractFirstName extrae solo el primer nombre de un nombre completo
+// extractFirstName extrae el nombre completo, no solo el primer nombre
 func extractFirstName(fullName string) string {
-	// Buscar el primer espacio y tomar solo la primera parte
-	for i, char := range fullName {
-		if char == ' ' {
-			return fullName[:i]
+	// Limpiar espacios al inicio y final
+	fullName = strings.TrimSpace(fullName)
+	
+	// Si está vacío, devolver tal como está
+	if fullName == "" {
+		return fullName
+	}
+	
+	// Capitalizar la primera letra de cada palabra
+	words := strings.Fields(fullName)
+	var capitalizedWords []string
+	
+	for _, word := range words {
+		if len(word) > 0 {
+			capitalizedWords = append(capitalizedWords, strings.ToUpper(string(word[0]))+strings.ToLower(word[1:]))
 		}
 	}
-	return fullName
+	
+	return strings.Join(capitalizedWords, " ")
 }

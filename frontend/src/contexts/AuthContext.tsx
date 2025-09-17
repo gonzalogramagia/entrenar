@@ -86,8 +86,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (!userInfo.profile_name && !userInfo.is_admin && userInfo.role === 'user') {
           try {
             const userName = user.user_metadata?.name || user.user_metadata?.full_name || user.user_metadata?.given_name || user.user_metadata?.display_name
-            // Si no hay nombre en metadata, usar el email como fallback
-            const finalName = userName || user.email?.split('@')[0] || 'Usuario'
+            // Si no hay nombre en metadata, usar el email como fallback, pero capitalizar
+            const emailName = user.email?.split('@')[0] || ''
+            const finalName = userName || (emailName ? emailName.charAt(0).toUpperCase() + emailName.slice(1).toLowerCase() : 'Usuario')
+            console.log('Setting up user with name:', finalName, 'from metadata:', userName, 'from email:', emailName)
             await apiClient.setupUser(user.id, user.email || '', finalName)
           } catch (error) {
             console.error('Error setting up user:', error)

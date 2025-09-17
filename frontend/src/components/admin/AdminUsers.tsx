@@ -342,7 +342,7 @@ export function AdminUsers() {
                       </Typography>
 
                       {/* Role Selection and Delete Button */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2, pb: 1, pr: 1 }}>
                         <FormControl size="small" sx={{ minWidth: 120 }}>
                           <InputLabel>Rol</InputLabel>
                           <Select
