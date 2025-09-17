@@ -163,7 +163,7 @@ export function AdminExercises() {
         mb: 3 
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-          Ejercicios del Sistema
+          Todos los Ejercicios
         </Typography>
         {(isAdmin || userRole === 'profe') && (
           <Button

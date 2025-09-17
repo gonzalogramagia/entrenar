@@ -76,9 +76,10 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Extraer solo el primer nombre
 	userName := extractFirstName(fullName)
+	fmt.Printf("🔧 SetupUser - UserID: %s, FullName: %s, FinalName: %s\n", req.UserID, fullName, userName)
 
 	// 1. Crear perfil de usuario
-	_, err = tx.Exec(`
+	result, err := tx.Exec(`
 		INSERT INTO user_profiles (user_id, name, is_admin, role)
 		VALUES ($1, $2, $3, $4)
 		ON CONFLICT (user_id) DO UPDATE SET
@@ -86,6 +87,11 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 			is_admin = EXCLUDED.is_admin
 			-- No actualizar el rol para preservar roles existentes
 	`, req.UserID, userName, false, "user")
+	
+	if err == nil {
+		rowsAffected, _ := result.RowsAffected()
+		fmt.Printf("✅ Perfil creado/actualizado para %s: %d filas afectadas\n", req.UserID, rowsAffected)
+	}
 
 	if err != nil {
 		fmt.Printf("Error creando perfil: %v\n", err)

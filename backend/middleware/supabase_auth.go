@@ -228,15 +228,18 @@ type SupabaseUser struct {
 // userExistsInDatabase verifica si un usuario existe en la base de datos
 func userExistsInDatabase(userID string) bool {
 	if database.DB == nil {
+		fmt.Printf("❌ Database connection is nil for user %s\n", userID)
 		return false
 	}
 	
 	var count int
 	err := database.DB.QueryRow("SELECT COUNT(*) FROM user_profiles WHERE user_id = $1", userID).Scan(&count)
 	if err != nil {
-		fmt.Printf("Error verificando existencia de usuario %s: %v\n", userID, err)
+		fmt.Printf("❌ Error verificando existencia de usuario %s: %v\n", userID, err)
 		return false
 	}
 	
-	return count > 0
+	exists := count > 0
+	fmt.Printf("🔍 Usuario %s existe en DB: %t (count: %d)\n", userID, exists, count)
+	return exists
 }

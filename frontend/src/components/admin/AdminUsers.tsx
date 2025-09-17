@@ -233,7 +233,7 @@ export function AdminUsers() {
         mb: 3 
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-          Usuarios Registrados
+          Todos los Usuarios
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {filteredUsers.length} de {users.length} usuarios

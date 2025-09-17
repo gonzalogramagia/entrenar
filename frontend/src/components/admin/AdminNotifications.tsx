@@ -278,7 +278,7 @@ export function AdminNotifications() {
         mb: 3 
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-          Notificaciones del Sistema
+          Todas las Notificaciones
         </Typography>
         {/* Solo mostrar botón de agregar para admin y staff */}
         {(userRole === 'admin' || userRole === 'staff' || isAdmin) && (
