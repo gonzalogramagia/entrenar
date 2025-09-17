@@ -558,7 +558,15 @@ function AuthenticatedAppContent() {
       }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
-          <Box sx={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 200px)' }}>
+          <Box sx={{ 
+            position: 'relative', 
+            zIndex: 1, 
+            minHeight: 'calc(100vh - 200px)',
+            px: 4, // Más padding horizontal
+            '@media (max-width: 767px)': {
+              px: 3 // Padding horizontal en mobile
+            }
+          }}>
             <WorkoutForm 
               exercises={exercises} 
               onSubmit={handleWorkoutSubmit}

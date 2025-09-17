@@ -126,11 +126,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
             height: '100%',
             overflow: 'hidden',
             backgroundColor: 'white',
-            // En mobile eliminar padding y borde blanco
             '@media (max-width: 767px)': {
               py: 0,
               px: 0,
-              backgroundColor: 'transparent'
+              backgroundColor: 'white'
             }
           }}
         >
