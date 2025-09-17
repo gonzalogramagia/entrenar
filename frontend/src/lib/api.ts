@@ -85,6 +85,19 @@ class ApiClient {
       
       if (!response.ok) {
         const errorText = await response.text()
+        
+        // Si es un error 401, limpiar la sesión automáticamente
+        if (response.status === 401) {
+          console.log('🔒 401 Unauthorized - Limpiando sesión automáticamente')
+          try {
+            await supabase.auth.signOut()
+            // Recargar la página para ir al login
+            window.location.reload()
+          } catch (signOutError) {
+            console.error('Error during automatic signout:', signOutError)
+          }
+        }
+        
         throw new Error(`API Error: ${response.status} - ${errorText}`)
       }
 
