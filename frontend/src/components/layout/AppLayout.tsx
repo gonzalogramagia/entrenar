@@ -16,6 +16,7 @@ const theme = createTheme({
         root: {
           paddingLeft: '16px',
           paddingRight: '16px',
+          borderRadius: '0px !important',
         },
       },
     },
@@ -24,6 +25,7 @@ const theme = createTheme({
         root: {
           boxShadow: 'none',
           borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+          borderRadius: '0px !important',
         },
       },
     },
@@ -31,6 +33,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           minHeight: '48px',
+          borderRadius: '0px !important',
         },
       },
     },
@@ -40,6 +43,7 @@ const theme = createTheme({
           minHeight: '48px',
           fontSize: '14px',
           fontWeight: 500,
+          borderRadius: '0px !important',
         },
       },
     },
@@ -83,11 +87,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
           left: '50%',
           top: '50%',
           transform: 'translate(-50%, -50%)',
-          border: '1px solid #ccc',
-          borderRadius: '20px',
-          boxShadow: '0 0 20px rgba(0,0,0,0.3)',
+          border: 'none',
+          borderRadius: '0px',
+          boxShadow: 'none',
           height: '667px',
-          backgroundColor: 'white',
+          backgroundColor: 'transparent',
           overflow: 'hidden',
           touchAction: 'none',
         },
@@ -119,8 +123,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           maxWidth={false}
           sx={{ 
             flexGrow: 1, 
-            py: 1,
-            px: 2,
+            py: 0,
+            px: 0,
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
@@ -129,7 +133,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             '@media (max-width: 767px)': {
               py: 0,
               px: 0,
-              backgroundColor: 'white'
+              backgroundColor: 'transparent'
             }
           }}
         >
@@ -138,9 +142,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
             overflow: 'hidden', 
             minHeight: 0,
             touchAction: 'none',
-            backgroundColor: 'white',
+            backgroundColor: 'transparent',
+            borderRadius: '0px',
             '@media (max-width: 767px)': {
-              backgroundColor: 'white'
+              backgroundColor: 'transparent',
+              borderRadius: '0px'
             },
             '&::-webkit-scrollbar': {
               display: 'none'
@@ -158,7 +164,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 py: 1.5,
                 textAlign: 'center',
                 flexShrink: 0,
-                // En mobile solo mostrar espacio en blanco
+                backgroundColor: 'white',
+                borderBottomLeftRadius: '20px !important',
+                borderBottomRightRadius: '20px !important',
                 '@media (max-width: 767px)': {
                   py: 1.5,
                   '& *': {
@@ -173,13 +181,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 rel="noopener noreferrer"
                 sx={{ 
                   textDecoration: 'none',
-                  color: 'white',
+                  color: 'black',
                   fontWeight: 500,
                   opacity: 1,
                   display: 'inline-block',
                   transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   '&:hover': {
-                    color: 'rgba(255, 255, 255, 0.8)'
+                    color: 'rgba(0, 0, 0, 0.7)'
                   }
                 }}
               >

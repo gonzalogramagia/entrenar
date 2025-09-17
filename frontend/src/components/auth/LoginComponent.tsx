@@ -31,11 +31,12 @@ export default function LoginComponent() {
       alignItems: 'center', // Centrado en todos los dispositivos
       height: '100%',
       backgroundColor: '#FFD700', // Amarillo dorado
-      borderRadius: { xs: 0, sm: 1 }, // Sin bordes en mobile, con bordes en desktop
-      mx: { xs: 0, sm: 1 }, // Sin márgenes en mobile, con márgenes en desktop
-      my: { xs: 0, sm: 1 }, // Sin márgenes en mobile, con márgenes en desktop
+      borderRadius: '20px !important', // Bordes redondeados
+      mx: 0, // Sin márgenes horizontales
+      my: 0, // Sin márgenes verticales
       width: '100%',
       minHeight: '100vh',
+      position: 'relative', // Para que el Backdrop se posicione correctamente
       // En desktop, mover un poco hacia arriba del centro
       '@media (min-width: 768px)': {
         alignItems: 'flex-start',
@@ -52,22 +53,17 @@ export default function LoginComponent() {
         height: '100vh',
         margin: 0,
         padding: 0,
-        borderRadius: 0,
+        borderRadius: '0px !important',
         zIndex: 9999
       }
     }}>
       <Box sx={{ 
         bgcolor: 'white', 
         p: 3, 
-        borderRadius: 2, 
+        borderRadius: '8px', 
         boxShadow: 3,
         maxWidth: '90%',
-        width: '100%',
-        '@media (min-width: 768px)': {
-          bgcolor: 'transparent',
-          boxShadow: 'none',
-          p: 0
-        }
+        width: '100%'
       }}>
         <Typography 
           variant="h4" 
@@ -77,10 +73,7 @@ export default function LoginComponent() {
           sx={{ 
             mb: 3, 
             fontWeight: 'bold', 
-            color: '#FFB732',
-            '@media (min-width: 768px)': {
-              color: '#FFB732'
-            }
+            color: '#FFB732'
           }}
         >
           Entrenar.app
@@ -119,16 +112,21 @@ export default function LoginComponent() {
         sx={{
           color: 'white',
           zIndex: (theme) => theme.zIndex.modal + 1,
-          backgroundColor: 'rgba(255, 215, 0, 0.9)', // Amarillo dorado con transparencia
-          backdropFilter: 'blur(4px)',
-          position: 'fixed',
+          backgroundColor: 'rgba(255, 215, 0, 0.95)', // Amarillo dorado con más opacidad
+          backdropFilter: 'blur(2px)',
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          borderRadius: '20px !important',
+          transition: 'all 0.2s ease-in-out',
+          '@media (max-width: 767px)': {
+            borderRadius: '0px !important'
+          }
         }}
         open={isSigningIn}
       >
@@ -137,7 +135,8 @@ export default function LoginComponent() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 2
+            gap: 2,
+            marginTop: '-60px' // Mover más arriba
           }}
         >
           <CircularProgress size={48} thickness={4} sx={{ color: 'white' }} />
