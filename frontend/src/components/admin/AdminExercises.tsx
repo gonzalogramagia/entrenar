@@ -160,7 +160,8 @@ export function AdminExercises() {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        mb: 3 
+        mb: 3,
+        pt: 2 // Padding superior para bajar el contenido
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
           Todos los Ejercicios

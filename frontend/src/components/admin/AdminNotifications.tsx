@@ -275,7 +275,8 @@ export function AdminNotifications() {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        mb: 3 
+        mb: 3,
+        pt: 2 // Padding superior para bajar el contenido
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
           Todas los Avisos
@@ -388,9 +389,75 @@ export function AdminNotifications() {
                       </Typography>
                     </Box>
                     
-                    <Typography variant="body1" sx={{ mb: 1, whiteSpace: 'pre-wrap' }}>
+                    <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
                       {notification.message}
                     </Typography>
+
+                    {/* Action Buttons - Ahora debajo del texto */}
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 1, 
+                      mb: 2,
+                      // En mobile, los botones van debajo del título
+                      '@media (max-width: 767px)': {
+                        alignSelf: 'flex-start'
+                      }
+                    }}>
+                      <IconButton
+                        onClick={() => handleViewHistory(notification.id)}
+                        disabled={loadingHistory}
+                        size="small"
+                        sx={{
+                          color: 'info.main',
+                          '&:hover': {
+                            backgroundColor: 'info.light',
+                            color: 'white'
+                          }
+                        }}
+                      >
+                        {loadingHistory && historyModal.notificationId === notification.id ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <HistoryIcon />
+                        )}
+                      </IconButton>
+                      
+                      <IconButton
+                        onClick={() => handleEditClick(notification)}
+                        size="small"
+                        sx={{
+                          color: 'primary.main',
+                          '&:hover': {
+                            backgroundColor: 'primary.light',
+                            color: 'white'
+                          }
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+
+                      {/* Solo mostrar botón de eliminar para admin */}
+                      {(userRole === 'admin' || isAdmin) && (
+                        <IconButton
+                          onClick={() => handleDeleteClick(notification.id)}
+                          disabled={deleting === notification.id}
+                          size="small"
+                          sx={{
+                            color: 'error.main',
+                            '&:hover': {
+                              backgroundColor: 'error.light',
+                              color: 'white'
+                            }
+                          }}
+                        >
+                          {deleting === notification.id ? (
+                            <CircularProgress size={16} />
+                          ) : (
+                            <DeleteIcon />
+                          )}
+                        </IconButton>
+                      )}
+                    </Box>
 
                     <Typography variant="caption" color="text.secondary">
                       {notification.updated_at !== notification.created_at 
@@ -398,64 +465,6 @@ export function AdminNotifications() {
                         : `Creada el ${formatDate(notification.created_at)} por ${notification.created_by}`
                       }
                     </Typography>
-                  </Box>
-
-                  {/* Action Buttons */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <IconButton
-                      onClick={() => handleViewHistory(notification.id)}
-                      disabled={loadingHistory}
-                      size="small"
-                      sx={{
-                        color: 'info.main',
-                        '&:hover': {
-                          backgroundColor: 'info.light',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      {loadingHistory && historyModal.notificationId === notification.id ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <HistoryIcon />
-                      )}
-                    </IconButton>
-                    
-                    <IconButton
-                      onClick={() => handleEditClick(notification)}
-                      size="small"
-                      sx={{
-                        color: 'primary.main',
-                        '&:hover': {
-                          backgroundColor: 'primary.light',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-
-                    {/* Solo mostrar botón de eliminar para admin */}
-                    {(userRole === 'admin' || isAdmin) && (
-                      <IconButton
-                        onClick={() => handleDeleteClick(notification.id)}
-                        disabled={deleting === notification.id}
-                        size="small"
-                        sx={{
-                          color: 'error.main',
-                          '&:hover': {
-                            backgroundColor: 'error.light',
-                            color: 'white'
-                          }
-                        }}
-                      >
-                        {deleting === notification.id ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          <DeleteIcon />
-                        )}
-                      </IconButton>
-                    )}
                   </Box>
                 </Box>
               </CardContent>

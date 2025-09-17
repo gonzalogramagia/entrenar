@@ -230,7 +230,8 @@ export function AdminUsers() {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        mb: 3 
+        mb: 3,
+        pt: 2 // Padding superior para bajar el contenido
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
           Beneficiarios
@@ -342,7 +343,20 @@ export function AdminUsers() {
                       </Typography>
 
                       {/* Role Selection and Delete Button */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2, pb: 1, pr: 1 }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 2, 
+                        mt: 2, 
+                        pb: 1, 
+                        pr: 1,
+                        // En mobile, cambiar a columna
+                        '@media (max-width: 767px)': {
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: 1
+                        }
+                      }}>
                         <FormControl size="small" sx={{ minWidth: 120 }}>
                           <InputLabel>Rol</InputLabel>
                           <Select
@@ -358,7 +372,14 @@ export function AdminUsers() {
                         </FormControl>
 
                         {isAdmin && (
-                          <>
+                          <Box sx={{
+                            display: 'flex',
+                            gap: 1,
+                            // En mobile, los botones van debajo del selector
+                            '@media (max-width: 767px)': {
+                              alignSelf: 'flex-start'
+                            }
+                          }}>
                             <IconButton
                               onClick={() => handleEditNameClick(user)}
                               disabled={updatingName === user.id}
@@ -385,7 +406,7 @@ export function AdminUsers() {
                                 <DeleteIcon />
                               )}
                             </IconButton>
-                          </>
+                          </Box>
                         )}
                       </Box>
 
