@@ -297,7 +297,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             <Button
               variant="contained"
               size="large"
-              startIcon={<AddIcon />}
+              startIcon={<AddIcon sx={{ color: '#fff' }} />}
               onClick={() => setOpenCreateDialog(true)}
               sx={{ 
                 fontWeight: 600,
@@ -307,7 +307,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 textTransform: 'none',
                 fontSize: '1.1rem',
                 backgroundColor: '#ffc107',
-                color: '#000',
+                color: '#fff',
                 '&:hover': {
                   backgroundColor: '#ffb300'
                 }
@@ -790,7 +790,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           right: 24,
           zIndex: 1000,
           backgroundColor: '#ffc107',
-          color: '#000',
+          color: '#fff',
           boxShadow: '0 4px 12px rgba(255, 193, 7, 0.3)',
           '&:hover': {
             backgroundColor: '#ffb300',
@@ -800,7 +800,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           transition: 'all 0.2s ease-in-out'
         }}
       >
-        <AddIcon />
+        <AddIcon sx={{ color: '#fff' }} />
       </Fab>
     </Box>
   )

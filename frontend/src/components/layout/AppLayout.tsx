@@ -172,13 +172,13 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
                 rel="noopener noreferrer"
                 sx={{ 
                   textDecoration: 'none',
-                  color: '#FFB732',
+                  color: '#666666',
                   fontWeight: 500,
                   opacity: 1,
                   display: 'inline-block',
                   transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   '&:hover': {
-                    color: '#FFD700'
+                    color: '#888888'
                   }
                 }}
               >
