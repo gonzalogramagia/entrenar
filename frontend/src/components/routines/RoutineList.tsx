@@ -305,7 +305,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 px: 4,
                 py: 1.5,
                 textTransform: 'none',
-                fontSize: '1.1rem'
+                fontSize: '1.1rem',
+                backgroundColor: '#ffc107',
+                color: '#000',
+                '&:hover': {
+                  backgroundColor: '#ffb300'
+                }
               }}
             >
                Crear
@@ -777,7 +782,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
       {/* Botón flotante para crear rutina */}
       <Fab
-        color="primary"
         aria-label="crear rutina"
         onClick={() => setOpenCreateDialog(true)}
         sx={{
@@ -785,9 +789,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           bottom: 24,
           right: 24,
           zIndex: 1000,
-          boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+          backgroundColor: '#ffc107',
+          color: '#000',
+          boxShadow: '0 4px 12px rgba(255, 193, 7, 0.3)',
           '&:hover': {
-            boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
+            backgroundColor: '#ffb300',
+            boxShadow: '0 6px 16px rgba(255, 193, 7, 0.4)',
             transform: 'scale(1.05)'
           },
           transition: 'all 0.2s ease-in-out'
