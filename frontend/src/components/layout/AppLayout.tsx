@@ -90,7 +90,7 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
           transform: 'translate(-50%, -50%)',
           border: 'none',
           borderRadius: '20px',
-          boxShadow: '0 0 30px rgba(255, 255, 255, 0.9)',
+          boxShadow: '0 0 30px rgba(255, 255, 255, 0.3)',
           height: 'auto',
           minHeight: '667px',
           maxHeight: '90vh',
