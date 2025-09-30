@@ -383,7 +383,7 @@ export default function WorkoutHistory() {
         }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
-            placeholder="Filtrar entrenamientos por fecha, nombre, ejercicios..."
+            placeholder="Filtrar mis entrenamientos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
