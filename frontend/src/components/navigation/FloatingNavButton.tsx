@@ -105,20 +105,12 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
           bottom: 24,
           right: 24,
           zIndex: 1000,
-          backgroundColor: currentTab === TABS.ROUTINES && activeRoutine && isRoutineComplete ? 'success.main' : '#ffc107',
+          backgroundColor: '#ffc107',
           color: '#fff',
-          boxShadow: currentTab === TABS.ROUTINES && activeRoutine 
-            ? (isRoutineComplete 
-              ? '0 4px 12px rgba(76, 175, 80, 0.3)' 
-              : '0 4px 12px rgba(255, 193, 7, 0.3)')
-            : '0 4px 12px rgba(255, 193, 7, 0.3)',
+          boxShadow: '0 4px 12px rgba(255, 193, 7, 0.3)',
           '&:hover': {
-            backgroundColor: currentTab === TABS.ROUTINES && activeRoutine && isRoutineComplete ? 'success.dark' : '#ffb300',
-            boxShadow: currentTab === TABS.ROUTINES && activeRoutine 
-              ? (isRoutineComplete 
-                ? '0 6px 16px rgba(76, 175, 80, 0.4)' 
-                : '0 6px 16px rgba(255, 193, 7, 0.4)')
-              : '0 6px 16px rgba(255, 193, 7, 0.4)',
+            backgroundColor: '#ffb300',
+            boxShadow: '0 6px 16px rgba(255, 193, 7, 0.4)',
             transform: 'scale(1.05)'
           },
           transition: 'all 0.2s ease-in-out',

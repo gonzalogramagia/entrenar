@@ -291,15 +291,15 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 elevation={2}
                 sx={{ 
                   border: '2px solid',
-                  borderColor: isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : 'grey.300',
-                  backgroundColor: isCompleted && isActiveRoutine ? '#fff3e0' : 'transparent',
+                  borderColor: isCompleted ? (isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main')) : 'grey.300',
+                  backgroundColor: isCompleted ? (isRoutineComplete ? '#f0f8f0' : (isActiveRoutine ? '#fff3e0' : '#f0f8f0')) : 'transparent',
                   borderRadius: '12px',
                   overflow: 'hidden',
                   transition: 'all 0.3s ease',
                   cursor: isActiveRoutine ? 'pointer' : 'default',
                   '&:hover': {
-                    borderColor: isCompleted ? (isActiveRoutine ? '#FFA000' : 'success.dark') : (isActiveRoutine ? '#FFB732' : 'grey.300'),
-                    backgroundColor: isCompleted && isActiveRoutine ? '#fff3e0' : (isActiveRoutine ? '#fff8e1' : 'transparent'),
+                    borderColor: isCompleted ? (isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'success.dark')) : (isActiveRoutine ? '#FFB732' : 'grey.300'),
+                    backgroundColor: isCompleted ? (isRoutineComplete ? '#f0f8f0' : (isActiveRoutine ? '#fff3e0' : '#f0f8f0')) : (isActiveRoutine ? '#fff8e1' : 'transparent'),
                     boxShadow: isActiveRoutine ? '0 8px 25px rgba(0,0,0,0.15)' : 'none',
                     transform: isActiveRoutine ? 'translateY(-2px)' : 'none'
                   }
@@ -333,12 +333,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                           }
                         }}
                         sx={{
-                          color: isRoutineComplete ? 'success.main' : '#FFB732',
+                          color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main'),
                           '&.Mui-checked': {
-                            color: isRoutineComplete ? 'success.main' : '#FFB732',
+                            color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main'),
                           },
                           '&.Mui-disabled': {
-                            color: isSetCompleted ? (isRoutineComplete ? 'success.main' : '#FFB732') : 'grey.400',
+                            color: isSetCompleted ? (isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main')) : 'grey.400',
                           },
                           p: 0.5
                         }}
@@ -378,7 +378,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                         size="small"
                         sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted && isActiveRoutine ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
                           color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                           fontWeight: 600,
                           '&:hover': {
@@ -391,7 +391,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                         size="small"
                         sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted && isActiveRoutine ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
                           color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                           fontWeight: 600,
                           '&:hover': {
