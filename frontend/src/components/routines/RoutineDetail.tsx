@@ -325,7 +325,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         key={setNumber}
                         checked={isSetCompleted}
                         disabled={!isActiveRoutine}
-                        onChange={() => {
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => {
+                          e.stopPropagation()
                           if (isActiveRoutine) {
                             toggleExerciseCompleted(today, routine.id, exercise.exercise_id, setNumber, routine)
                           }

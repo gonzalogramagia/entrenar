@@ -15,18 +15,28 @@ const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ trigger, onComple
   })
 
   useEffect(() => {
-    if (trigger && !showConfetti) {
-      setShowConfetti(true)
+    if (trigger) {
+      // Resetear el estado antes de activar
+      setShowConfetti(false)
       
-      // Ocultar confeti después de 2.5 segundos (más rápido)
-      const timer = setTimeout(() => {
-        setShowConfetti(false)
-        onComplete?.()
-      }, 2500)
+      // Pequeño delay para asegurar que el reset se complete
+      const resetTimer = setTimeout(() => {
+        setShowConfetti(true)
+        
+        // Ocultar confeti después de 2 segundos (aún más rápido)
+        const hideTimer = setTimeout(() => {
+          setShowConfetti(false)
+          onComplete?.()
+        }, 2000)
 
-      return () => clearTimeout(timer)
+        return () => clearTimeout(hideTimer)
+      }, 50)
+
+      return () => {
+        clearTimeout(resetTimer)
+      }
     }
-  }, [trigger, showConfetti, onComplete])
+  }, [trigger, onComplete])
 
   useEffect(() => {
     const handleResize = () => {
@@ -58,11 +68,11 @@ const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ trigger, onComple
         width={windowDimensions.width}
         height={windowDimensions.height}
         recycle={false}
-        numberOfPieces={400}
-        gravity={0.5}
-        initialVelocityX={30}
-        initialVelocityY={30}
-        colors={['#FFB732', '#FF6B35', '#F7931E', '#FFD23F', '#06FFA5', '#3A86FF', '#8338EC', '#FF1744', '#00E676', '#FF9800']}
+        numberOfPieces={600}
+        gravity={0.8}
+        initialVelocityX={40}
+        initialVelocityY={40}
+        colors={['#FFB732', '#FF6B35', '#F7931E', '#FFD23F', '#06FFA5', '#3A86FF', '#8338EC', '#FF1744', '#00E676', '#FF9800', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5']}
         style={{
           position: 'absolute',
           top: 0,
