@@ -327,50 +327,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             maxWidth: '100%',
             overflow: 'hidden'
           }}>
-            {/* Card para agregar nueva rutina */}
-            {sortedRoutines && sortedRoutines.length > 0 && (
-              <Card 
-                elevation={2}
-                onClick={() => setOpenCreateDialog(true)}
-                sx={{ 
-                  height: 'fit-content',
-                  width: '100%',
-                  border: '2px solid',
-                  borderColor: 'primary.main',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  backgroundColor: 'transparent',
-                  '&:hover': {
-                    backgroundColor: '#f0f8ff',
-                    borderColor: 'primary.dark'
-                  }
-                }}
-              >
-                <CardContent sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography 
-                    variant="h6" 
-                    component="h2" 
-                    sx={{ 
-                      fontWeight: 700,
-                      color: 'primary.main',
-                      mb: 1
-                    }}
-                  >
-                    ➕ Agregar Nueva Rutina
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary"
-                    sx={{ fontStyle: 'italic' }}
-                  >
-                    Crear una nueva rutina personalizada
-                  </Typography>
-                </CardContent>
-              </Card>
-            )}
-
             {sortedRoutines?.map((routine) => (
             <Card 
               key={routine.id} 
@@ -379,7 +335,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               sx={{ 
                 height: 'fit-content',
                 width: '100%',
-                border: '2px solid',
+                border: '1px solid',
                 borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'grey.300'),
                 borderRadius: '16px',
                 overflow: 'hidden',
@@ -398,7 +354,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     : (activeRoutine?.id === routine.id 
                         ? '#fff3e0'  // Amarillo muy claro para activas
                         : '#f0f8ff'  // Azul muy claro para inactivas
-                      )
+                      ),
+                  borderColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'grey.400'),
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }
               }}
             >
@@ -626,8 +584,52 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 )}
               </CardActions>
             </Card>
-          ))}
-        </Box>
+            ))}
+
+            {/* Card para agregar nueva rutina - al final */}
+            {sortedRoutines && sortedRoutines.length > 0 && (
+              <Card 
+                elevation={2}
+                onClick={() => setOpenCreateDialog(true)}
+                sx={{ 
+                  height: 'fit-content',
+                  width: '100%',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent',
+                  '&:hover': {
+                    backgroundColor: '#f0f8ff',
+                    borderColor: 'primary.dark'
+                  }
+                }}
+              >
+                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                  <Typography 
+                    variant="h6" 
+                    component="h2" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: 'primary.main',
+                      mb: 1
+                    }}
+                  >
+                    ➕ Agregar Nueva Rutina
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontStyle: 'italic' }}
+                  >
+                    Crear una nueva rutina personalizada
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
+          </Box>
         </Box>
       )}
 

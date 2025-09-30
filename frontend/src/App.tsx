@@ -1,20 +1,17 @@
 import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { TabProvider, useTab } from './contexts/TabContext'
+import { TabProvider } from './contexts/TabContext'
 import LoginComponent from './components/auth/LoginComponent'
 import AuthenticatedApp from './components/app/AuthenticatedApp'
 import AppLayout from './components/layout/AppLayout'
 import ApiTestPage from './pages/ApiTestPage'
-import { TABS } from './constants/tabs'
 import './App.css'
 
 function AppContent() {
   const { isAuthenticated } = useAuth()
-  const { activeTab } = useTab()
   
   return (
     <AppLayout 
       showFooter={isAuthenticated}
-      disableFooterLink={isAuthenticated && activeTab === TABS.WORKOUT}
     >
       <AppContentInner />
     </AppLayout>

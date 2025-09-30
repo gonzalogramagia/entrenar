@@ -158,13 +158,7 @@ export default function AppLayout({ children, showFooter = true, disableFooterLi
                 py: 1.5,
                 textAlign: 'center',
                 flexShrink: 0,
-                backgroundColor: 'white',
-                '@media (max-width: 767px)': {
-                  py: 1.5,
-                  '& *': {
-                    display: 'none'
-                  }
-                }
+                backgroundColor: 'white'
               }}
             >
               {disableFooterLink ? (
