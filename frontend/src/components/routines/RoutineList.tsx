@@ -19,7 +19,6 @@ import {
 } from '@mui/material'
 import {
   Add as AddIcon,
-  Edit as EditIcon,
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   FitnessCenter as FitnessCenterIcon,
@@ -181,17 +180,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     })
   }
 
-  const handleEditRoutineClick = async (routine: RoutineWithExercises) => {
-    try {
-      // Obtener la rutina completa con todos los ejercicios
-      const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
-      setSelectedRoutine(fullRoutine)
-      setOpenEditDialog(true)
-    } catch (error) {
-      console.error('Error obteniendo detalles de la rutina para editar:', error)
-      setError('Error al cargar los detalles de la rutina')
-    }
-  }
 
   const handleSaveRoutineName = async () => {
     if (!editNameModal.routineId || !editNameModal.newName.trim()) {
@@ -425,25 +413,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   >
                     🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
                   </Typography>
-                  {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleEditRoutineClick(routine)
-                      }}
-                      sx={{ 
-                        color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
-                        flexShrink: 0,
-                        '&:hover': {
-                          backgroundColor: isRoutineComplete(routine) ? 'success.light' : 'primary.light',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  )}
                 </Box>
 
                 {/* Layout para mobile */}
@@ -490,27 +459,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     />
                   </Box>
 
-                  {/* Botón de editar en mobile */}
-                  {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEditRoutineClick(routine)
-                        }}
-                        sx={{ 
-                          color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
-                          '&:hover': {
-                            backgroundColor: isRoutineComplete(routine) ? 'success.light' : 'primary.light',
-                            color: 'white'
-                          }
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  )}
                 </Box>
 
                 <Typography 

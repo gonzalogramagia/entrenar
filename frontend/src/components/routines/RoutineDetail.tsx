@@ -119,12 +119,13 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         }}
       >
         <CardContent sx={{ p: 3 }}>
+          {/* Layout para desktop */}
           <Box sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
+            display: { xs: 'none', sm: 'flex' },
+            flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: { xs: 1, sm: 2 }
+            alignItems: 'center',
+            gap: 2
           }}>
             <Box sx={{ flex: 1 }}>
               <Typography 
@@ -219,6 +220,129 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   </Tooltip>
                 )}
               </Box>
+              {onStart && !isRoutineComplete && (
+                <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onStart()
+                      if (!isActiveRoutine) {
+                        // Navegar al registro con la rutina activa solo si no está activa
+                        const navigateEvent = new CustomEvent('navigateToWorkout', {})
+                        window.dispatchEvent(navigateEvent)
+                      }
+                    }}
+                    sx={{ 
+                      backgroundColor: isActiveRoutine ? '#FFB732' : 'primary.main',
+                      color: 'white',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: isActiveRoutine ? '#FF8F00' : 'primary.dark'
+                      }
+                    }}
+                  >
+                    {isActiveRoutine ? <StopIcon /> : <PlayIcon />}
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
+          </Box>
+
+          {/* Layout para mobile */}
+          <Box sx={{
+            display: { xs: 'flex', sm: 'none' },
+            flexDirection: 'column',
+            gap: 2
+          }}>
+            {/* Nombre de la rutina */}
+            <Typography 
+              variant="h5" 
+              component="h2" 
+              sx={{ 
+                fontWeight: 800,
+                color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
+                textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                textAlign: 'center'
+              }}
+            >
+              🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
+            </Typography>
+            
+            {routine.description && (
+              <Typography 
+                variant="body1" 
+                color="text.secondary" 
+                sx={{ 
+                  fontStyle: 'italic',
+                  fontSize: '1.1rem',
+                  textAlign: 'center'
+                }}
+              >
+                {routine.description}
+              </Typography>
+            )}
+
+            {/* Pill de ejercicios */}
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Chip
+                label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
+                sx={{
+                  backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
+                  color: 'white',
+                  fontWeight: 700,
+                  fontSize: '1rem'
+                }}
+                variant="filled"
+                size="medium"
+              />
+            </Box>
+
+            {/* Botones */}
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexWrap: 'wrap'
+            }}>
+              {onDelete && (isRoutineComplete || !isActiveRoutine) && (
+                <Tooltip title="Eliminar rutina">
+                  <IconButton
+                    color="error"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete()
+                    }}
+                    sx={{ 
+                      backgroundColor: 'transparent',
+                      color: 'error.main',
+                      '&:hover': {
+                        backgroundColor: 'error.main',
+                        color: 'white'
+                      }
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              
+              {onEdit && (isRoutineComplete || !isActiveRoutine) && (
+                <Tooltip title="Editar rutina">
+                  <IconButton
+                    sx={{
+                      color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main')
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit()
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+
               {onStart && !isRoutineComplete && (
                 <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
                   <IconButton
