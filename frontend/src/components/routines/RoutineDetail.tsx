@@ -220,6 +220,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     onClick={(e) => {
                       e.stopPropagation()
                       onStart()
+                      if (!isActiveRoutine) {
+                        // Navegar al registro con la rutina activa solo si no está activa
+                        const navigateEvent = new CustomEvent('navigateToWorkout', {})
+                        window.dispatchEvent(navigateEvent)
+                      }
                     }}
                     sx={{ 
                       backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
@@ -601,7 +606,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         {!isRoutineComplete && onStart && (
           <Button
             variant="contained"
-            onClick={onStart}
+            onClick={() => {
+              onStart()
+              // Navegar al registro con la rutina activa
+              const navigateEvent = new CustomEvent('navigateToWorkout', {})
+              window.dispatchEvent(navigateEvent)
+            }}
             startIcon={isActiveRoutine ? <StopIcon /> : <PlayIcon />}
             sx={{
               backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',

@@ -124,18 +124,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     try {
       await apiClient.updateUserRoutine(id, routineData)
       
-      // Actualizar el estado local directamente
-      setRoutines(prevRoutines => 
-        prevRoutines.map(routine => 
-          routine.id === id 
-            ? { 
-                ...routine, 
-                name: routineData.name || routine.name,
-                description: routineData.description || routine.description
-              }
-            : routine
-        )
-      )
+      // Recargar todas las rutinas para obtener los datos actualizados del servidor
+      await loadRoutines()
       
       setOpenEditDialog(false)
       setSelectedRoutine(null)
@@ -428,6 +418,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                           detail: { routine: fullRoutine } 
                         })
                         window.dispatchEvent(event)
+                        
+                        // Navegar al registro con la rutina activa
+                        const navigateEvent = new CustomEvent('navigateToWorkout', {})
+                        window.dispatchEvent(navigateEvent)
                       } catch (error) {
                         console.error('Error obteniendo detalles de la rutina:', error)
                         setError('Error al cargar los detalles de la rutina')
