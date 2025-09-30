@@ -368,7 +368,7 @@ export default function WorkoutForm({
         <Box sx={{ 
           mb: 3, 
           p: 2, 
-          backgroundColor: isRoutineComplete ? 'success.main' : (isRoutinePaused ? 'primary.main' : 'warning.main'), 
+          backgroundColor: isRoutineComplete ? 'success.main' : (isRoutinePaused ? 'primary.main' : '#FFB732'), 
           borderRadius: 2,
           color: 'white',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -595,8 +595,8 @@ export default function WorkoutForm({
                             color: 'white',
                             borderColor: 'rgba(255,255,255,0.5)',
                             '&:hover': {
-                              borderColor: 'warning.main',
-                              backgroundColor: 'rgba(255,152,0,0.1)'
+                              borderColor: '#FFB732',
+                              backgroundColor: 'rgba(255,183,50,0.1)'
                             }
                           }}
                           onClick={() => {

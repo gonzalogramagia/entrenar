@@ -193,7 +193,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 
                 <Chip
                   label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
-                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
+                  sx={{
+                    backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
+                    color: 'white',
+                    fontWeight: 600
+                  }}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700, mt: 0.5 }}
@@ -202,7 +206,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 {onEdit && (isRoutineComplete || !isActiveRoutine) && (
                   <Tooltip title="Editar rutina">
                     <IconButton
-                      color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
+                      sx={{
+                        color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main')
+                      }}
                       onClick={(e) => {
                         e.stopPropagation()
                         onEdit()
@@ -216,7 +222,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               {onStart && !isRoutineComplete && (
                 <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
                   <IconButton
-                    color={isActiveRoutine ? "warning" : "primary"}
+                    sx={{
+                      color: isActiveRoutine ? '#FFB732' : 'primary.main'
+                    }}
                     onClick={(e) => {
                       e.stopPropagation()
                       onStart()
@@ -368,7 +376,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                         size="small"
-                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "warning" : "default"))}
+                        sx={{
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : 'grey.400')),
+                          color: 'white'
+                        }}
                         variant="filled"
                         sx={{ 
                           fontWeight: 600,
@@ -382,7 +393,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                         size="small"
-                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "warning" : "default"))}
+                        sx={{
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : 'grey.400')),
+                          color: 'white'
+                        }}
                         variant="filled"
                         sx={{ 
                           fontWeight: 600,
@@ -397,7 +411,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         <Chip
                           label={`${exercise.weight} kg`}
                           size="small"
-                          color={isRoutineComplete ? "success" : (isCompleted || isActiveRoutine ? "warning" : "default")}
+                          sx={{
+                            backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted || isActiveRoutine ? '#FFB732' : 'grey.400'),
+                            color: 'white'
+                          }}
                           variant="filled"
                                                   sx={{ 
                           fontWeight: 600,
@@ -587,7 +604,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         </CardContent>
       </Card>
 
-      <Box display="flex" justifyContent={isRoutineComplete ? "center" : "space-between"} sx={{ mt: 3 }}>
+      <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
         {isRoutineComplete ? (
           <>
             <Button
@@ -599,10 +616,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 onClose()
               }}
               sx={{
-                borderColor: 'warning.main',
-                color: 'warning.main',
+                borderColor: 'primary.main',
+                color: 'primary.main',
                 '&:hover': {
-                  backgroundColor: 'warning.main',
+                  backgroundColor: 'primary.main',
                   color: 'white'
                 }
               }}

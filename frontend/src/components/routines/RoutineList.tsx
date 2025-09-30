@@ -527,7 +527,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                     <Chip
                       label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
-                      color={isRoutineComplete(routine) ? "success" : (activeRoutine?.id === routine.id ? "warning" : "primary")}
+                      sx={{
+                        backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                        color: 'white',
+                        fontWeight: 600
+                      }}
                       variant="filled"
                       size="medium"
                       sx={{
