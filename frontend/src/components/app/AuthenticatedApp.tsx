@@ -17,6 +17,7 @@ import type { Workout, WorkoutDay } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 import { apiClient } from '../../lib/api'
 import FloatingNavButton from '../navigation/FloatingNavButton'
+import ConfettiAnimation from '../animations/ConfettiAnimation'
 
 type Exercise = {
   id: number
@@ -39,6 +40,7 @@ function AuthenticatedAppContent() {
   const [notificationsModalOpen, setNotificationsModalOpen] = useState(false)
   const [adminPanelOpen, setAdminPanelOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   // Función para cargar el contador de notificaciones no leídas
   const loadUnreadNotificationsCount = useCallback(async () => {
@@ -509,6 +511,7 @@ function AuthenticatedAppContent() {
         } else {
           // La rutina está completa
           console.log('¡Rutina completada!')
+          setShowConfetti(true) // Activar animación de confeti
           setActiveRoutine(null)
           setPreloadedExercise(null)
           setRoutineProgress(100)
@@ -860,6 +863,12 @@ function AuthenticatedAppContent() {
           onClose={() => setAdminPanelOpen(false)}
         />
       )}
+
+      {/* Animación de confeti cuando se completa una rutina */}
+      <ConfettiAnimation 
+        trigger={showConfetti}
+        onComplete={() => setShowConfetti(false)}
+      />
     </Box>
   )
 }

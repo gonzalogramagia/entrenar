@@ -24,6 +24,7 @@
     "@vercel/node": "^5.3.17",
     "date-fns": "^4.1.0",
     "react": "^19.1.1",
+    "react-confetti": "^6.4.0",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",
     "zod": "^4.0.16"
