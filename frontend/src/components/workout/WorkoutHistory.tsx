@@ -367,10 +367,31 @@ export default function WorkoutHistory() {
     );
   }
 
+  // Verificar si hay entrenamientos expandidos
+  const hasExpandedWorkouts = expandedDays.size > 0
+  
+  // Determinar si debe tener scroll: más de 3 entrenamientos O hay algunos expandidos
+  const shouldHaveScroll = filteredWorkoutDays.length > 3 || hasExpandedWorkouts
+
   return (
-    <Box sx={{ p: 1 }}>
+    <Box sx={{ 
+      p: 1, 
+      height: shouldHaveScroll ? '100%' : 'auto',
+      overflow: shouldHaveScroll ? 'hidden' : 'visible'
+    }}>
       
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ 
+        height: shouldHaveScroll ? '100%' : 'auto',
+        overflow: shouldHaveScroll ? 'auto' : 'visible',
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        },
+        '&::-moz-scrollbar': {
+          display: 'none'
+        },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}>
         {/* Buscador y ordenamiento */}
         <Box sx={{ 
           p: 3, 

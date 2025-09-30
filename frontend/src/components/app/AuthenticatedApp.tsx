@@ -561,7 +561,8 @@ function AuthenticatedAppContent() {
           <Box sx={{ 
             position: 'relative', 
             zIndex: 1, 
-            minHeight: 'calc(100vh - 200px)',
+            height: '100%',
+            overflow: 'hidden',
             px: { xs: 2, sm: 1 }
           }}>
             <WorkoutForm 

@@ -243,7 +243,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   }
 
   return (
-    <Box sx={{ p: 1 }}>
+    <Box sx={{ 
+      p: 1, 
+      height: (!routines || routines.length === 0) ? 'auto' : '100%',
+      overflow: (!routines || routines.length === 0) ? 'visible' : 'hidden'
+    }}>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -315,7 +319,18 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           </CardContent>
         </Card>
       ) : (
-        <Box>
+        <Box sx={{ 
+          height: '100%',
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          '&::-moz-scrollbar': {
+            display: 'none'
+          },
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}>
           {/* Campo de búsqueda */}
           <TextField
             fullWidth
