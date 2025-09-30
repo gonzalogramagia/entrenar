@@ -327,6 +327,50 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             maxWidth: '100%',
             overflow: 'hidden'
           }}>
+            {/* Card para agregar nueva rutina */}
+            {sortedRoutines && sortedRoutines.length > 0 && (
+              <Card 
+                elevation={2}
+                onClick={() => setOpenCreateDialog(true)}
+                sx={{ 
+                  height: 'fit-content',
+                  width: '100%',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent',
+                  '&:hover': {
+                    backgroundColor: '#f0f8ff',
+                    borderColor: 'primary.dark'
+                  }
+                }}
+              >
+                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                  <Typography 
+                    variant="h6" 
+                    component="h2" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: 'primary.main',
+                      mb: 1
+                    }}
+                  >
+                    ➕ Agregar Nueva Rutina
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontStyle: 'italic' }}
+                  >
+                    Crear una nueva rutina personalizada
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
+
             {sortedRoutines?.map((routine) => (
             <Card 
               key={routine.id} 

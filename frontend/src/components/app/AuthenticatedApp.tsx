@@ -17,6 +17,7 @@ import type { Workout, WorkoutDay } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 import { apiClient } from '../../lib/api'
 import FloatingNavButton from '../navigation/FloatingNavButton'
+import FloatingNavButtons from '../navigation/FloatingNavButtons'
 import ConfettiAnimation from '../animations/ConfettiAnimation'
 
 type Exercise = {
@@ -41,10 +42,6 @@ function AuthenticatedAppContent() {
   const [adminPanelOpen, setAdminPanelOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
-  
-  // Estados para el swipe entre tabs
-  const [touchStart, setTouchStart] = useState<number | null>(null)
-  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   // Función para cargar el contador de notificaciones no leídas
   const loadUnreadNotificationsCount = useCallback(async () => {
@@ -465,59 +462,6 @@ function AuthenticatedAppContent() {
     setActiveTab(TABS.ROUTINES)
   }
 
-  // Funciones para manejar el swipe entre tabs
-  const minSwipeDistance = 30 // Reducido para mejor detección
-  
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
-  }
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
-    
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
-
-    console.log('Swipe detected:', { touchStart, touchEnd, distance, isLeftSwipe, isRightSwipe, activeTab })
-
-    if (isLeftSwipe || isRightSwipe) {
-      // Mapeo específico para cada tab según los requerimientos
-      // Nota: isLeftSwipe = swipe hacia la izquierda, isRightSwipe = swipe hacia la derecha
-      const swipeMap: { [key in TabType]: { left: TabType | null, right: TabType | null } } = {
-        [TABS.WORKOUT]: { left: TABS.SOCIAL, right: TABS.ROUTINES },
-        [TABS.ROUTINES]: { left: TABS.WORKOUT, right: TABS.HISTORY },
-        [TABS.SOCIAL]: { left: TABS.HISTORY, right: TABS.WORKOUT },
-        [TABS.HISTORY]: { left: TABS.ROUTINES, right: TABS.SOCIAL },
-        [TABS.EXERCISES]: { left: null, right: null },
-        [TABS.EQUIPMENT]: { left: null, right: null },
-        [TABS.NOTIFICATIONS]: { left: null, right: null },
-        [TABS.ADMIN]: { left: null, right: null }
-      }
-      
-      const currentMapping = swipeMap[activeTab]
-      console.log('Current mapping:', currentMapping)
-      
-      if (!currentMapping) return
-      
-      if (isLeftSwipe && currentMapping.left) {
-        console.log('Going left to:', currentMapping.left)
-        setActiveTab(currentMapping.left)
-      } else if (isRightSwipe && currentMapping.right) {
-        console.log('Going right to:', currentMapping.right)
-        setActiveTab(currentMapping.right)
-      }
-    }
-    
-    // Reset para el próximo swipe
-    setTouchStart(null)
-    setTouchEnd(null)
-  }
 
   // Función para manejar el envío del formulario de workout
   const handleWorkoutSubmit = async (data: any): Promise<void> => {
@@ -611,24 +555,20 @@ function AuthenticatedAppContent() {
           unreadNotifications={unreadNotifications}
         />
       
-      <Box 
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        sx={{ 
-          flexGrow: 1, 
-          p: 2,
-          pb: 0,
-          overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            display: 'none'
-          },
-          '&::-moz-scrollbar': {
-            display: 'none'
-          },
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
-        }}>
+      <Box sx={{ 
+        flexGrow: 1, 
+        p: 2,
+        pb: 0,
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        },
+        '&::-moz-scrollbar': {
+          display: 'none'
+        },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
           <Box sx={{ 
@@ -932,6 +872,9 @@ function AuthenticatedAppContent() {
           onClose={() => setAdminPanelOpen(false)}
         />
       )}
+
+      {/* Botones flotantes de navegación */}
+      <FloatingNavButtons />
 
       {/* Animación de confeti cuando se completa una rutina */}
       <ConfettiAnimation 
