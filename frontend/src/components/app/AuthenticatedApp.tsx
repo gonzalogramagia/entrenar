@@ -466,7 +466,7 @@ function AuthenticatedAppContent() {
   }
 
   // Funciones para manejar el swipe entre tabs
-  const minSwipeDistance = 50
+  const minSwipeDistance = 30 // Reducido para mejor detección
   
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null)
@@ -484,6 +484,8 @@ function AuthenticatedAppContent() {
     const isLeftSwipe = distance > minSwipeDistance
     const isRightSwipe = distance < -minSwipeDistance
 
+    console.log('Swipe detected:', { touchStart, touchEnd, distance, isLeftSwipe, isRightSwipe, activeTab })
+
     if (isLeftSwipe || isRightSwipe) {
       // Mapeo específico para cada tab según los requerimientos
       // Nota: isLeftSwipe = swipe hacia la izquierda, isRightSwipe = swipe hacia la derecha
@@ -499,14 +501,22 @@ function AuthenticatedAppContent() {
       }
       
       const currentMapping = swipeMap[activeTab]
+      console.log('Current mapping:', currentMapping)
+      
       if (!currentMapping) return
       
       if (isLeftSwipe && currentMapping.left) {
+        console.log('Going left to:', currentMapping.left)
         setActiveTab(currentMapping.left)
       } else if (isRightSwipe && currentMapping.right) {
+        console.log('Going right to:', currentMapping.right)
         setActiveTab(currentMapping.right)
       }
     }
+    
+    // Reset para el próximo swipe
+    setTouchStart(null)
+    setTouchEnd(null)
   }
 
   // Función para manejar el envío del formulario de workout
