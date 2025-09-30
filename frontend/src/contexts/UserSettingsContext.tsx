@@ -32,7 +32,7 @@ interface UserSettingsContextType {
   setOnSocialSettingsChange: (callback: () => void) => void
   // Funciones para ejercicios completados
   completedExercises: CompletedExercises
-  toggleExerciseCompleted: (date: string, routineId: number, exerciseId: number, setNumber: number) => void
+  toggleExerciseCompleted: (date: string, routineId: number, exerciseId: number, setNumber: number, routine?: any) => void
   getCompletedExercisesForRoutine: (date: string, routineId: number) => { [exerciseId: number]: number[] }
   getRoutineProgress: (date: string, routineId: number, routine: any) => number
   resetCompletedExercisesForDate: (date: string) => void
