@@ -41,6 +41,10 @@ function AuthenticatedAppContent() {
   const [adminPanelOpen, setAdminPanelOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
+  
+  // Estados para el swipe entre tabs
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   // Función para cargar el contador de notificaciones no leídas
   const loadUnreadNotificationsCount = useCallback(async () => {
@@ -461,6 +465,39 @@ function AuthenticatedAppContent() {
     setActiveTab(TABS.ROUTINES)
   }
 
+  // Funciones para manejar el swipe entre tabs
+  const minSwipeDistance = 50
+  
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe || isRightSwipe) {
+      const tabs: TabType[] = [TABS.WORKOUT, TABS.EXERCISES, TABS.EQUIPMENT, TABS.HISTORY, TABS.SOCIAL, TABS.ROUTINES]
+      const currentIndex = tabs.indexOf(activeTab)
+      
+      if (isLeftSwipe && currentIndex < tabs.length - 1) {
+        // Swipe izquierda: ir a la siguiente tab
+        setActiveTab(tabs[currentIndex + 1])
+      } else if (isRightSwipe && currentIndex > 0) {
+        // Swipe derecha: ir a la tab anterior
+        setActiveTab(tabs[currentIndex - 1])
+      }
+    }
+  }
+
   // Función para manejar el envío del formulario de workout
   const handleWorkoutSubmit = async (data: any): Promise<void> => {
     setIsSubmittingWorkout(true)
@@ -553,20 +590,24 @@ function AuthenticatedAppContent() {
           unreadNotifications={unreadNotifications}
         />
       
-      <Box sx={{ 
-        flexGrow: 1, 
-        p: 2,
-        pb: 0,
-        overflow: 'auto',
-        '&::-webkit-scrollbar': {
-          display: 'none'
-        },
-        '&::-moz-scrollbar': {
-          display: 'none'
-        },
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-      }}>
+      <Box 
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        sx={{ 
+          flexGrow: 1, 
+          p: 2,
+          pb: 0,
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          '&::-moz-scrollbar': {
+            display: 'none'
+          },
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
           <Box sx={{ 
