@@ -14,8 +14,7 @@ import {
   Alert,
   CircularProgress,
   Fab,
-  TextField,
-  Chip
+  TextField
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -365,13 +364,14 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   position: 'absolute',
                   top: 20,
                   right: 16,
-                  backgroundColor: isRoutineComplete(routine) ? 'success.main' : '#FFB732',
-                  color: 'white',
+                  backgroundColor: 'transparent',
+                  border: '2px solid',
+                  borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                  color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                   borderRadius: '12px',
                   px: 1.5,
                   py: 0.5,
                   zIndex: 1,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                   mr: 1
                 }}>
                   <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
@@ -446,20 +446,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
                   </Typography>
 
-                  {/* Pill de cantidad de ejercicios */}
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                    <Chip
-                      label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
-                      sx={{
-                        backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                        color: 'white',
-                        fontWeight: 600,
-                        fontSize: '0.875rem'
-                      }}
-                      variant="filled"
-                      size="medium"
-                    />
-                  </Box>
 
                 </Box>
 
@@ -493,7 +479,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 pt: 1
               }}>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation()
@@ -503,19 +489,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     fontWeight: 600,
                     borderRadius: '8px',
                     textTransform: 'none',
-                    color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                    borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                    backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                    color: 'white',
                     '&:hover': {
-                      backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                      color: 'white'
+                      backgroundColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark')
                     },
                     '&:focus': {
-                      outline: 'none',
-                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main')
-                    },
-                    '&.Mui-focused': {
-                      outline: 'none',
-                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main')
+                      outline: 'none'
                     }
                   }}
                 >

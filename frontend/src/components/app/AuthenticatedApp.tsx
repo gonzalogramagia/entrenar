@@ -485,15 +485,21 @@ function AuthenticatedAppContent() {
     const isRightSwipe = distance < -minSwipeDistance
 
     if (isLeftSwipe || isRightSwipe) {
-      const tabs: TabType[] = [TABS.WORKOUT, TABS.EXERCISES, TABS.EQUIPMENT, TABS.HISTORY, TABS.SOCIAL, TABS.ROUTINES]
-      const currentIndex = tabs.indexOf(activeTab)
+      // Orden específico para swipe: Registro -> Social -> Mis Rutinas -> Mis Entrenamientos
+      const swipeTabs: TabType[] = [TABS.WORKOUT, TABS.SOCIAL, TABS.ROUTINES, TABS.HISTORY]
+      const currentIndex = swipeTabs.indexOf(activeTab)
       
-      if (isLeftSwipe && currentIndex < tabs.length - 1) {
-        // Swipe izquierda: ir a la siguiente tab
-        setActiveTab(tabs[currentIndex + 1])
-      } else if (isRightSwipe && currentIndex > 0) {
-        // Swipe derecha: ir a la tab anterior
-        setActiveTab(tabs[currentIndex - 1])
+      // Solo permitir swipe si la tab actual está en la lista de swipe
+      if (currentIndex === -1) return
+      
+      if (isLeftSwipe) {
+        // Swipe izquierda: ir a la siguiente tab (circular)
+        const nextIndex = (currentIndex + 1) % swipeTabs.length
+        setActiveTab(swipeTabs[nextIndex])
+      } else if (isRightSwipe) {
+        // Swipe derecha: ir a la tab anterior (circular)
+        const prevIndex = (currentIndex - 1 + swipeTabs.length) % swipeTabs.length
+        setActiveTab(swipeTabs[prevIndex])
       }
     }
   }
