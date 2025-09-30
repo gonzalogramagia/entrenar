@@ -18,11 +18,11 @@ const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ trigger, onComple
     if (trigger && !showConfetti) {
       setShowConfetti(true)
       
-      // Ocultar confeti después de 4 segundos
+      // Ocultar confeti después de 2.5 segundos (más rápido)
       const timer = setTimeout(() => {
         setShowConfetti(false)
         onComplete?.()
-      }, 4000)
+      }, 2500)
 
       return () => clearTimeout(timer)
     }
@@ -58,10 +58,11 @@ const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ trigger, onComple
         width={windowDimensions.width}
         height={windowDimensions.height}
         recycle={false}
-        numberOfPieces={200}
-        gravity={0.3}
-        initialVelocityY={20}
-        colors={['#FFB732', '#FF6B35', '#F7931E', '#FFD23F', '#06FFA5', '#3A86FF', '#8338EC']}
+        numberOfPieces={400}
+        gravity={0.5}
+        initialVelocityX={30}
+        initialVelocityY={30}
+        colors={['#FFB732', '#FF6B35', '#F7931E', '#FFD23F', '#06FFA5', '#3A86FF', '#8338EC', '#FF1744', '#00E676', '#FF9800']}
         style={{
           position: 'absolute',
           top: 0,

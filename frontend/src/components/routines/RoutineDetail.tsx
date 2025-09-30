@@ -291,13 +291,15 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 elevation={2}
                 sx={{ 
                   border: '2px solid',
-                  borderColor: isCompleted ? 'success.main' : 'grey.300',
+                  borderColor: isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : 'grey.300',
+                  backgroundColor: isCompleted && isActiveRoutine ? '#fff3e0' : 'transparent',
                   borderRadius: '12px',
                   overflow: 'hidden',
                   transition: 'all 0.3s ease',
                   cursor: isActiveRoutine ? 'pointer' : 'default',
                   '&:hover': {
-                    borderColor: isCompleted ? 'success.dark' : (isActiveRoutine ? '#FFB732' : 'grey.300'),
+                    borderColor: isCompleted ? (isActiveRoutine ? '#FFA000' : 'success.dark') : (isActiveRoutine ? '#FFB732' : 'grey.300'),
+                    backgroundColor: isCompleted && isActiveRoutine ? '#fff3e0' : (isActiveRoutine ? '#fff8e1' : 'transparent'),
                     boxShadow: isActiveRoutine ? '0 8px 25px rgba(0,0,0,0.15)' : 'none',
                     transform: isActiveRoutine ? 'translateY(-2px)' : 'none'
                   }
@@ -374,11 +376,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                         size="small"
                         sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted && isActiveRoutine ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
                           color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                           fontWeight: 600,
                           '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
                           }
                         }}
                         variant="filled"
@@ -387,11 +389,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                         size="small"
                         sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted && isActiveRoutine ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
                           color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                           fontWeight: 600,
                           '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
                           }
                         }}
                         variant="filled"
@@ -405,7 +407,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                             color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                             fontWeight: 600,
                             '&:hover': {
-                              backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                              backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
                             }
                           }}
                           variant="filled"
