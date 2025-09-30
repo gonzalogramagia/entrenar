@@ -729,10 +729,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 onClose()
               }}
               sx={{
-                borderColor: 'primary.main',
-                color: 'primary.main',
+                borderColor: 'success.main',
+                color: 'success.main',
                 '&:hover': {
-                  backgroundColor: 'primary.main',
+                  backgroundColor: 'success.main',
                   color: 'white'
                 }
               }}

@@ -584,9 +584,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     }}
                     sx={{ 
                       color: 'white',
-                      backgroundColor: 'primary.main',
+                      backgroundColor: 'success.main',
                       '&:hover': {
-                        backgroundColor: 'primary.light',
+                        backgroundColor: 'success.dark',
                         color: 'white'
                       },
                       '&:focus': {
