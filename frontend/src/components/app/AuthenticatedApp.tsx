@@ -486,11 +486,12 @@ function AuthenticatedAppContent() {
 
     if (isLeftSwipe || isRightSwipe) {
       // Mapeo específico para cada tab según los requerimientos
+      // Nota: isLeftSwipe = swipe hacia la izquierda, isRightSwipe = swipe hacia la derecha
       const swipeMap: { [key in TabType]: { left: TabType | null, right: TabType | null } } = {
-        [TABS.WORKOUT]: { left: TABS.SOCIAL, right: TABS.ROUTINES },
-        [TABS.ROUTINES]: { left: TABS.WORKOUT, right: TABS.HISTORY },
-        [TABS.SOCIAL]: { left: TABS.HISTORY, right: TABS.WORKOUT },
-        [TABS.HISTORY]: { left: TABS.ROUTINES, right: TABS.SOCIAL },
+        [TABS.WORKOUT]: { left: TABS.ROUTINES, right: TABS.SOCIAL },
+        [TABS.ROUTINES]: { left: TABS.HISTORY, right: TABS.WORKOUT },
+        [TABS.SOCIAL]: { left: TABS.WORKOUT, right: TABS.HISTORY },
+        [TABS.HISTORY]: { left: TABS.SOCIAL, right: TABS.ROUTINES },
         [TABS.EXERCISES]: { left: null, right: null },
         [TABS.EQUIPMENT]: { left: null, right: null },
         [TABS.NOTIFICATIONS]: { left: null, right: null },
