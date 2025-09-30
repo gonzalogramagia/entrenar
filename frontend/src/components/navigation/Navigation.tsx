@@ -372,7 +372,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                     onClick={() => handleTabChange(item.value)}
                     sx={{
                       color: 'white',
-                      pl: '33px',
+                      pl: { xs: '15px', sm: '33px' },
                       transform: visibleItems.includes(index) ? 'translateY(0)' : 'translateY(-15px)',
                       transition: 'all 0.2s ease',
                       '&:hover': {

@@ -485,21 +485,25 @@ function AuthenticatedAppContent() {
     const isRightSwipe = distance < -minSwipeDistance
 
     if (isLeftSwipe || isRightSwipe) {
-      // Orden específico para swipe: Registro -> Social -> Mis Rutinas -> Mis Entrenamientos
-      const swipeTabs: TabType[] = [TABS.WORKOUT, TABS.SOCIAL, TABS.ROUTINES, TABS.HISTORY]
-      const currentIndex = swipeTabs.indexOf(activeTab)
+      // Mapeo específico para cada tab según los requerimientos
+      const swipeMap: { [key in TabType]: { left: TabType | null, right: TabType | null } } = {
+        [TABS.WORKOUT]: { left: TABS.SOCIAL, right: TABS.ROUTINES },
+        [TABS.ROUTINES]: { left: TABS.WORKOUT, right: TABS.HISTORY },
+        [TABS.SOCIAL]: { left: TABS.HISTORY, right: TABS.WORKOUT },
+        [TABS.HISTORY]: { left: TABS.ROUTINES, right: TABS.SOCIAL },
+        [TABS.EXERCISES]: { left: null, right: null },
+        [TABS.EQUIPMENT]: { left: null, right: null },
+        [TABS.NOTIFICATIONS]: { left: null, right: null },
+        [TABS.ADMIN]: { left: null, right: null }
+      }
       
-      // Solo permitir swipe si la tab actual está en la lista de swipe
-      if (currentIndex === -1) return
+      const currentMapping = swipeMap[activeTab]
+      if (!currentMapping) return
       
-      if (isLeftSwipe) {
-        // Swipe izquierda: ir a la siguiente tab (circular)
-        const nextIndex = (currentIndex + 1) % swipeTabs.length
-        setActiveTab(swipeTabs[nextIndex])
-      } else if (isRightSwipe) {
-        // Swipe derecha: ir a la tab anterior (circular)
-        const prevIndex = (currentIndex - 1 + swipeTabs.length) % swipeTabs.length
-        setActiveTab(swipeTabs[prevIndex])
+      if (isLeftSwipe && currentMapping.left) {
+        setActiveTab(currentMapping.left)
+      } else if (isRightSwipe && currentMapping.right) {
+        setActiveTab(currentMapping.right)
       }
     }
   }
