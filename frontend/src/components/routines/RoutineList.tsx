@@ -14,8 +14,7 @@ import {
   Alert,
   CircularProgress,
   Fab,
-  TextField,
-  InputAdornment
+  TextField
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -23,7 +22,6 @@ import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   FitnessCenter as FitnessCenterIcon,
-  Search as SearchIcon,
   Close as CloseIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
@@ -54,7 +52,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   const [selectedRoutine, setSelectedRoutine] = useState<RoutineWithExercises | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingRoutineId, setDeletingRoutineId] = useState<number | null>(null)
-  const [filterText, setFilterText] = useState('')
   const [editNameModal, setEditNameModal] = useState<{
     show: boolean
     routineId: number | null
@@ -135,22 +132,17 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     }
   }
 
-  // Filtrar rutinas por nombre o descripción
-  const filteredRoutines = routines
-    .filter(routine =>
-      routine.name.toLowerCase().includes(filterText.toLowerCase()) ||
-      (routine.description && routine.description.toLowerCase().includes(filterText.toLowerCase()))
-    )
-    .sort((a, b) => {
-      // La rutina activa siempre va primero
-      if (activeRoutine?.id === a.id) return -1
-      if (activeRoutine?.id === b.id) return 1
-      
-      // Luego ordenar por fecha de creación (más recientes primero)
-      const dateA = new Date(a.created_at).getTime()
-      const dateB = new Date(b.created_at).getTime()
-      return dateB - dateA
-    })
+  // Ordenar rutinas (sin filtrado)
+  const sortedRoutines = routines.sort((a, b) => {
+    // La rutina activa siempre va primero
+    if (activeRoutine?.id === a.id) return -1
+    if (activeRoutine?.id === b.id) return 1
+    
+    // Luego ordenar por fecha de creación (más recientes primero)
+    const dateA = new Date(a.created_at).getTime()
+    const dateB = new Date(b.created_at).getTime()
+    return dateB - dateA
+  })
 
   const handleDeleteRoutine = async (id: number) => {
     try {
@@ -333,21 +325,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}>
-          {/* Campo de búsqueda */}
-          <TextField
-            fullWidth
-            placeholder="Buscar rutinas por nombre..."
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            sx={{ mb: 3 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
           
           <Box sx={{ 
             display: 'grid', 
@@ -361,7 +338,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             maxWidth: '100%',
             overflow: 'hidden'
           }}>
-            {filteredRoutines?.map((routine) => (
+            {sortedRoutines?.map((routine) => (
             <Card 
               key={routine.id} 
               elevation={2}
@@ -460,7 +437,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
                 </IconButton>
               )}
-              <CardContent sx={{ p: 3, pb: 2, pr: 6 }}>
+              <CardContent sx={{ p: 3, pb: 1, pr: 6 }}>
                 <Box sx={{ 
                   display: 'flex', 
                   alignItems: 'center', 
@@ -531,8 +508,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               <CardActions sx={{ 
                 justifyContent: 'flex-start', 
                 px: 3, 
-                pb: 2,
-                pt: 0
+                pb: 3,
+                pt: 1
               }}>
                 <Button
                   variant="outlined"
