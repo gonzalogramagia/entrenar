@@ -14,7 +14,8 @@ import {
   Alert,
   CircularProgress,
   Fab,
-  TextField
+  TextField,
+  Chip
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -342,15 +343,17 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             <Card 
               key={routine.id} 
               elevation={2}
+              onClick={() => handleViewRoutine(routine)}
               sx={{ 
                 height: 'fit-content',
                 width: '100%',
                 border: '2px solid',
-                borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'grey.300'),
+                borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'grey.300'),
                 borderRadius: '16px',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease',
                 position: 'relative',
+                cursor: 'pointer',
                 '&:hover': {
                   backgroundColor: isRoutineComplete(routine) 
                     ? '#f0f8f0'  // Verde muy claro para completadas
@@ -367,7 +370,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   position: 'absolute',
                   top: 20,
                   right: 16,
-                  backgroundColor: isRoutineComplete(routine) ? 'success.main' : 'warning.main',
+                  backgroundColor: isRoutineComplete(routine) ? 'success.main' : '#FFB732',
                   color: 'white',
                   borderRadius: '12px',
                   px: 1.5,
@@ -388,7 +391,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               {!isRoutineComplete(routine) && (
                 <IconButton
                   size="small"
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.stopPropagation()
                     if (activeRoutine?.id === routine.id) {
                       // Detener la rutina activa
                       const event = new CustomEvent('stopRoutine', { 
@@ -422,9 +426,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     bottom: 16,
                     right: 16,
                     color: 'white',
-                    backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                    backgroundColor: activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main',
                     '&:hover': {
-                      backgroundColor: activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light',
+                      backgroundColor: activeRoutine?.id === routine.id ? '#FFA000' : 'primary.light',
                       color: 'white'
                     },
                     '&:focus': {
@@ -438,8 +442,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 </IconButton>
               )}
               <CardContent sx={{ p: 3, pb: 1, pr: 6 }}>
+                {/* Layout para desktop */}
                 <Box sx={{ 
-                  display: 'flex', 
+                  display: { xs: 'none', sm: 'flex' }, 
                   alignItems: 'center', 
                   gap: 1,
                   mb: 2,
@@ -450,7 +455,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     component="h2" 
                     sx={{ 
                       fontWeight: 700,
-                      color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
+                      color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                       textShadow: '0 1px 2px rgba(0,0,0,0.1)',
                       cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
                       overflow: 'hidden',
@@ -461,14 +466,20 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                         textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
                       }
                     }}
-                    onClick={() => activeRoutine?.id !== routine.id && handleEditNameClick(routine)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                    }}
                   >
                     🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
                   </Typography>
                   {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
                     <IconButton
                       size="small"
-                      onClick={() => handleEditRoutineClick(routine)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleEditRoutineClick(routine)
+                      }}
                       sx={{ 
                         color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
                         flexShrink: 0,
@@ -480,6 +491,72 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
+                  )}
+                </Box>
+
+                {/* Layout para mobile */}
+                <Box sx={{ 
+                  display: { xs: 'flex', sm: 'none' }, 
+                  flexDirection: 'column',
+                  gap: 2,
+                  mb: 2
+                }}>
+                  {/* Nombre de la rutina */}
+                  <Typography 
+                    variant="h5" 
+                    component="h2" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                      textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                      cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
+                      textAlign: 'left',
+                      '&:hover': {
+                        textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                    }}
+                  >
+                    🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
+                  </Typography>
+
+                  {/* Pill de cantidad de ejercicios */}
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <Chip
+                      label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
+                      color={isRoutineComplete(routine) ? "success" : (activeRoutine?.id === routine.id ? "warning" : "primary")}
+                      variant="filled"
+                      size="medium"
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.875rem'
+                      }}
+                    />
+                  </Box>
+
+                  {/* Botón de editar en mobile */}
+                  {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditRoutineClick(routine)
+                        }}
+                        sx={{ 
+                          color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
+                          '&:hover': {
+                            backgroundColor: isRoutineComplete(routine) ? 'success.light' : 'primary.light',
+                            color: 'white'
+                          }
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
                   )}
                 </Box>
 
@@ -514,24 +591,27 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={() => handleViewRoutine(routine)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleViewRoutine(routine)
+                  }}
                   sx={{ 
                     fontWeight: 600,
                     borderRadius: '8px',
                     textTransform: 'none',
-                    color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
-                    borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
+                    color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                    borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                     '&:hover': {
-                      backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
+                      backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                       color: 'white'
                     },
                     '&:focus': {
                       outline: 'none',
-                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main')
+                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main')
                     },
                     '&.Mui-focused': {
                       outline: 'none',
-                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main')
+                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main')
                     }
                   }}
                 >
@@ -585,6 +665,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
         onClose={() => setOpenDetailDialog(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            width: { xs: '95%', sm: '100%' },
+            maxWidth: { xs: '95%', sm: '900px' },
+            margin: { xs: '16px', sm: 'auto' }
+          }
+        }}
       >
         <DialogTitle sx={{ 
           display: 'flex', 

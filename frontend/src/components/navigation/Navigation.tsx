@@ -300,7 +300,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                 aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}
+                sx={{ ml: 2 }}
               >
                 {drawerOpen ? <CloseIcon /> : <MenuIcon />}
               </IconButton>

@@ -46,7 +46,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   onExerciseClick,
   onNavigateToWorkout
 }) => {
-  const { toggleExerciseCompleted, getCompletedExercisesForRoutine, getRoutineProgress } = useUserSettings()
+  const { toggleExerciseCompleted, getCompletedExercisesForRoutine, getRoutineProgress, resetCompletedExercisesForDate } = useUserSettings()
   
   // Obtener fecha actual y ejercicios completados
   const today = new Date().toISOString().split('T')[0]
@@ -104,7 +104,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         sx={{ 
           mb: 3,
           border: '2px solid',
-          borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
+          borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
           borderRadius: '16px',
           background: isRoutineComplete 
             ? 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
@@ -132,7 +132,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 component="h2" 
                 sx={{ 
                   fontWeight: 800,
-                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
+                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
                   textShadow: '0 1px 2px rgba(0,0,0,0.1)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -227,11 +227,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       }
                     }}
                     sx={{ 
-                      backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
+                      backgroundColor: isActiveRoutine ? '#FFB732' : 'primary.main',
                       color: 'white',
                       cursor: 'pointer',
                       '&:hover': {
-                        backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
+                        backgroundColor: isActiveRoutine ? '#FF8F00' : 'primary.dark'
                       }
                     }}
                   >
@@ -253,7 +253,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
               Progreso de la rutina
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary') }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary') }}>
               {realRoutineProgress}%
             </Typography>
           </Box>
@@ -266,7 +266,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               backgroundColor: 'grey.200',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 4,
-                backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main')
+                backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main')
               }
             }}
           />
@@ -292,7 +292,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   transition: 'all 0.3s ease',
                   cursor: isActiveRoutine ? 'pointer' : 'default',
                   '&:hover': {
-                    borderColor: isCompleted ? 'success.dark' : (isActiveRoutine ? 'warning.main' : 'grey.300'),
+                    borderColor: isCompleted ? 'success.dark' : (isActiveRoutine ? '#FFB732' : 'grey.300'),
                     boxShadow: isActiveRoutine ? '0 8px 25px rgba(0,0,0,0.15)' : 'none',
                     transform: isActiveRoutine ? 'translateY(-2px)' : 'none'
                   }
@@ -324,12 +324,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                           }
                         }}
                         sx={{
-                          color: isRoutineComplete ? 'success.main' : 'warning.main',
+                          color: isRoutineComplete ? 'success.main' : '#FFB732',
                           '&.Mui-checked': {
-                            color: isRoutineComplete ? 'success.main' : 'warning.main',
+                            color: isRoutineComplete ? 'success.main' : '#FFB732',
                           },
                           '&.Mui-disabled': {
-                            color: isSetCompleted ? (isRoutineComplete ? 'success.main' : 'warning.main') : 'grey.400',
+                            color: isSetCompleted ? (isRoutineComplete ? 'success.main' : '#FFB732') : 'grey.400',
                           },
                           p: 0.5
                         }}
@@ -483,7 +483,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
             : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'),
         border: '2px solid',
-        borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'grey.400'),
+        borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'grey.400'),
         borderRadius: '16px',
         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
         overflow: 'hidden'
@@ -494,7 +494,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             sx={{ 
               mb: 3, 
               fontWeight: 800,
-              color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary'),
+              color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary'),
               textAlign: 'center',
               textShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}
@@ -521,7 +521,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
                 {getCompletedExercises()}
               </Typography>
               <Box sx={{ textAlign: 'center' }}>
@@ -546,7 +546,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
                 {getCompletedSets()}
               </Typography>
               <Box sx={{ textAlign: 'center' }}>
@@ -571,7 +571,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
                 {getCompletedReps()}
               </Typography>
               <Box sx={{ textAlign: 'center' }}>
@@ -588,21 +588,56 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       </Card>
 
       <Box display="flex" justifyContent={isRoutineComplete ? "center" : "space-between"} sx={{ mt: 3 }}>
-        <Button 
-          variant={isRoutineComplete ? "contained" : "outlined"} 
-          onClick={onClose}
-          sx={{
-            backgroundColor: isRoutineComplete ? 'success.main' : 'transparent',
-            color: isRoutineComplete ? 'white' : 'primary.main',
-            borderColor: isRoutineComplete ? 'success.main' : 'primary.main',
-            '&:hover': {
-              backgroundColor: isRoutineComplete ? 'success.dark' : 'primary.light',
-              color: isRoutineComplete ? 'white' : 'white'
-            }
-          }}
-        >
-          {isRoutineComplete ? 'Aceptar' : 'Cerrar'}
-        </Button>
+        {isRoutineComplete ? (
+          <>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                // Resetear el progreso de la rutina para hoy
+                const today = new Date().toISOString().split('T')[0]
+                resetCompletedExercisesForDate(today)
+                onClose()
+              }}
+              sx={{
+                borderColor: 'warning.main',
+                color: 'warning.main',
+                '&:hover': {
+                  backgroundColor: 'warning.main',
+                  color: 'white'
+                }
+              }}
+            >
+              Resetear
+            </Button>
+            <Button
+              variant="contained"
+              onClick={onClose}
+              sx={{
+                backgroundColor: 'success.main',
+                '&:hover': {
+                  backgroundColor: 'success.dark'
+                }
+              }}
+            >
+              Aceptar
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="outlined"
+            onClick={onClose}
+            sx={{
+              borderColor: 'primary.main',
+              color: 'primary.main',
+              '&:hover': {
+                backgroundColor: 'primary.main',
+                color: 'white'
+              }
+            }}
+          >
+            Cerrar
+          </Button>
+        )}
         {!isRoutineComplete && onStart && (
           <Button
             variant="contained"
@@ -614,9 +649,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             }}
             startIcon={isActiveRoutine ? <StopIcon /> : <PlayIcon />}
             sx={{
-              backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
+              backgroundColor: isActiveRoutine ? '#FFB732' : 'primary.main',
               '&:hover': {
-                backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
+                backgroundColor: isActiveRoutine ? '#FF8F00' : 'primary.dark'
               }
             }}
           >
