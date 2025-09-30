@@ -530,14 +530,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       sx={{
                         backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                         color: 'white',
-                        fontWeight: 600
-                      }}
-                      variant="filled"
-                      size="medium"
-                      sx={{
                         fontWeight: 600,
                         fontSize: '0.875rem'
                       }}
+                      variant="filled"
+                      size="medium"
                     />
                   </Box>
 

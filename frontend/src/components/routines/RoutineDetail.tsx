@@ -196,11 +196,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   sx={{
                     backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
                     color: 'white',
-                    fontWeight: 600
+                    fontWeight: 700,
+                    mt: 0.5
                   }}
                   variant="filled"
                   size="medium"
-                  sx={{ fontWeight: 700, mt: 0.5 }}
                 />
                 
                 {onEdit && (isRoutineComplete || !isActiveRoutine) && (
@@ -222,9 +222,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               {onStart && !isRoutineComplete && (
                 <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
                   <IconButton
-                    sx={{
-                      color: isActiveRoutine ? '#FFB732' : 'primary.main'
-                    }}
                     onClick={(e) => {
                       e.stopPropagation()
                       onStart()
@@ -377,53 +374,41 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                         size="small"
                         sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : 'grey.400')),
-                          color: 'white'
-                        }}
-                        variant="filled"
-                        sx={{ 
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                           fontWeight: 600,
-                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
                           '&:hover': {
                             backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
                           }
                         }}
+                        variant="filled"
                       />
                       <Chip
                         label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                         size="small"
                         sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : 'grey.400')),
-                          color: 'white'
-                        }}
-                        variant="filled"
-                        sx={{ 
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? '#FFB732' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
                           fontWeight: 600,
-                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
                           '&:hover': {
                             backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
                           }
                         }}
+                        variant="filled"
                       />
                       {exercise.weight && exercise.weight > 0 && (
                         <Chip
                           label={`${exercise.weight} kg`}
                           size="small"
                           sx={{
-                            backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted || isActiveRoutine ? '#FFB732' : 'grey.400'),
-                            color: 'white'
+                            backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted || isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400')),
+                            color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
+                            fontWeight: 600,
+                            '&:hover': {
+                              backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                            }
                           }}
                           variant="filled"
-                                                  sx={{ 
-                          fontWeight: 600,
-                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
-                          '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
-                          }
-                        }}
                         />
                       )}
                       <Chip
