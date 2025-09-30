@@ -371,7 +371,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   px: 1.5,
                   py: 0.5,
                   zIndex: 1,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  mr: 1
                 }}>
                   <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
                     {(() => {
