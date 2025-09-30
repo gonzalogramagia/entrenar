@@ -546,6 +546,7 @@ function AuthenticatedAppContent() {
       <Box sx={{ 
         flexGrow: 1, 
         p: 2,
+        pb: 0,
         overflow: 'auto',
         '&::-webkit-scrollbar': {
           display: 'none'
@@ -563,7 +564,8 @@ function AuthenticatedAppContent() {
             zIndex: 1, 
             height: '100%',
             overflow: 'hidden',
-            px: { xs: 2, sm: 1 }
+            px: { xs: 2, sm: 1 },
+            pb: 0
           }}>
             <WorkoutForm 
               exercises={exercises} 
@@ -686,7 +688,7 @@ function AuthenticatedAppContent() {
 
         {/* Pestaña Historial */}
         {activeTab === TABS.HISTORY && (
-          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
+          <Box sx={{ height: '100%' }}>
             <WorkoutHistory />
           </Box>
         )}
@@ -700,7 +702,7 @@ function AuthenticatedAppContent() {
 
         {/* Pestaña Mis Rutinas */}
         {activeTab === TABS.ROUTINES && (
-          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
+          <Box sx={{ height: '100%' }}>
             <RoutineList activeRoutine={activeRoutine} routineProgress={routineProgress} />
           </Box>
         )}

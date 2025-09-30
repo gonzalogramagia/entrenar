@@ -911,7 +911,7 @@ export default function WorkoutForm({
             }
           }}
         >
-          {isLoading ? 'Guardando...' : 'Guardar Entrenamiento'}
+          {isLoading ? 'Registrando...' : 'Registrar Entrenamiento'}
         </Button>
       </Stack>
       </form>
