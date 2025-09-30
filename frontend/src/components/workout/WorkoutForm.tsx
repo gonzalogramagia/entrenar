@@ -362,9 +362,6 @@ export default function WorkoutForm({
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
-        Registrar
-      </Typography>
       
       {/* Box de rutina activa o mensaje de no rutina */}
       {activeRoutine ? (

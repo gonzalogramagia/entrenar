@@ -244,9 +244,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-        Mis Rutinas
-      </Typography>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

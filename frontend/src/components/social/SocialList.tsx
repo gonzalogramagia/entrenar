@@ -383,9 +383,6 @@ export default function SocialList() {
 
   return (
           <Box sx={{ p: 1 }} data-testid="social-feed-container">
-        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-          Feed Social
-        </Typography>
       
       <Stack spacing={3}>
         {groupedWorkouts.length > 0 ? (

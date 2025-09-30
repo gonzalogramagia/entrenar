@@ -192,6 +192,9 @@ export default function WorkoutHistory() {
         const formattedDate = formatDate(day.workoutDay.date);
         const dateMatch = formattedDate.toLowerCase().includes(searchLower);
         
+        // Buscar en nombre del entrenamiento
+        const workoutNameMatch = day.workoutDay.name?.toLowerCase().includes(searchLower) || false;
+        
         // Buscar en nombre de ejercicios
         const exerciseMatch = day.exerciseGroups.some(group => 
           group.exerciseName.toLowerCase().includes(searchLower)
@@ -213,7 +216,7 @@ export default function WorkoutHistory() {
           )
         );
         
-        return dateMatch || exerciseMatch || observationMatch || workoutDataMatch;
+        return dateMatch || workoutNameMatch || exerciseMatch || observationMatch || workoutDataMatch;
       });
     }
     
@@ -366,9 +369,6 @@ export default function WorkoutHistory() {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-        Entrenamientos
-      </Typography>
       
       <Stack spacing={3}>
         {/* Buscador y ordenamiento */}
@@ -383,7 +383,7 @@ export default function WorkoutHistory() {
         }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
-            placeholder="Buscar por fecha, ejercicios, etc..."
+            placeholder="Filtrar entrenamientos por fecha, nombre, ejercicios..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{

@@ -136,9 +136,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
   if (exercises.length === 0) {
     return (
       <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
-          Hacer consulta
-        </Typography>
         {renderEmptyState(true)}
       </Box>
     )
@@ -146,9 +143,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
-        Hacer consulta
-      </Typography>
       
       <Stack spacing={3}>
         {/* Filtros */}
