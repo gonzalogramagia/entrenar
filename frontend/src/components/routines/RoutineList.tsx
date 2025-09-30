@@ -22,7 +22,8 @@ import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   FitnessCenter as FitnessCenterIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Autorenew as AutorenewIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { RoutineWithExercises, CreateRoutineRequest, UpdateRoutineRequest } from '../../types/routine'
@@ -36,7 +37,7 @@ interface RoutineListProps {
 }
 
 const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgress = 0 }) => {
-  const { getRoutineProgress } = useUserSettings()
+  const { getRoutineProgress, resetCompletedExercisesForDate } = useUserSettings()
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
   
   // Función para detectar si una rutina está completa
@@ -520,7 +521,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   Ver detalles
                 </Button>
 
-                {/* Botón play/stop - se oculta cuando está completa */}
+                {/* Botón play/stop para rutinas no completadas */}
                 {!isRoutineComplete(routine) && (
                   <IconButton
                     size="small"
@@ -568,6 +569,34 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     }}
                   >
                     {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
+                  </IconButton>
+                )}
+
+                {/* Botón resetear para rutinas completadas */}
+                {isRoutineComplete(routine) && (
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // Resetear el progreso de la rutina para hoy
+                      const today = new Date().toISOString().split('T')[0]
+                      resetCompletedExercisesForDate(today)
+                    }}
+                    sx={{ 
+                      color: 'white',
+                      backgroundColor: 'primary.main',
+                      '&:hover': {
+                        backgroundColor: 'primary.light',
+                        color: 'white'
+                      },
+                      '&:focus': {
+                        outline: 'none'
+                      },
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}
+                    title="Resetear rutina"
+                  >
+                    <AutorenewIcon />
                   </IconButton>
                 )}
               </CardActions>

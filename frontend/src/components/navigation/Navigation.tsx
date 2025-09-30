@@ -300,7 +300,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                 aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ ml: 1 }}
+                sx={{ ml: 0 }}
               >
                 {drawerOpen ? <CloseIcon /> : <MenuIcon />}
               </IconButton>
@@ -372,7 +372,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                     onClick={() => handleTabChange(item.value)}
                     sx={{
                       color: 'white',
-                      ml: 2,
+                      pl: 2,
                       transform: visibleItems.includes(index) ? 'translateY(0)' : 'translateY(-15px)',
                       transition: 'all 0.2s ease',
                       '&:hover': {
