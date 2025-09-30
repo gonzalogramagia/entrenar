@@ -22,7 +22,7 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
-import type { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseRequest } from '../../types/routine'
+import type { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseRequest, UpdateRoutineRequest } from '../../types/routine'
 
 interface Exercise {
   id: number
@@ -32,7 +32,7 @@ interface Exercise {
 
 interface RoutineFormProps {
   routine?: RoutineWithExercises
-  onSubmit: (data: CreateRoutineRequest) => void
+  onSubmit: (data: CreateRoutineRequest | UpdateRoutineRequest) => void
   onCancel: () => void
 }
 

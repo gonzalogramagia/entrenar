@@ -27,7 +27,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
-import type { RoutineWithExercises, CreateRoutineRequest } from '../../types/routine'
+import type { RoutineWithExercises, CreateRoutineRequest, UpdateRoutineRequest } from '../../types/routine'
 import RoutineForm from './RoutineForm'
 import RoutineDetail from './RoutineDetail'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -109,9 +109,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     loadRoutines()
   }, [loadRoutines])
 
-  const handleCreateRoutine = async (routineData: CreateRoutineRequest) => {
+  const handleCreateRoutine = async (routineData: CreateRoutineRequest | UpdateRoutineRequest) => {
     try {
-      await apiClient.createUserRoutine(routineData)
+      await apiClient.createUserRoutine(routineData as CreateRoutineRequest)
       setOpenCreateDialog(false)
       loadRoutines()
     } catch (err) {
@@ -120,7 +120,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     }
   }
 
-  const handleEditRoutine = async (id: number, routineData: Partial<CreateRoutineRequest>): Promise<void> => {
+  const handleEditRoutine = async (id: number, routineData: UpdateRoutineRequest): Promise<void> => {
     try {
       await apiClient.updateUserRoutine(id, routineData)
       

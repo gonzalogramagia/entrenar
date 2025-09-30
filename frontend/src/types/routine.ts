@@ -49,6 +49,7 @@ export interface UpdateRoutineRequest {
   name?: string
   description?: string
   is_active?: boolean
+  exercises?: CreateRoutineExerciseRequest[]
 }
 
 export interface UpdateRoutineExerciseRequest {
