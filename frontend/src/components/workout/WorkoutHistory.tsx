@@ -39,6 +39,17 @@ export default function WorkoutHistory() {
   const [loadingWorkoutId, setLoadingWorkoutId] = useState<number | null>(null)
   const [exerciseModal, setExerciseModal] = useState<{ show: boolean; exerciseGroup: ExerciseGroup | null; workoutDay: WorkoutDay | null }>({ show: false, exerciseGroup: null, workoutDay: null })
 
+  // Auto-hide success message after 3 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('')
+      }, 3000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [successMessage])
+
 
 
   const formatDate = (dateString: string) => {
@@ -585,8 +596,6 @@ export default function WorkoutHistory() {
           >
             <DialogTitle sx={{ 
               pb: 2, 
-              borderBottom: 1, 
-              borderColor: 'divider',
               textAlign: 'center',
               fontWeight: 600,
               color: 'error.main'
@@ -879,13 +888,13 @@ export default function WorkoutHistory() {
           <Box
             sx={{
               position: 'fixed',
-              bottom: 32,
+              top: 32,
               left: '50%',
               transform: 'translateX(-50%)',
               width: '95%',
               maxWidth: '800px',
               zIndex: 99998,
-              animation: 'slideUp 0.3s ease-out'
+              animation: 'slideDown 0.3s ease-out'
             }}
           >
             <Box
