@@ -60,9 +60,9 @@ export default function LoginComponent() {
       <Box sx={{ 
         bgcolor: 'white', 
         p: 3, 
-        borderRadius: '8px', 
-        boxShadow: 3,
-        maxWidth: '90%',
+        borderRadius: 4, 
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        maxWidth: '330px',
         width: '100%'
       }}>
         <Typography 
@@ -71,7 +71,7 @@ export default function LoginComponent() {
           gutterBottom 
           textAlign="center"
           sx={{ 
-            mb: 3, 
+            mb: 2.5, 
             fontWeight: 'bold', 
             color: '#FFB732'
           }}
@@ -85,19 +85,22 @@ export default function LoginComponent() {
           disabled={isSigningIn}
           variant="outlined"
           fullWidth
-          size="large"
           startIcon={<GoogleIcon />}
           sx={{
+            py: 1.5,
+            borderRadius: 3,
             borderColor: '#4285f4',
-            fontWeight: 'bold',
             color: '#4285f4',
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 500,
             '&:hover': {
-              borderColor: '#3367d6',
+              borderColor: '#357ae8',
               backgroundColor: 'rgba(66, 133, 244, 0.04)'
             }
           }}
         >
-          {isSigningIn ? 'Iniciando...' : 'Continuar'}
+          {isSigningIn ? 'Iniciando...' : 'Continuar con Google'}
         </Button>
 
         {error && (
