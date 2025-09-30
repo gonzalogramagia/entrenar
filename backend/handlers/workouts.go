@@ -567,7 +567,6 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Verificar que el workout existe y pertenece al usuario, y obtener el workout_day_id
 	var workoutDayID int
-	var workoutExists bool
 	err = database.DB.QueryRow("SELECT workout_day_id FROM workouts WHERE id = $1 AND user_id = $2", id, userID).Scan(&workoutDayID)
 	if err != nil {
 		if err == sql.ErrNoRows {
