@@ -53,9 +53,10 @@ const theme = createTheme({
 type AppLayoutProps = {
   children: ReactNode
   showFooter?: boolean
+  disableFooterLink?: boolean
 }
 
-export default function AppLayout({ children, showFooter = true }: AppLayoutProps) {
+export default function AppLayout({ children, showFooter = true, disableFooterLink = false }: AppLayoutProps) {
 
   return (
     <ThemeProvider theme={theme}>
@@ -166,26 +167,42 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
                 }
               }}
             >
-              <Link 
-                href="https://gonza.gr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                sx={{ 
-                  textDecoration: 'none',
-                  color: '#666666',
-                  fontWeight: 500,
-                  opacity: 1,
-                  display: 'inline-block',
-                  transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  '&:hover': {
-                    color: '#888888'
-                  }
-                }}
-              >
-                <Typography variant="caption" sx={{ fontSize: '0.8rem', letterSpacing: '0.5px' }}>
+              {disableFooterLink ? (
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    fontSize: '0.8rem', 
+                    letterSpacing: '0.5px',
+                    color: '#666666',
+                    fontWeight: 500,
+                    opacity: 1,
+                    display: 'inline-block'
+                  }}
+                >
                   💻 🧉 Desarrollado por Gonza
                 </Typography>
-              </Link>
+              ) : (
+                <Link 
+                  href="https://gonza.gr" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  sx={{ 
+                    textDecoration: 'none',
+                    color: '#666666',
+                    fontWeight: 500,
+                    opacity: 1,
+                    display: 'inline-block',
+                    transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    '&:hover': {
+                      color: '#888888'
+                    }
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontSize: '0.8rem', letterSpacing: '0.5px' }}>
+                    💻 🧉 Desarrollado por Gonza
+                  </Typography>
+                </Link>
+              )}
             </Box>
           )}
         </Box>
