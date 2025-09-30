@@ -565,22 +565,54 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Verificar que el workout existe y pertenece al usuario
+	// Verificar que el workout existe y pertenece al usuario, y obtener el workout_day_id
+	var workoutDayID int
 	var workoutExists bool
-	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM workouts WHERE id = $1 AND user_id = $2)", id, userID).Scan(&workoutExists)
+	err = database.DB.QueryRow("SELECT workout_day_id FROM workouts WHERE id = $1 AND user_id = $2", id, userID).Scan(&workoutDayID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Workout no encontrado", http.StatusNotFound)
+			return
+		}
 		http.Error(w, "Error verificando workout", http.StatusInternalServerError)
 		return
 	}
-	if !workoutExists {
-		http.Error(w, "Workout no encontrado", http.StatusNotFound)
+
+	// Iniciar transacción
+	tx, err := database.DB.Begin()
+	if err != nil {
+		http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	// Eliminar el workout
+	_, err = tx.Exec("DELETE FROM workouts WHERE id = $1 AND user_id = $2", id, userID)
+	if err != nil {
+		http.Error(w, "Error eliminando workout", http.StatusInternalServerError)
 		return
 	}
 
-	// Eliminar el workout
-	_, err = database.DB.Exec("DELETE FROM workouts WHERE id = $1 AND user_id = $2", id, userID)
+	// Verificar si quedan más workouts para este día
+	var remainingWorkouts int
+	err = tx.QueryRow("SELECT COUNT(*) FROM workouts WHERE workout_day_id = $1", workoutDayID).Scan(&remainingWorkouts)
 	if err != nil {
-		http.Error(w, "Error eliminando workout", http.StatusInternalServerError)
+		http.Error(w, "Error verificando workouts restantes", http.StatusInternalServerError)
+		return
+	}
+
+	// Si no quedan más workouts, eliminar también el workout_day
+	if remainingWorkouts == 0 {
+		_, err = tx.Exec("DELETE FROM workout_days WHERE id = $1 AND user_id = $2", workoutDayID, userID)
+		if err != nil {
+			http.Error(w, "Error eliminando día de entrenamiento", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Confirmar transacción
+	if err = tx.Commit(); err != nil {
+		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
 		return
 	}
 
