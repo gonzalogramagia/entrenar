@@ -880,7 +880,7 @@ export default function WorkoutForm({
           <TextField
             label="Observaciones (opcional)"
             multiline
-            rows={2}
+            rows={activeRoutine ? 1 : 2}
             disabled={isLoading}
             error={Boolean(errors.observations)}
             {...register('observations')}
