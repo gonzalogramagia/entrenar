@@ -432,12 +432,18 @@ function AuthenticatedAppContent() {
       setActiveTab(TABS.WORKOUT)
     }
 
+    const handleRoutineCompletedManually = () => {
+      console.log('¡Rutina completada manualmente! Activando confeti...')
+      setShowConfetti(true)
+    }
+
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
     window.addEventListener('startRoutineFromModal', handleStartRoutineFromModalEvent as EventListener)
     window.addEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
     window.addEventListener('viewRoutine', handleViewRoutine as EventListener)
     window.addEventListener('stopRoutine', handleStopRoutine as EventListener)
     window.addEventListener('navigateToWorkout', handleNavigateToWorkout as EventListener)
+    window.addEventListener('routineCompletedManually', handleRoutineCompletedManually as EventListener)
     
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
@@ -446,6 +452,7 @@ function AuthenticatedAppContent() {
       window.removeEventListener('viewRoutine', handleViewRoutine as EventListener)
       window.removeEventListener('stopRoutine', handleStopRoutine as EventListener)
       window.removeEventListener('navigateToWorkout', handleNavigateToWorkout as EventListener)
+      window.removeEventListener('routineCompletedManually', handleRoutineCompletedManually as EventListener)
     }
   }, [])
 

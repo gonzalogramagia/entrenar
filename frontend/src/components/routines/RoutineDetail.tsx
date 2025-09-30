@@ -325,7 +325,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         disabled={!isActiveRoutine}
                         onChange={() => {
                           if (isActiveRoutine) {
-                            toggleExerciseCompleted(today, routine.id, exercise.exercise_id, setNumber)
+                            toggleExerciseCompleted(today, routine.id, exercise.exercise_id, setNumber, routine)
                           }
                         }}
                         sx={{

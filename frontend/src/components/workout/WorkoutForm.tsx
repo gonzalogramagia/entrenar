@@ -474,8 +474,7 @@ export default function WorkoutForm({
               p: 2, 
               backgroundColor: 'rgba(255,255,255,0.1)', 
               borderRadius: 2,
-              maxHeight: '300px',
-              overflow: 'auto'
+              overflow: 'visible'
             }}>
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: 'white' }}>
                 Ejercicios restantes:
@@ -526,7 +525,7 @@ export default function WorkoutForm({
                                 }}
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  toggleExerciseCompleted(today, activeRoutine.id, exercise.exercise_id, setNumber)
+                                  toggleExerciseCompleted(today, activeRoutine.id, exercise.exercise_id, setNumber, activeRoutine)
                                 }}
                               >
                                 {isCompleted && (

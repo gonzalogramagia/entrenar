@@ -200,7 +200,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   }, [settings.favoriteExercises.length, settings.hasConfiguredFavorites])
 
   // Función para alternar el estado de completado de un ejercicio
-  const toggleExerciseCompleted = useCallback((date: string, routineId: number, exerciseId: number, setNumber: number) => {
+  const toggleExerciseCompleted = useCallback((date: string, routineId: number, exerciseId: number, setNumber: number, routine?: any) => {
     setCompletedExercises(prev => {
       const newState = { ...prev }
       
@@ -228,6 +228,33 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       
       // Guardar en localStorage
       localStorage.setItem('completed-exercises', JSON.stringify(newState))
+      
+      // Verificar si la rutina está completa después del cambio
+      if (routine) {
+        const completedForRoutine = newState[date][routineId] || {}
+        let completedSets = 0
+        let totalSets = 0
+        
+        routine.exercises.forEach((exercise: any) => {
+          const exerciseId = exercise.exercise_id
+          const completedSetsForExercise = completedForRoutine[exerciseId]?.length || 0
+          const targetSets = exercise.sets
+          
+          completedSets += Math.min(completedSetsForExercise, targetSets)
+          totalSets += targetSets
+        })
+        
+        const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
+        
+        // Si la rutina está completa (100%), disparar evento de confeti
+        if (progress === 100) {
+          console.log('¡Rutina completada manualmente!')
+          const confettiEvent = new CustomEvent('routineCompletedManually', { 
+            detail: { routineId, routine, progress } 
+          })
+          window.dispatchEvent(confettiEvent)
+        }
+      }
       
       return newState
     })
