@@ -285,6 +285,15 @@ func UpdateUserRoutineHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Iniciar transacción
+	tx, err := database.DB.Begin()
+	if err != nil {
+		fmt.Printf("Error iniciando transacción: %v\n", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
 	// Construir query de actualización dinámicamente
 	query := "UPDATE user_routines SET updated_at = NOW()"
 	args := []interface{}{}
@@ -311,10 +320,54 @@ func UpdateUserRoutineHandler(w http.ResponseWriter, r *http.Request) {
 	query += fmt.Sprintf(" WHERE id = $%d AND user_id = $%d", argIndex, argIndex+1)
 	args = append(args, routineID, userID)
 
-	_, err = database.DB.Exec(query, args...)
+	_, err = tx.Exec(query, args...)
 	if err != nil {
 		fmt.Printf("Error actualizando rutina: %v\n", err)
 		http.Error(w, "Error actualizando rutina", http.StatusInternalServerError)
+		return
+	}
+
+	// Si se proporcionaron ejercicios, actualizarlos
+	if req.Exercises != nil {
+		// Eliminar ejercicios existentes
+		_, err = tx.Exec("DELETE FROM routine_exercises WHERE routine_id = $1", routineID)
+		if err != nil {
+			fmt.Printf("Error eliminando ejercicios existentes: %v\n", err)
+			http.Error(w, "Error actualizando ejercicios de la rutina", http.StatusInternalServerError)
+			return
+		}
+
+		// Insertar nuevos ejercicios
+		if len(req.Exercises) > 0 {
+			exerciseQuery := `
+				INSERT INTO routine_exercises (routine_id, exercise_id, order_index, sets, reps, weight, rest_time_seconds, notes)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			`
+
+			for _, exercise := range req.Exercises {
+				_, err = tx.Exec(exerciseQuery,
+					routineID,
+					exercise.ExerciseID,
+					exercise.OrderIndex,
+					exercise.Sets,
+					exercise.Reps,
+					exercise.Weight,
+					exercise.RestTimeSeconds,
+					exercise.Notes,
+				)
+				if err != nil {
+					fmt.Printf("Error agregando ejercicio a rutina: %v\n", err)
+					http.Error(w, "Error agregando ejercicios a la rutina", http.StatusInternalServerError)
+					return
+				}
+			}
+		}
+	}
+
+	// Confirmar transacción
+	if err = tx.Commit(); err != nil {
+		fmt.Printf("Error confirmando transacción: %v\n", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
 		return
 	}
 

@@ -188,6 +188,18 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     })
   }
 
+  const handleEditRoutineClick = async (routine: RoutineWithExercises) => {
+    try {
+      // Obtener la rutina completa con todos los ejercicios
+      const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+      setSelectedRoutine(fullRoutine)
+      setOpenEditDialog(true)
+    } catch (error) {
+      console.error('Error obteniendo detalles de la rutina para editar:', error)
+      setError('Error al cargar los detalles de la rutina')
+    }
+  }
+
   const handleSaveRoutineName = async () => {
     if (!editNameModal.routineId || !editNameModal.newName.trim()) {
       return
@@ -479,7 +491,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
                     <IconButton
                       size="small"
-                      onClick={() => handleEditNameClick(routine)}
+                      onClick={() => handleEditRoutineClick(routine)}
                       sx={{ 
                         color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
                         flexShrink: 0,

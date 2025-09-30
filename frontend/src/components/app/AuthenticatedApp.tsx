@@ -563,9 +563,17 @@ function AuthenticatedAppContent() {
             position: 'relative', 
             zIndex: 1, 
             height: '100%',
-            overflow: 'hidden',
+            overflow: activeRoutine ? 'auto' : 'hidden',
             px: { xs: 2, sm: 1 },
-            pb: 0
+            pb: 0,
+            '&::-webkit-scrollbar': {
+              display: 'none'
+            },
+            '&::-moz-scrollbar': {
+              display: 'none'
+            },
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
           }}>
             <WorkoutForm 
               exercises={exercises} 

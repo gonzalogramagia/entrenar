@@ -50,9 +50,10 @@ type CreateRoutineExerciseRequest struct {
 
 // UpdateRoutineRequest representa la solicitud para actualizar una rutina
 type UpdateRoutineRequest struct {
-	Name        *string `json:"name,omitempty" validate:"omitempty,min=1,max=255"`
-	Description *string `json:"description,omitempty"`
-	IsActive    *bool   `json:"is_active,omitempty"`
+	Name        *string                      `json:"name,omitempty" validate:"omitempty,min=1,max=255"`
+	Description *string                      `json:"description,omitempty"`
+	IsActive    *bool                        `json:"is_active,omitempty"`
+	Exercises   []CreateRoutineExerciseRequest `json:"exercises,omitempty"`
 }
 
 // UpdateRoutineExerciseRequest representa la solicitud para actualizar un ejercicio en una rutina
