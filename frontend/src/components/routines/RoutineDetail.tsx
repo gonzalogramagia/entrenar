@@ -419,10 +419,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         icon={<TimerIcon />}
                         sx={{ 
                           fontWeight: 600,
-                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
+                          backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'warning.main')),
+                          color: 'white',
                           '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : (!isActiveRoutine && !isCompleted ? 'grey.400' : 'warning.dark'))
                           }
                         }}
                       />
