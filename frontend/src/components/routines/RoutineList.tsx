@@ -213,10 +213,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        height: '300px',
+        minHeight: 'calc(100vh - 200px)',
         flexDirection: 'column',
-        gap: 2,
-        backgroundColor: 'transparent'
+        gap: 2
       }}>
         <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
         <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
