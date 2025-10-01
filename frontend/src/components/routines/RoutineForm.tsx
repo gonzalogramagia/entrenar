@@ -10,10 +10,7 @@ import {
   CardContent,
   Alert,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  Autocomplete
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -36,6 +33,14 @@ interface RoutineFormProps {
   onCancel: () => void
 }
 
+// Función para normalizar texto (quitar acentos y convertir a minúsculas)
+const normalizeText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+}
+
 const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }) => {
   const { settings } = useUserSettings()
   const [name, setName] = useState(routine?.name || '')
@@ -54,6 +59,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [searchTerms, setSearchTerms] = useState<string[]>([]) // Términos de búsqueda para cada ejercicio
 
   const loadExercises = useCallback(async () => {
     try {
@@ -81,6 +87,13 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     loadExercises()
   }, [loadExercises])
 
+  // Inicializar términos de búsqueda cuando se carga una rutina existente
+  useEffect(() => {
+    if (routine?.exercises) {
+      setSearchTerms(new Array(routine.exercises.length).fill(''))
+    }
+  }, [routine])
+
   // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici
   const isRunningExercise = (exerciseId: number) => exerciseId === 18
   const isBiciExercise = (exerciseId: number) => {
@@ -88,6 +101,25 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     return exercise?.name?.toLowerCase().includes('bici') || exerciseId === 30 || false
   }
   const isRunningOrBiciExercise = (exerciseId: number) => isRunningExercise(exerciseId) || isBiciExercise(exerciseId)
+
+  // Función para filtrar ejercicios basado en el término de búsqueda
+  const getFilteredExercises = (searchTerm: string): Exercise[] => {
+    if (!searchTerm.trim()) {
+      return availableExercises
+    }
+    
+    const normalizedSearchTerm = normalizeText(searchTerm)
+    return availableExercises.filter(exercise => 
+      normalizeText(exercise.name).includes(normalizedSearchTerm)
+    )
+  }
+
+  // Función para manejar cambios en el término de búsqueda
+  const handleSearchChange = (index: number, value: string) => {
+    const newSearchTerms = [...searchTerms]
+    newSearchTerms[index] = value
+    setSearchTerms(newSearchTerms)
+  }
 
   const handleAddExercise = () => {
     const newExercise: CreateRoutineExerciseRequest = {
@@ -100,6 +132,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       notes: ''
     }
     setExercises([...exercises, newExercise])
+    setSearchTerms([...searchTerms, '']) // Agregar término de búsqueda vacío
   }
 
   const handleRemoveExercise = (index: number) => {
@@ -110,6 +143,10 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       order_index: i
     }))
     setExercises(reorderedExercises)
+    
+    // También remover el término de búsqueda correspondiente
+    const newSearchTerms = searchTerms.filter((_, i) => i !== index)
+    setSearchTerms(newSearchTerms)
   }
 
   const handleExerciseChange = (index: number, field: keyof CreateRoutineExerciseRequest, value: any) => {
@@ -221,20 +258,36 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
             </Box>
 
             <Box sx={{ mb: 2 }}>
-              <FormControl fullWidth required>
-                <InputLabel>Ejercicio</InputLabel>
-                <Select
-                  value={exercise.exercise_id}
-                  onChange={(e) => handleExerciseChange(index, 'exercise_id', e.target.value)}
-                  label="Ejercicio"
-                >
-                  {availableExercises.map((ex) => (
-                    <MenuItem key={ex.id} value={ex.id}>
-                      {ex.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Autocomplete
+                fullWidth
+                options={getFilteredExercises(searchTerms[index] || '')}
+                getOptionLabel={(option) => option.name}
+                value={availableExercises.find(ex => ex.id === exercise.exercise_id) || null}
+                onChange={(_, newValue) => {
+                  handleExerciseChange(index, 'exercise_id', newValue?.id || 0)
+                }}
+                onInputChange={(_, newInputValue) => {
+                  handleSearchChange(index, newInputValue)
+                }}
+                inputValue={searchTerms[index] || ''}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Ejercicio"
+                    required
+                    placeholder="Buscar ejercicio..."
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    {option.name}
+                  </li>
+                )}
+                noOptionsText="No se encontraron ejercicios"
+                clearOnEscape
+                selectOnFocus
+                handleHomeEndKeys
+              />
             </Box>
 
             {/* Ocultar campos Series y Repeticiones para Running y Bici */}
@@ -314,7 +367,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
 
       {exercises.some(ex => ex.exercise_id === 0) && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          Debes seleccionar un ejercicio para cada elemento de la rutina
+          Debes seleccionar un ejercicio para cada momento de la rutina
         </Alert>
       )}
 
