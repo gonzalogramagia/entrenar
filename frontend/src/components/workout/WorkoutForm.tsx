@@ -716,10 +716,11 @@ export default function WorkoutForm({
             />
           )}
           filterOptions={(options, { inputValue }) => {
-            const searchTerm = inputValue.toLowerCase()
-            return options.filter(option => 
-              option.name.toLowerCase().includes(searchTerm)
-            )
+            const searchTerm = inputValue.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            return options.filter(option => {
+              const optionName = option.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+              return optionName.includes(searchTerm)
+            })
           }}
           noOptionsText="No se encontraron ejercicios"
           loading={isLoading}
