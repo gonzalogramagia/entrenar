@@ -84,8 +84,8 @@ export default function AppLayout({ children, showFooter = true, disableFooterLi
         msOverflowStyle: 'none',
         // Ancho fijo para simular móvil en desktop
         '@media (min-width: 768px)': {
-          width: '375px',
-          maxWidth: '375px',
+          width: '390px',
+          maxWidth: '390px',
           left: '50%',
           top: '50%',
           transform: 'translate(-50%, -50%)',
@@ -93,8 +93,8 @@ export default function AppLayout({ children, showFooter = true, disableFooterLi
           borderRadius: '20px',
           boxShadow: '0 0 30px rgba(255, 255, 255, 0.3)',
           height: 'auto',
-          minHeight: '667px',
-          maxHeight: '90vh',
+          minHeight: '720px',
+          maxHeight: '92vh',
           backgroundColor: 'transparent',
           overflow: 'hidden',
           touchAction: 'none',

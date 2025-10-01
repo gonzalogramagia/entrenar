@@ -213,9 +213,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        minHeight: 'calc(100vh - 200px)',
+        height: '300px',
         flexDirection: 'column',
-        gap: 2
+        gap: 2,
+        backgroundColor: 'transparent'
       }}>
         <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
         <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
@@ -327,7 +328,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             maxWidth: '100%',
             overflow: 'hidden'
           }}>
-            {sortedRoutines?.map((routine) => (
+A            {sortedRoutines?.map((routine) => (
             <Card 
               key={routine.id} 
               elevation={2}
