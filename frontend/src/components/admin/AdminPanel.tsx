@@ -55,7 +55,7 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const getAvailableTabs = () => {
     const tabs = []
     
-    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+    if (userRole === 'admin' || userRole === 'staff' || isAdmin) {
       tabs.push('notifications')
     }
     if (userRole === 'admin' || userRole === 'profe' || isAdmin) {
