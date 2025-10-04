@@ -20,8 +20,6 @@ import {
   Close,
   AdminPanelSettings as AdminIcon
 } from '@mui/icons-material'
-import { useUserSettings } from '../../contexts/UserSettingsContext'
-import { useAuth } from '../../contexts/AuthContext'
 
 type Exercise = {
   id: number
@@ -36,73 +34,78 @@ type SettingsModalProps = {
 }
 
 export default function SettingsModal({ open, onClose, exercises = [] }: SettingsModalProps) {
-  const {
-    settings,
-    setFavoriteExercises,
-    setHasConfiguredFavorites
-  } = useUserSettings()
-  const { userRole, isAdmin } = useAuth()
   const [hasChanges, setHasChanges] = useState(false)
-  const [tempSettings, setTempSettings] = useState(settings)
+  const [tempSettings, setTempSettings] = useState<{ favoriteExercises: number[] }>({ favoriteExercises: [] })
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [saving, setSaving] = useState(false)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
-    // Para usuarios Admin, Staff o Profe, usar localStorage
-    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
-      try {
-        const adminSettings = localStorage.getItem('admin-exercise-settings')
-        if (adminSettings) {
-          const parsed = JSON.parse(adminSettings)
-          setTempSettings(prev => ({
-            ...prev,
-            favoriteExercises: parsed.favoriteExercises || []
-          }))
-        } else {
-          // Si no hay configuraciones guardadas, inicializar con lista vacía
-          setTempSettings(prev => ({
-            ...prev,
-            favoriteExercises: []
-          }))
+    // Todos los usuarios usan localStorage
+    try {
+      const adminSettings = localStorage.getItem('admin-exercise-settings')
+      if (adminSettings) {
+        const parsed = JSON.parse(adminSettings)
+        setTempSettings(prev => ({
+          ...prev,
+          favoriteExercises: parsed.favoriteExercises || []
+        }))
+      } else {
+        // Si no hay configuraciones guardadas, inicializar con todos los ejercicios disponibles
+        const allExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+        setTempSettings(prev => ({
+          ...prev,
+          favoriteExercises: allExerciseIds
+        }))
+        
+        // Guardar automáticamente todos los ejercicios como favoritos en localStorage
+        const settingsToSave = {
+          favoriteExercises: allExerciseIds,
+          lastUpdated: new Date().toISOString()
         }
-      } catch (error) {
-        console.error('Error loading admin exercise settings:', error)
-        setTempSettings(settings)
+        localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
+        console.log('🔍 Initial settings saved to localStorage:', settingsToSave)
       }
-    } else {
-      // Para usuarios normales, usar el contexto
-      setTempSettings(settings)
+    } catch (error) {
+      console.error('Error loading exercise settings:', error)
+      // Fallback: inicializar con todos los ejercicios disponibles
+      const allExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+      setTempSettings(prev => ({
+        ...prev,
+        favoriteExercises: allExerciseIds
+      }))
+      
+      // Guardar automáticamente en localStorage
+      const settingsToSave = {
+        favoriteExercises: allExerciseIds,
+        lastUpdated: new Date().toISOString()
+      }
+      localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
+      console.log('🔍 Fallback settings saved to localStorage:', settingsToSave)
     }
-  }, [settings, userRole, isAdmin, exercises])
+  }, [exercises])
 
   // Verificar si hay cambios solo en ejercicios favoritos
   useEffect(() => {
     let hasFavoriteChanges = false
     
-    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
-      // Para usuarios admin, comparar con localStorage
-      try {
-        const adminSettings = localStorage.getItem('admin-exercise-settings')
-        if (adminSettings) {
-          const parsed = JSON.parse(adminSettings)
-          hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || [])
-        } else {
-          // Si no hay configuraciones guardadas, cualquier cambio es válido
-          hasFavoriteChanges = tempSettings.favoriteExercises.length > 0
-        }
-      } catch (error) {
-        console.error('Error checking admin settings changes:', error)
-        hasFavoriteChanges = false
+    try {
+      const adminSettings = localStorage.getItem('admin-exercise-settings')
+      if (adminSettings) {
+        const parsed = JSON.parse(adminSettings)
+        hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || [])
+      } else {
+        // Si no hay configuraciones guardadas, cualquier cambio es válido
+        hasFavoriteChanges = tempSettings.favoriteExercises.length > 0
       }
-    } else {
-      // Para usuarios normales, comparar con el contexto
-      hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)
+    } catch (error) {
+      console.error('Error checking settings changes:', error)
+      hasFavoriteChanges = false
     }
     
     setHasChanges(hasFavoriteChanges)
-  }, [tempSettings.favoriteExercises, settings.favoriteExercises, userRole, isAdmin])
+  }, [tempSettings.favoriteExercises])
 
 
 
@@ -134,22 +137,13 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     try {
       setSaving(true)
       
-      // Para usuarios Admin, Staff o Profe, guardar en localStorage
-      if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
-        const settingsToSave = {
-          favoriteExercises: tempSettings.favoriteExercises,
-          lastUpdated: new Date().toISOString()
-        }
-        localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
-        console.log('🔍 Admin settings saved to localStorage:', settingsToSave)
-      } else {
-        // Para usuarios normales, usar el contexto
-        if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
-          await setFavoriteExercises(tempSettings.favoriteExercises)
-          // Marcar que el usuario ha configurado manualmente sus favoritos
-          await setHasConfiguredFavorites(true)
-        }
+      // Guardar en localStorage para todos los usuarios
+      const settingsToSave = {
+        favoriteExercises: tempSettings.favoriteExercises,
+        lastUpdated: new Date().toISOString()
       }
+      localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
+      console.log('🔍 Settings saved to localStorage:', settingsToSave)
       
       setHasChanges(false)
       setShowSuccessMessage(true)
@@ -182,10 +176,19 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   }, [availableExercises, exerciseSearchTerm])
 
   const handleCancel = () => {
-    setTempSettings(prev => ({
-      ...prev,
-      favoriteExercises: settings.favoriteExercises
-    }))
+    // Recargar configuraciones desde localStorage
+    try {
+      const adminSettings = localStorage.getItem('admin-exercise-settings')
+      if (adminSettings) {
+        const parsed = JSON.parse(adminSettings)
+        setTempSettings(prev => ({
+          ...prev,
+          favoriteExercises: parsed.favoriteExercises || []
+        }))
+      }
+    } catch (error) {
+      console.error('Error loading settings for cancel:', error)
+    }
     setHasChanges(false)
     setExerciseSearchTerm('')
     onClose()
@@ -202,9 +205,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       PaperProps={{
         sx: {
           borderRadius: 2,
-          maxHeight: '90vh',
-          overflow: 'hidden',
-          width: { xs: '95vw', sm: '90vw', md: '80vw' }
+          maxHeight: '95vh',
+          width: { xs: '95vw', sm: '90vw', md: '80vw' },
+          display: 'flex',
+          flexDirection: 'column'
         }
       }}
     >
@@ -236,7 +240,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 0, overflow: 'hidden' }}>
+      <DialogContent sx={{ p: 0, overflow: 'auto', flex: 1 }}>
         <Box sx={{ p: { xs: 1, sm: 2 } }}>
         {/* Sección NOTIFICACIONES UNC - OCULTA */}
         {/* <Box sx={{ mb: 3 }}>
@@ -361,8 +365,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                 borderColor: 'divider',
                 borderRadius: 1,
                 p: 1,
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                display: 'flex',
+                flexWrap: 'wrap',
                 gap: 1
               }}>
                 {filteredExercises.map(exercise => (
@@ -377,6 +381,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                       border: '1px solid',
                       borderColor: 'divider',
                       backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.50' : 'background.paper',
+                      minWidth: '200px',
+                      flex: '1 1 200px',
                       '&:hover': {
                         backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.100' : 'grey.50'
                       }
@@ -419,7 +425,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 3 }}>
+      <DialogActions sx={{ px: 3, pb: 3, flexShrink: 0, borderTop: '1px solid', borderColor: 'divider' }}>
         <Button
           onClick={handleCancel}
           variant="outlined"
