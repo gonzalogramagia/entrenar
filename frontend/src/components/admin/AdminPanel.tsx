@@ -32,10 +32,11 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== tabValue}
       id={`admin-tabpanel-${tabValue}`}
       aria-labelledby={`admin-tab-${tabValue}`}
+      style={{ height: '100%' }}
       {...other}
     >
       {value === tabValue && (
-        <Box sx={{ p: { xs: 1, sm: 2 } }}>
+        <Box sx={{ height: '100%' }}>
           {children}
         </Box>
       )}

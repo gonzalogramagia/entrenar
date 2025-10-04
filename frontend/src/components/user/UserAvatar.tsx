@@ -195,6 +195,16 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           </MenuItem>
         )}
 
+        {/* Opción de configuración - solo para usuarios normales (no staff, profe, admin) */}
+        {!(isAdmin || userRole === 'profe' || userRole === 'staff') && (
+          <MenuItem onClick={handleOpenSettings}>
+            <ListItemIcon>
+              <AdminIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Panel de Usuario</ListItemText>
+          </MenuItem>
+        )}
+
         {/* Opción de notificaciones - siempre visible */}
         <MenuItem onClick={handleOpenNotifications}>
           <ListItemIcon>
@@ -227,16 +237,6 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
             Notificaciones
           </ListItemText>
         </MenuItem>
-
-        {/* Opción de configuración - solo para usuarios normales (no staff, profe, admin) */}
-        {!(isAdmin || userRole === 'profe' || userRole === 'staff') && (
-          <MenuItem onClick={handleOpenSettings}>
-            <ListItemIcon>
-              <AdminIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Panel de Usuario</ListItemText>
-          </MenuItem>
-        )}
 
         {/* Opción de logout */}
         <MenuItem onClick={handleLogout}>
