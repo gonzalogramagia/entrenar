@@ -212,7 +212,7 @@ export default function WorkoutForm({
 
   // Timer para el modal de descanso
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null
+    let interval: number | null = null
     
     if (showRestModal && isRestRunning) {
       interval = setInterval(() => {

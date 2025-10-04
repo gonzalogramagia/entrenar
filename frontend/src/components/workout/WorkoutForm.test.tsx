@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render } from '@testing-library/react'
+import { waitFor } from '@testing-library/dom'
+import { screen, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import WorkoutForm from './WorkoutForm.tsx'
 

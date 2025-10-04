@@ -1,4 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render } from '@testing-library/react'
+import { waitFor } from '@testing-library/dom'
+import { screen, fireEvent } from '@testing-library/dom'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import WorkoutHistory from './WorkoutHistory'
 import { apiClient } from '../../lib/api'

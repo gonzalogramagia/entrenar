@@ -16,7 +16,6 @@ import {
   CircularProgress
 } from '@mui/material'
 import {
-  Settings,
   Close
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'

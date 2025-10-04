@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/dom'
 import { AuthProvider, useAuth } from './AuthContext'
 
 // Componente de prueba para usar el contexto

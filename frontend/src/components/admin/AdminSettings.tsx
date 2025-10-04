@@ -35,8 +35,8 @@ export function AdminSettings() {
         setLoading(true)
         
         // Cargar ejercicios
-        const response = await apiClient.get('/exercises')
-        setExercises(response.data || [])
+        const response = await apiClient.getExercises() as Exercise[]
+        setExercises(response || [])
         
         // Cargar configuraciones desde localStorage
         const savedSettings = localStorage.getItem('admin-exercise-settings')
@@ -46,7 +46,7 @@ export function AdminSettings() {
           setTempFavoriteExercises(parsed.favoriteExercises || [])
         } else {
           // Si no hay configuraciones guardadas, mostrar todos los ejercicios
-          const allExerciseIds = response.data?.map((ex: Exercise) => ex.id) || []
+          const allExerciseIds = (response as Exercise[])?.map((ex: Exercise) => ex.id) || []
           setFavoriteExercises(allExerciseIds)
           setTempFavoriteExercises(allExerciseIds)
         }
