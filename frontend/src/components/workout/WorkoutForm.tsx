@@ -83,6 +83,34 @@ export default function WorkoutForm({
     getRoutineProgress 
   } = useUserSettings()
   
+  // Estado para forzar re-render cuando cambien las configuraciones
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  
+  // Escuchar cambios en localStorage para actualizar ejercicios instantáneamente
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setRefreshTrigger(prev => prev + 1)
+    }
+    
+    // Escuchar cambios desde otras pestañas
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Escuchar cambios desde la misma pestaña
+    const originalSetItem = localStorage.setItem
+    localStorage.setItem = function(key, value) {
+      originalSetItem.apply(this, [key, value])
+      if (key === 'admin-exercise-settings') {
+        // Pequeño delay para asegurar que el localStorage se actualizó
+        setTimeout(handleStorageChange, 10)
+      }
+    }
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      localStorage.setItem = originalSetItem
+    }
+  }, [])
+  
   // Filtrar ejercicios favoritos si están configurados manualmente y excluir deportes
   const filteredExercises = useMemo(() => {
     // Primero excluir deportes
@@ -109,7 +137,7 @@ export default function WorkoutForm({
     }
     
     return filtered
-  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin])
+  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin, refreshTrigger])
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {

@@ -4,7 +4,6 @@ import {
   Typography,
   FormControlLabel,
   Switch,
-  Divider,
   Alert,
   TextField,
   CircularProgress,
@@ -92,6 +91,7 @@ export function AdminSettings() {
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
       
+      
       // Actualizar el estado
       setFavoriteExercises(tempFavoriteExercises)
       setHasChanges(false)
@@ -138,86 +138,118 @@ export function AdminSettings() {
   }
 
   return (
-    <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: 'primary.main' }}>
-        ⚙️ Mis Configuraciones
-      </Typography>
-
-      {/* Sección EJERCICIOS FAVORITOS */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          💪 EJERCICIOS DEL REGISTRO
+    <Box sx={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
+      {/* Contenido scrolleable */}
+      <Box sx={{ 
+        flex: 1, 
+        overflow: 'auto', 
+        p: 2 
+      }}>
+        <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: 'primary.main' }}>
+          ⚙️ Mis Configuraciones
         </Typography>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Configura qué ejercicios aparecen en tu selector del registro de entrenamiento
-        </Typography>
+        {/* Sección EJERCICIOS FAVORITOS */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            💪 EJERCICIOS DEL REGISTRO
+          </Typography>
 
-        {/* Buscador de ejercicios */}
-        <TextField
-          placeholder="Buscar ejercicios..."
-          value={exerciseSearchTerm}
-          onChange={(e) => setExerciseSearchTerm(e.target.value)}
-          size="small"
-          fullWidth
-          sx={{ mb: 2 }}
-        />
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Configura qué ejercicios aparecen en tu selector del registro de entrenamiento
+          </Typography>
 
-        {exercises.length > 0 ? (
-          <Box>
-            <Box sx={{
-              maxHeight: 300,
-              overflowY: 'auto',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              p: 1
-            }}>
-              {filteredExercises.map(exercise => (
-                <FormControlLabel
-                  key={exercise.id}
-                  control={
-                    <Switch
-                      checked={tempFavoriteExercises.includes(exercise.id)}
-                      onChange={() => handleToggleFavoriteExercise(exercise.id)}
-                      size="small"
-                      color="primary"
+          {/* Buscador de ejercicios */}
+          <TextField
+            placeholder="Buscar ejercicios..."
+            value={exerciseSearchTerm}
+            onChange={(e) => setExerciseSearchTerm(e.target.value)}
+            size="small"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+
+          {exercises.length > 0 ? (
+            <Box>
+              <Box sx={{
+                maxHeight: 250,
+                overflowY: 'auto',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                p: 1,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: 1,
+                alignItems: 'start'
+              }}>
+                {filteredExercises.map(exercise => (
+                  <Box
+                    key={exercise.id}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      py: 0.5,
+                      px: 1,
+                      borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      backgroundColor: tempFavoriteExercises.includes(exercise.id) ? 'primary.50' : 'background.paper',
+                      minHeight: '40px',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: tempFavoriteExercises.includes(exercise.id) ? 'primary.100' : 'grey.50'
+                      }
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={tempFavoriteExercises.includes(exercise.id)}
+                          onChange={() => handleToggleFavoriteExercise(exercise.id)}
+                          size="small"
+                          color="primary"
+                        />
+                      }
+                      label={exercise.name}
+                      sx={{
+                        m: 0,
+                        width: '100%',
+                        '& .MuiFormControlLabel-label': {
+                          fontSize: '0.875rem',
+                          fontWeight: tempFavoriteExercises.includes(exercise.id) ? 500 : 400
+                        }
+                      }}
                     />
-                  }
-                  label={exercise.name}
-                  sx={{
-                    m: 0,
-                    py: 0.5,
-                    px: 1,
-                    borderRadius: 1,
-                    width: '100%',
-                    '&:hover': {
-                      backgroundColor: 'grey.50'
-                    }
-                  }}
-                />
-              ))}
+                  </Box>
+                ))}
+              </Box>
             </Box>
-          </Box>
-        ) : (
-          <Alert severity="info">
-            <Typography variant="body2">
-              Los ejercicios se cargarán automáticamente cuando estén disponibles
-            </Typography>
-          </Alert>
-        )}
+          ) : (
+            <Alert severity="info">
+              <Typography variant="body2">
+                Los ejercicios se cargarán automáticamente cuando estén disponibles
+              </Typography>
+            </Alert>
+          )}
+        </Box>
       </Box>
 
-      <Divider sx={{ my: 3 }} />
-
-      {/* Botones de acción */}
+      {/* Botones de acción - siempre visibles */}
       <Box sx={{ 
+        flexShrink: 0,
         display: 'flex', 
         gap: 2, 
         justifyContent: 'flex-end',
-        pt: 2,
+        p: 2,
         borderTop: '1px solid',
-        borderColor: 'divider'
+        borderColor: 'divider',
+        backgroundColor: 'background.paper'
       }}>
         <Button
           onClick={handleCancel}

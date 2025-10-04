@@ -145,6 +145,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
       console.log('🔍 Settings saved to localStorage:', settingsToSave)
       
+      
       setHasChanges(false)
       setShowSuccessMessage(true)
       // Cerrar el modal después de un breve delay para mostrar el mensaje
@@ -339,11 +340,11 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         {/* Sección EJERCICIOS FAVORITOS */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            EJERCICIOS FAVORITOS
+            💪 EJERCICIOS DEL REGISTRO
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Selecciona los ejercicios que quieres que aparezcan en el selector del registro de entrenamiento
+            Configura qué ejercicios aparecen en tu selector del registro de entrenamiento
           </Typography>
 
           {/* Buscador de ejercicios */}
@@ -359,15 +360,16 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           {availableExercises.length > 0 ? (
             <Box>
               <Box sx={{
-                maxHeight: 400,
+                maxHeight: 300,
                 overflowY: 'auto',
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 1,
                 p: 1,
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 1
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: 1,
+                alignItems: 'start'
               }}>
                 {filteredExercises.map(exercise => (
                   <Box
@@ -381,8 +383,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                       border: '1px solid',
                       borderColor: 'divider',
                       backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.50' : 'background.paper',
-                      minWidth: '200px',
-                      flex: '1 1 200px',
+                      minHeight: '40px',
+                      width: '100%',
                       '&:hover': {
                         backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.100' : 'grey.50'
                       }
