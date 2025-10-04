@@ -28,6 +28,7 @@ type Exercise = {
 
 function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
+  const { userRole, isAdmin } = useAuth()
   const { isLoggingOut, isSigningIn } = useAuth()
   const { initializeAllExercisesAsFavorites } = useUserSettings()
   const [workouts, setWorkouts] = useState<Workout[]>([])
@@ -596,6 +597,8 @@ function AuthenticatedAppContent() {
               onStopRoutine={handleStopRoutine}
               preloadedExercise={preloadedExercise}
               onNavigateToRoutines={handleNavigateToRoutines}
+              userRole={userRole}
+              isAdmin={isAdmin}
             />
           </Box>
         )}

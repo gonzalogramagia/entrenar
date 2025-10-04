@@ -14,6 +14,7 @@ import { Close as CloseIcon } from '@mui/icons-material'
 import { AdminNotifications } from './AdminNotifications'
 import { AdminExercises } from './AdminExercises'
 import { AdminUsers } from './AdminUsers'
+import { AdminSettings } from './AdminSettings'
 import { useAuth } from '../../contexts/AuthContext'
 
 interface TabPanelProps {
@@ -63,6 +64,9 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
     }
     if (userRole === 'admin' || isAdmin) {
       tabs.push('users')
+    }
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+      tabs.push('settings')
     }
     
     return tabs
@@ -194,7 +198,8 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                     const tabConfig = {
                       notifications: { label: "📢 Notificaciones", value: "notifications" },
                       exercises: { label: "💪 Ejercicios", value: "exercises" },
-                      users: { label: "👥 Usuarios", value: "users" }
+                      users: { label: "👥 Usuarios", value: "users" },
+                      settings: { label: "⚙️ Configuraciones", value: "settings" }
                     }
                     
                     return (
@@ -215,7 +220,8 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                 const panelConfig = {
                   notifications: <AdminNotifications />,
                   exercises: <AdminExercises />,
-                  users: <AdminUsers />
+                  users: <AdminUsers />,
+                  settings: <AdminSettings />
                 }
                 
                 return (

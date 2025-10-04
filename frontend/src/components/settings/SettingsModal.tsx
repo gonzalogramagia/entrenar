@@ -145,9 +145,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Settings sx={{ color: 'primary.main' }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            Configuración
+            👤 Panel de Usuario
           </Typography>
         </Box>
         <IconButton

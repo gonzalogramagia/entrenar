@@ -228,13 +228,13 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           </ListItemText>
         </MenuItem>
 
-        {/* Opción de configuración - solo para admins, profe y staff */}
-        {(isAdmin || userRole === 'profe' || userRole === 'staff') && (
+        {/* Opción de configuración - solo para usuarios normales (no staff, profe, admin) */}
+        {!(isAdmin || userRole === 'profe' || userRole === 'staff') && (
           <MenuItem onClick={handleOpenSettings}>
             <ListItemIcon>
               <SettingsIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Configuración</ListItemText>
+            <ListItemText>Panel de Usuario</ListItemText>
           </MenuItem>
         )}
 

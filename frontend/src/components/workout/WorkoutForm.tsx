@@ -60,6 +60,8 @@ type WorkoutFormProps = {
   onStopRoutine?: () => void
   preloadedExercise?: any
   onNavigateToRoutines?: () => void
+  userRole?: string
+  isAdmin?: boolean
 }
 
 export default function WorkoutForm({ 
@@ -70,7 +72,9 @@ export default function WorkoutForm({
   isRoutinePaused = false,
   onStopRoutine,
   preloadedExercise,
-  onNavigateToRoutines
+  onNavigateToRoutines,
+  userRole,
+  isAdmin
 }: WorkoutFormProps) {
   const { 
     settings, 
@@ -84,14 +88,28 @@ export default function WorkoutForm({
     // Primero excluir deportes
     let filtered = exercises.filter(exercise => !exercise.is_sport)
     
-    // Luego aplicar filtro de favoritos si está configurado
-    if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
-      filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+    // Para usuarios Admin, Staff o Profe, usar configuraciones de localStorage
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+      try {
+        const adminSettings = localStorage.getItem('admin-exercise-settings')
+        if (adminSettings) {
+          const parsed = JSON.parse(adminSettings)
+          if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
+            filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
+          }
+        }
+      } catch (error) {
+        console.error('Error loading admin exercise settings:', error)
+      }
+    } else {
+      // Para usuarios normales, usar configuraciones del contexto
+      if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
+        filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+      }
     }
     
-    
     return filtered
-  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises])
+  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin])
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
