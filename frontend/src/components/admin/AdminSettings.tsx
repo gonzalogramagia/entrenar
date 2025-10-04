@@ -158,22 +158,33 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
 
   return (
     <Box sx={{ 
-      height: '600px', // Altura fija independiente de la pestaña
-      display: 'flex', 
-      flexDirection: 'column',
-      overflow: 'hidden',
-      minHeight: 0 // Importante para que flex funcione correctamente
+      maxWidth: '900px', 
+      mx: 'auto',
+      px: { xs: 2, sm: 3, md: 4 },
+      height: 'calc(100vh - 300px)',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
+      {/* Header */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 3,
+        pt: 2 // Padding superior para bajar el contenido
+      }}>
+        <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
+          ⚙️ Mis Configuraciones
+        </Typography>
+      </Box>
+
       {/* Contenido scrolleable */}
       <Box sx={{ 
         flex: 1, 
         overflow: 'auto', 
-        p: 2,
-        minHeight: 0 // Importante para que el scroll funcione
+        minHeight: 0,
+        maxHeight: '400px' // Limitar altura para asegurar que los botones sean visibles
       }}>
-        <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: 'primary.main' }}>
-          ⚙️ Mis Configuraciones
-        </Typography>
 
         {/* Sección EJERCICIOS FAVORITOS */}
         <Box sx={{ mb: 4 }}>
@@ -282,25 +293,20 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
         </Box>
       </Box>
 
-      {/* Botones de acción - siempre visibles */}
+      {/* Botones de acción - SIEMPRE VISIBLES */}
       <Box sx={{ 
         flexShrink: 0,
         display: 'flex', 
         gap: 2, 
         justifyContent: 'flex-end',
         p: 3,
-        pt: 2,
-        pb: 2,
+        pt: 1,
         borderTop: '1px solid',
-        borderColor: 'divider',
-        backgroundColor: 'background.paper',
-        minHeight: '80px' // Asegurar altura mínima para los botones
+        borderColor: 'divider'
       }}>
         <Button
           onClick={handleCancel}
-          variant="outlined"
           disabled={saving}
-          sx={{ minWidth: 100 }}
         >
           Cancelar
         </Button>
@@ -308,7 +314,6 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
           onClick={handleSave}
           variant="contained"
           disabled={!hasChanges || saving}
-          sx={{ minWidth: 100 }}
         >
           {saving ? (
             <>
