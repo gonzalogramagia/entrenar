@@ -13,10 +13,12 @@ import {
   Alert,
   IconButton,
   TextField,
-  CircularProgress
+  CircularProgress,
+  Snackbar
 } from '@mui/material'
 import {
-  Close
+  Close,
+  AdminPanelSettings as AdminIcon
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
@@ -41,6 +43,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const [tempSettings, setTempSettings] = useState(settings)
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [saving, setSaving] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
@@ -92,7 +95,11 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         await setHasConfiguredFavorites(true)
       }
       setHasChanges(false)
-      onClose()
+      setShowSuccessMessage(true)
+      // Cerrar el modal después de un breve delay para mostrar el mensaje
+      setTimeout(() => {
+        onClose()
+      }, 1000)
     } catch (error) {
       console.error('Error saving settings:', error)
       // Aquí podrías mostrar un mensaje de error al usuario
@@ -144,8 +151,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AdminIcon sx={{ fontSize: 20, color: 'primary.main' }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            👤 Panel de Usuario
+            Panel de Usuario
           </Typography>
         </Box>
         <IconButton
@@ -285,7 +293,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 1,
-                p: 1
+                p: 1,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: 1
               }}>
                 {filteredExercises.map(exercise => (
                   <FormControlLabel
@@ -350,6 +361,22 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           )}
         </Button>
       </DialogActions>
+
+      {/* Mensaje de éxito */}
+      <Snackbar
+        open={showSuccessMessage}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccessMessage(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setShowSuccessMessage(false)} 
+          severity="success" 
+          sx={{ width: '100%' }}
+        >
+          ✅ Configuraciones guardadas exitosamente
+        </Alert>
+      </Snackbar>
     </Dialog>
   )
 }
