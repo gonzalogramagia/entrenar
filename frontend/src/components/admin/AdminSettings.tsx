@@ -139,16 +139,18 @@ export function AdminSettings() {
 
   return (
     <Box sx={{ 
-      height: '100%', 
+      height: '600px', // Altura fija independiente de la pestaña
       display: 'flex', 
       flexDirection: 'column',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      minHeight: 0 // Importante para que flex funcione correctamente
     }}>
       {/* Contenido scrolleable */}
       <Box sx={{ 
         flex: 1, 
         overflow: 'auto', 
-        p: 2 
+        p: 2,
+        minHeight: 0 // Importante para que el scroll funcione
       }}>
         <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: 'primary.main' }}>
           ⚙️ Mis Configuraciones
@@ -177,7 +179,7 @@ export function AdminSettings() {
           {exercises.length > 0 ? (
             <Box>
               <Box sx={{
-                maxHeight: 250,
+                maxHeight: 300,
                 overflowY: 'auto',
                 border: '1px solid',
                 borderColor: 'divider',
@@ -246,10 +248,13 @@ export function AdminSettings() {
         display: 'flex', 
         gap: 2, 
         justifyContent: 'flex-end',
-        p: 2,
+        p: 3,
+        pt: 2,
+        pb: 2,
         borderTop: '1px solid',
         borderColor: 'divider',
-        backgroundColor: 'background.paper'
+        backgroundColor: 'background.paper',
+        minHeight: '80px' // Asegurar altura mínima para los botones
       }}>
         <Button
           onClick={handleCancel}
