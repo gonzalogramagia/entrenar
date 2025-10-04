@@ -11,7 +11,7 @@ import {
   IconButton,
   Badge
 } from '@mui/material'
-import { Logout as LogoutIcon, Settings as SettingsIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 // import { useUserSettings } from '../../contexts/UserSettingsContext' // Ya no se usa
 
@@ -232,7 +232,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         {!(isAdmin || userRole === 'profe' || userRole === 'staff') && (
           <MenuItem onClick={handleOpenSettings}>
             <ListItemIcon>
-              <SettingsIcon fontSize="small" />
+              <Box sx={{ fontSize: '1.2rem' }}>⚙️</Box>
             </ListItemIcon>
             <ListItemText>Panel de Usuario</ListItemText>
           </MenuItem>

@@ -17,8 +17,7 @@ import {
   Snackbar
 } from '@mui/material'
 import {
-  Close,
-  AdminPanelSettings as AdminIcon
+  Close
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { useAuth } from '../../contexts/AuthContext'
@@ -50,14 +49,60 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
-    setTempSettings(settings)
-  }, [settings])
+    // Para usuarios Admin, Staff o Profe, usar localStorage
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+      try {
+        const adminSettings = localStorage.getItem('admin-exercise-settings')
+        if (adminSettings) {
+          const parsed = JSON.parse(adminSettings)
+          setTempSettings(prev => ({
+            ...prev,
+            favoriteExercises: parsed.favoriteExercises || []
+          }))
+        } else {
+          // Si no hay configuraciones guardadas, usar todos los ejercicios disponibles
+          const allExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+          setTempSettings(prev => ({
+            ...prev,
+            favoriteExercises: allExerciseIds
+          }))
+        }
+      } catch (error) {
+        console.error('Error loading admin exercise settings:', error)
+        setTempSettings(settings)
+      }
+    } else {
+      // Para usuarios normales, usar el contexto
+      setTempSettings(settings)
+    }
+  }, [settings, userRole, isAdmin, exercises])
 
   // Verificar si hay cambios solo en ejercicios favoritos
   useEffect(() => {
-    const hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)
+    let hasFavoriteChanges = false
+    
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+      // Para usuarios admin, comparar con localStorage
+      try {
+        const adminSettings = localStorage.getItem('admin-exercise-settings')
+        if (adminSettings) {
+          const parsed = JSON.parse(adminSettings)
+          hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || [])
+        } else {
+          // Si no hay configuraciones guardadas, cualquier cambio es válido
+          hasFavoriteChanges = tempSettings.favoriteExercises.length > 0
+        }
+      } catch (error) {
+        console.error('Error checking admin settings changes:', error)
+        hasFavoriteChanges = false
+      }
+    } else {
+      // Para usuarios normales, comparar con el contexto
+      hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)
+    }
+    
     setHasChanges(hasFavoriteChanges)
-  }, [tempSettings.favoriteExercises, settings.favoriteExercises])
+  }, [tempSettings.favoriteExercises, settings.favoriteExercises, userRole, isAdmin])
 
 
 
@@ -88,15 +133,24 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const handleSave = async () => {
     try {
       setSaving(true)
-      // Aplicar cambios
-      // if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
-      //   await toggleShowOwnWorkoutsInSocial()
-      // }
-      if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
-        await setFavoriteExercises(tempSettings.favoriteExercises)
-        // Marcar que el usuario ha configurado manualmente sus favoritos
-        await setHasConfiguredFavorites(true)
+      
+      // Para usuarios Admin, Staff o Profe, guardar en localStorage
+      if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+        const settingsToSave = {
+          favoriteExercises: tempSettings.favoriteExercises,
+          lastUpdated: new Date().toISOString()
+        }
+        localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
+        console.log('🔍 Admin settings saved to localStorage:', settingsToSave)
+      } else {
+        // Para usuarios normales, usar el contexto
+        if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
+          await setFavoriteExercises(tempSettings.favoriteExercises)
+          // Marcar que el usuario ha configurado manualmente sus favoritos
+          await setHasConfiguredFavorites(true)
+        }
       }
+      
       setHasChanges(false)
       setShowSuccessMessage(true)
       // Cerrar el modal después de un breve delay para mostrar el mensaje
@@ -170,8 +224,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       PaperProps={{
         sx: {
           borderRadius: 2,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-          maxHeight: '90vh'
+          maxHeight: '90vh',
+          overflow: 'hidden',
+          width: { xs: '95vw', sm: '90vw', md: '80vw' }
         }
       }}
     >
@@ -179,21 +234,22 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        bgcolor: 'primary.main',
+        color: 'white',
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <AdminIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            Panel de Usuario
+          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+            ⚙️ Panel de Usuario
           </Typography>
         </Box>
         <IconButton
           onClick={handleCancel}
           size="small"
           sx={{
-            color: 'text.secondary',
+            color: 'white',
             '&:hover': {
-              backgroundColor: 'grey.100'
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
             }
           }}
         >
@@ -201,7 +257,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ p: 0, overflow: 'hidden' }}>
+        <Box sx={{ p: { xs: 1, sm: 2 } }}>
         {/* Sección NOTIFICACIONES UNC - OCULTA */}
         {/* <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
@@ -376,7 +433,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
         <Divider sx={{ my: 2 }} />
 
-
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
