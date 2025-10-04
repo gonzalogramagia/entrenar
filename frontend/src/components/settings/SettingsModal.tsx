@@ -21,10 +21,12 @@ import {
   AdminPanelSettings as AdminIcon
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useAuth } from '../../contexts/AuthContext'
 
 type Exercise = {
   id: number
   name: string
+  is_sport?: boolean
 }
 
 type SettingsModalProps = {
@@ -39,6 +41,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setFavoriteExercises,
     setHasConfiguredFavorites
   } = useUserSettings()
+  const { userRole, isAdmin } = useAuth()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
@@ -108,15 +111,43 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     }
   }
 
+  // Filtrar ejercicios disponibles (excluir deportes y aplicar filtros de favoritos)
+  const availableExercises = useMemo(() => {
+    // Primero excluir deportes
+    let filtered = exercises.filter(exercise => !exercise.is_sport)
+    
+    // Para usuarios Admin, Staff o Profe, usar configuraciones de localStorage
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
+      try {
+        const adminSettings = localStorage.getItem('admin-exercise-settings')
+        if (adminSettings) {
+          const parsed = JSON.parse(adminSettings)
+          if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
+            filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
+          }
+        }
+      } catch (error) {
+        console.error('Error loading admin exercise settings:', error)
+      }
+    } else {
+      // Para usuarios normales, usar configuraciones del contexto
+      if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
+        filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+      }
+    }
+    
+    return filtered
+  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin])
+
   // Filtrar ejercicios por término de búsqueda
   const filteredExercises = useMemo(() => {
     if (!exerciseSearchTerm.trim()) {
-      return exercises
+      return availableExercises
     }
-    return exercises.filter(exercise =>
+    return availableExercises.filter(exercise =>
       exercise.name.toLowerCase().includes(exerciseSearchTerm.toLowerCase())
     )
-  }, [exercises, exerciseSearchTerm])
+  }, [availableExercises, exerciseSearchTerm])
 
   const handleCancel = () => {
     setTempSettings(prev => ({
@@ -140,7 +171,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         sx: {
           borderRadius: 2,
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-          maxHeight: '80vh'
+          maxHeight: '90vh'
         }
       }}
     >
@@ -285,33 +316,25 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
             sx={{ mb: 2 }}
           />
 
-          {exercises.length > 0 ? (
+          {availableExercises.length > 0 ? (
             <Box>
               <Box sx={{
-                maxHeight: 200,
+                maxHeight: 300,
                 overflowY: 'auto',
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 1,
                 p: 1,
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                 gap: 1
               }}>
                 {filteredExercises.map(exercise => (
-                  <FormControlLabel
+                  <Box
                     key={exercise.id}
-                    control={
-                      <Switch
-                        checked={tempSettings.favoriteExercises.includes(exercise.id)}
-                        onChange={() => handleToggleFavoriteExercise(exercise.id)}
-                        size="small"
-                        color="primary"
-                      />
-                    }
-                    label={exercise.name}
                     sx={{
-                      m: 0,
+                      display: 'flex',
+                      alignItems: 'center',
                       py: 0.5,
                       px: 1,
                       borderRadius: 1,
@@ -319,7 +342,26 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                         backgroundColor: 'grey.50'
                       }
                     }}
-                  />
+                  >
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={tempSettings.favoriteExercises.includes(exercise.id)}
+                          onChange={() => handleToggleFavoriteExercise(exercise.id)}
+                          size="small"
+                          color="primary"
+                        />
+                      }
+                      label={exercise.name}
+                      sx={{
+                        m: 0,
+                        width: '100%',
+                        '& .MuiFormControlLabel-label': {
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
                 ))}
               </Box>
             </Box>
