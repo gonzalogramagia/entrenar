@@ -222,12 +222,12 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                   notifications: <AdminNotifications />,
                   exercises: <AdminExercises />,
                   users: <AdminUsers />,
-                  settings: <AdminSettings />
+                  settings: <AdminSettings onClose={onClose} />
                 }
                 
                 return (
                   <TabPanel key={tab} value={activeTab} tabValue={tab}>
-                    <Box sx={{ height: '100%' }}>
+                    <Box sx={{ height: tab === 'settings' ? 'auto' : '100%' }}>
                       {panelConfig[tab as keyof typeof panelConfig]}
                     </Box>
                   </TabPanel>

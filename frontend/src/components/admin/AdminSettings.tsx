@@ -15,9 +15,14 @@ import { apiClient } from '../../lib/api'
 type Exercise = {
   id: number
   name: string
+  is_sport?: boolean
 }
 
-export function AdminSettings() {
+type AdminSettingsProps = {
+  onClose?: () => void
+}
+
+export function AdminSettings({ onClose }: AdminSettingsProps) {
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -44,10 +49,17 @@ export function AdminSettings() {
           setFavoriteExercises(parsed.favoriteExercises || [])
           setTempFavoriteExercises(parsed.favoriteExercises || [])
         } else {
-          // Si no hay configuraciones guardadas, mostrar todos los ejercicios
-          const allExerciseIds = (response as Exercise[])?.map((ex: Exercise) => ex.id) || []
-          setFavoriteExercises(allExerciseIds)
-          setTempFavoriteExercises(allExerciseIds)
+          // Si no hay configuraciones guardadas, inicializar solo con ejercicios no-deportes
+          const nonSportExerciseIds = (response as Exercise[])?.filter((ex: Exercise) => !ex.is_sport).map((ex: Exercise) => ex.id) || []
+          setFavoriteExercises(nonSportExerciseIds)
+          setTempFavoriteExercises(nonSportExerciseIds)
+          
+          // Guardar automáticamente la configuración inicial
+          const settingsToSave = {
+            favoriteExercises: nonSportExerciseIds,
+            lastUpdated: new Date().toISOString()
+          }
+          localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
         }
       } catch (error) {
         console.error('Error loading data:', error)
@@ -96,6 +108,13 @@ export function AdminSettings() {
       setFavoriteExercises(tempFavoriteExercises)
       setHasChanges(false)
       setShowSuccessMessage(true)
+      
+      // Cerrar el panel después de un breve delay para mostrar el mensaje
+      if (onClose) {
+        setTimeout(() => {
+          onClose()
+        }, 1000)
+      }
     } catch (error) {
       console.error('Error saving settings:', error)
     } finally {
@@ -109,7 +128,7 @@ export function AdminSettings() {
     setExerciseSearchTerm('')
   }
 
-  // Filtrar ejercicios por término de búsqueda
+  // Filtrar ejercicios por término de búsqueda (mostrar todos, incluyendo deportes)
   const filteredExercises = useMemo(() => {
     if (!exerciseSearchTerm.trim()) {
       return exercises
@@ -218,7 +237,28 @@ export function AdminSettings() {
                           color="primary"
                         />
                       }
-                      label={exercise.name}
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <span>{exercise.name}</span>
+                          {exercise.is_sport && (
+                            <Box
+                              sx={{
+                                fontSize: '0.7rem',
+                                color: 'primary.main',
+                                fontWeight: 'bold',
+                                px: 0.5,
+                                py: 0.25,
+                                borderRadius: 0.5,
+                                backgroundColor: 'primary.50',
+                                border: '1px solid',
+                                borderColor: 'primary.200'
+                              }}
+                            >
+                              DEPORTE
+                            </Box>
+                          )}
+                        </Box>
+                      }
                       sx={{
                         m: 0,
                         width: '100%',

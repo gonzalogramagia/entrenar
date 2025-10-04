@@ -137,7 +137,7 @@ type AdminUser struct {
 func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Consultar todos los usuarios con información básica y configuraciones
+	// Consultar todos los usuarios con información básica
 	query := `
 		SELECT 
 			u.id,
@@ -151,7 +151,6 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			true as unc_notifications_enabled
 		FROM auth.users u
 		LEFT JOIN user_profiles up ON u.id = up.user_id
-		LEFT JOIN user_settings us ON u.id = us.user_id
 		WHERE u.email_confirmed_at IS NOT NULL
 		ORDER BY u.last_sign_in_at DESC NULLS LAST, u.created_at DESC
 	`

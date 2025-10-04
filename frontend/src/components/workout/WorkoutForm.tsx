@@ -111,10 +111,9 @@ export default function WorkoutForm({
     }
   }, [])
   
-  // Filtrar ejercicios favoritos si están configurados manualmente y excluir deportes
+  // Filtrar ejercicios favoritos según configuraciones
   const filteredExercises = useMemo(() => {
-    // Primero excluir deportes
-    let filtered = exercises.filter(exercise => !exercise.is_sport)
+    let filtered = exercises // Incluir todos los ejercicios inicialmente
     
     // Para usuarios Admin, Staff o Profe, usar configuraciones de localStorage
     if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
@@ -123,16 +122,22 @@ export default function WorkoutForm({
         if (adminSettings) {
           const parsed = JSON.parse(adminSettings)
           if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
+            // Filtrar solo los ejercicios seleccionados (pueden incluir deportes)
             filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
           }
         }
       } catch (error) {
         console.error('Error loading admin exercise settings:', error)
+        // Fallback: excluir deportes si hay error
+        filtered = exercises.filter(exercise => !exercise.is_sport)
       }
     } else {
       // Para usuarios normales, usar configuraciones del contexto
       if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
         filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+      } else {
+        // Fallback: excluir deportes para usuarios normales
+        filtered = exercises.filter(exercise => !exercise.is_sport)
       }
     }
     
