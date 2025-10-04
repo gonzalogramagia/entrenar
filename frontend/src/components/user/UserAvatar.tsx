@@ -232,7 +232,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         {!(isAdmin || userRole === 'profe' || userRole === 'staff') && (
           <MenuItem onClick={handleOpenSettings}>
             <ListItemIcon>
-              <Box sx={{ fontSize: '1.2rem' }}>⚙️</Box>
+              <AdminIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>Panel de Usuario</ListItemText>
           </MenuItem>

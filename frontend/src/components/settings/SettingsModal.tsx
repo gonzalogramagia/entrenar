@@ -17,7 +17,8 @@ import {
   Snackbar
 } from '@mui/material'
 import {
-  Close
+  Close,
+  AdminPanelSettings as AdminIcon
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { useAuth } from '../../contexts/AuthContext'
@@ -60,11 +61,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
             favoriteExercises: parsed.favoriteExercises || []
           }))
         } else {
-          // Si no hay configuraciones guardadas, usar todos los ejercicios disponibles
-          const allExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+          // Si no hay configuraciones guardadas, inicializar con lista vacía
           setTempSettings(prev => ({
             ...prev,
-            favoriteExercises: allExerciseIds
+            favoriteExercises: []
           }))
         }
       } catch (error) {
@@ -165,33 +165,11 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     }
   }
 
-  // Filtrar ejercicios disponibles (excluir deportes y aplicar filtros de favoritos)
+  // Filtrar ejercicios disponibles (solo excluir deportes, mostrar todos para configuración)
   const availableExercises = useMemo(() => {
-    // Primero excluir deportes
-    let filtered = exercises.filter(exercise => !exercise.is_sport)
-    
-    // Para usuarios Admin, Staff o Profe, usar configuraciones de localStorage
-    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
-      try {
-        const adminSettings = localStorage.getItem('admin-exercise-settings')
-        if (adminSettings) {
-          const parsed = JSON.parse(adminSettings)
-          if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
-            filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
-          }
-        }
-      } catch (error) {
-        console.error('Error loading admin exercise settings:', error)
-      }
-    } else {
-      // Para usuarios normales, usar configuraciones del contexto
-      if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
-        filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
-      }
-    }
-    
-    return filtered
-  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin])
+    // Solo excluir deportes, mostrar todos los ejercicios para que puedan ser configurados
+    return exercises.filter(exercise => !exercise.is_sport)
+  }, [exercises])
 
   // Filtrar ejercicios por término de búsqueda
   const filteredExercises = useMemo(() => {
@@ -239,8 +217,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AdminIcon sx={{ fontSize: 24, color: 'white' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            ⚙️ Panel de Usuario
+            Panel de Usuario
           </Typography>
         </Box>
         <IconButton
@@ -376,14 +355,14 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           {availableExercises.length > 0 ? (
             <Box>
               <Box sx={{
-                maxHeight: 300,
+                maxHeight: 400,
                 overflowY: 'auto',
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 1,
                 p: 1,
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
                 gap: 1
               }}>
                 {filteredExercises.map(exercise => (
@@ -395,8 +374,11 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                       py: 0.5,
                       px: 1,
                       borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.50' : 'background.paper',
                       '&:hover': {
-                        backgroundColor: 'grey.50'
+                        backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.100' : 'grey.50'
                       }
                     }}
                   >
@@ -414,7 +396,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                         m: 0,
                         width: '100%',
                         '& .MuiFormControlLabel-label': {
-                          fontSize: '0.875rem'
+                          fontSize: '0.875rem',
+                          fontWeight: tempSettings.favoriteExercises.includes(exercise.id) ? 500 : 400
                         }
                       }}
                     />
