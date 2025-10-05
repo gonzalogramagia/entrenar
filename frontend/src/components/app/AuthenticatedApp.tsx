@@ -77,11 +77,6 @@ function AuthenticatedAppContent() {
         apiClient.getExercises()
       ])
       
-      console.log('Datos cargados:', {
-        workouts: Array.isArray(workoutsData) ? workoutsData.length : 0,
-        workoutDays: Array.isArray(workoutDaysData) ? workoutDaysData.length : 0,
-        exercises: Array.isArray(exercisesData) ? exercisesData.length : 0
-      })
       
       setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
       setWorkoutDays(Array.isArray(workoutDaysData) ? workoutDaysData : [])
@@ -92,7 +87,6 @@ function AuthenticatedAppContent() {
       if (Array.isArray(exercisesData) && exercisesData.length > 0) {
         const exerciseIds = exercisesData.map(ex => ex.id)
         setTimeout(() => {
-          console.log('🔍 AuthenticatedApp: About to initialize exercises as favorites')
           initializeAllExercisesAsFavorites(exerciseIds)
         }, 100) // Pequeño delay para que las configuraciones se carguen primero
       }
@@ -155,7 +149,6 @@ function AuthenticatedAppContent() {
   }
 
   const handleOpenSettings = () => {
-    console.log('Abriendo configuración, ejercicios disponibles:', exercises.length)
     setSettingsModalOpen(true)
   }
 
@@ -278,7 +271,6 @@ function AuthenticatedAppContent() {
       console.log('📋 Ejercicios de la rutina:', activeRoutine.exercises.map((ex: any) => ({ id: ex.exercise_id, name: ex.exercise_name, sets: ex.sets })))
       
       // Obtener workouts del día actual
-      console.log('🔍 Obteniendo workouts del día...')
       const todayWorkouts = await apiClient.getWorkouts(today) as any[]
       console.log('✅ Workouts del día:', todayWorkouts.length)
       console.log('📊 Workouts:', todayWorkouts.map((w: any) => ({ exercise_id: w.exercise_id, set: w.set })))

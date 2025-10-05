@@ -67,7 +67,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           lastUpdated: new Date().toISOString()
         }
         localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
-        console.log('🔍 Initial settings saved to localStorage:', settingsToSave)
       }
     } catch (error) {
       console.error('Error loading exercise settings:', error)
@@ -84,7 +83,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
-      console.log('🔍 Fallback settings saved to localStorage:', settingsToSave)
     }
   }, [exercises])
 
@@ -145,7 +143,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
-      console.log('🔍 Settings saved to localStorage:', settingsToSave)
       
       
       setHasChanges(false)

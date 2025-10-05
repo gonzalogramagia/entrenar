@@ -94,7 +94,6 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       if (savedSettings) {
         try {
           const parsedSettings = JSON.parse(savedSettings)
-          console.log('🔍 Loading from localStorage fallback:', parsedSettings)
           setSettings({ ...defaultSettings, ...parsedSettings })
         } catch (error) {
           console.error('Error parsing user settings:', error)
@@ -118,24 +117,19 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       hasConfiguredFavorites: settings.hasConfiguredFavorites
     }
     localStorage.setItem('user-settings', JSON.stringify(settingsToSave))
-    console.log('🔍 Saving to localStorage:', settingsToSave)
   }, [settings.favoriteExercises, settings.hasConfiguredFavorites])
 
   const setFavoriteExercises = useCallback(async (exerciseIds: number[]) => {
-    console.log('🔍 setFavoriteExercises called with:', exerciseIds)
     setSettings(prev => {
       const newSettings = { 
         ...prev, 
         favoriteExercises: exerciseIds
       }
-      console.log('🔍 New settings after setFavoriteExercises:', newSettings)
       return newSettings
     })
     
     try {
-      console.log('🔍 Calling API to update favorite_exercises:', exerciseIds)
       await apiClient.updateUserSettings({ favorite_exercises: exerciseIds })
-      console.log('🔍 API call successful')
     } catch (error) {
       console.error('Error updating favorite_exercises setting:', error)
     }
@@ -148,14 +142,11 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         ...prev, 
         hasConfiguredFavorites: hasConfigured
       }
-      console.log('🔍 New settings after setHasConfiguredFavorites:', newSettings)
       return newSettings
     })
     
     try {
-      console.log('🔍 Calling API to update has_configured_favorites:', hasConfigured)
       await apiClient.updateUserSettings({ has_configured_favorites: hasConfigured })
-      console.log('🔍 API call successful')
     } catch (error) {
       console.error('Error updating has_configured_favorites setting:', error)
     }
@@ -185,17 +176,11 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const initializeAllExercisesAsFavorites = useCallback((exerciseIds: number[]) => {
     // Solo inicializar si no hay ejercicios favoritos configurados Y no ha configurado manualmente
     if (settings.favoriteExercises.length === 0 && !settings.hasConfiguredFavorites && exerciseIds.length > 0) {
-      console.log('🔍 Initializing all exercises as favorites:', exerciseIds)
       setSettings(prev => ({ 
         ...prev, 
         favoriteExercises: exerciseIds
       }))
     } else {
-      console.log('🔍 Skipping initialization:', {
-        favoriteExercisesLength: settings.favoriteExercises.length,
-        hasConfiguredFavorites: settings.hasConfiguredFavorites,
-        exerciseIdsLength: exerciseIds.length
-      })
     }
   }, [settings.favoriteExercises.length, settings.hasConfiguredFavorites])
 

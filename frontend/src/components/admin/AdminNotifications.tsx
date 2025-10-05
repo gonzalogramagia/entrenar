@@ -77,7 +77,6 @@ export function AdminNotifications() {
   const { userRole, isAdmin } = useAuth()
   
   // Debug: verificar permisos
-  console.log('🔧 AdminNotifications - userRole:', userRole, 'isAdmin:', isAdmin)
   const [notifications, setNotifications] = useState<AdminNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
