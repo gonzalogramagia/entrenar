@@ -41,6 +41,13 @@ func main() {
 
 	// Health check
 	api.HandleFunc("/health", handlers.HealthHandler).Methods("GET")
+	
+	// Test endpoint for debugging
+	api.HandleFunc("/test-export", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Test endpoint working", "method": "` + r.Method + `", "path": "` + r.URL.Path + `"}`))
+	}).Methods("POST")
 
 	// Workouts endpoints
 	api.HandleFunc("/workouts", handlers.GetWorkoutsHandler).Methods("GET")
