@@ -2,11 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import type { ReactNode } from 'react'
 import { apiClient } from '../lib/api'
 
-interface ApiUserSettings {
-  show_own_workouts_in_social: boolean
-  has_configured_favorites: boolean
-  favorite_exercises: number[]
-}
 
 interface UserSettings {
   favoriteExercises: number[]
@@ -51,57 +46,20 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const [onSocialSettingsChange, setOnSocialSettingsChange] = useState<(() => void) | undefined>(undefined)
   const [completedExercises, setCompletedExercises] = useState<CompletedExercises>({})
 
-  // Función para cargar configuraciones desde la API
+  // Función para cargar configuraciones desde localStorage
   const loadSettings = useCallback(async () => {
-    try {
-      const apiSettings = await apiClient.getUserSettings()
-
-      
-      // Combinar configuraciones de API con localStorage para ejercicios favoritos
-      const savedSettings = localStorage.getItem('user-settings')
-      let localSettings: Partial<UserSettings> = {}
-      if (savedSettings) {
-        try {
-          localSettings = JSON.parse(savedSettings)
-        } catch (error) {
-          console.error('Error parsing local settings:', error)
-        }
-      }
-      
-      const apiSettingsTyped = apiSettings as ApiUserSettings
-      
-      console.log('🔍 UserSettingsContext Debug:', {
-        apiSettings: apiSettingsTyped,
-        localSettings,
-        hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
-        favoriteExercisesFromAPI: apiSettingsTyped.favorite_exercises,
-        favoriteExercisesFromLocal: localSettings.favoriteExercises
-      })
-      
-      const finalSettings = { 
-        ...defaultSettings, 
-        showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
-        hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
-        favoriteExercises: apiSettingsTyped.favorite_exercises ?? []
-      }
-      
-      console.log('🔍 Final settings being set:', finalSettings)
-      setSettings(finalSettings)
-    } catch (error) {
-      console.error('Error loading user settings from API:', error)
-      // Fallback a localStorage
-      const savedSettings = localStorage.getItem('user-settings')
-      if (savedSettings) {
-        try {
-          const parsedSettings = JSON.parse(savedSettings)
-          setSettings({ ...defaultSettings, ...parsedSettings })
-        } catch (error) {
-          console.error('Error parsing user settings:', error)
-          setSettings(defaultSettings)
-        }
-      } else {
+    // Cargar configuraciones solo desde localStorage
+    const savedSettings = localStorage.getItem('user-settings')
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings)
+        setSettings({ ...defaultSettings, ...parsedSettings })
+      } catch (error) {
+        console.error('Error parsing user settings:', error)
         setSettings(defaultSettings)
       }
+    } else {
+      setSettings(defaultSettings)
     }
   }, [])
 
@@ -128,11 +86,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       return newSettings
     })
     
-    try {
-      await apiClient.updateUserSettings({ favorite_exercises: exerciseIds })
-    } catch (error) {
-      console.error('Error updating favorite_exercises setting:', error)
-    }
+    // Ya no se hacen llamadas a la API, todo se maneja con localStorage
   }, [])
 
   const setHasConfiguredFavorites = useCallback(async (hasConfigured: boolean) => {
@@ -145,11 +99,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       return newSettings
     })
     
-    try {
-      await apiClient.updateUserSettings({ has_configured_favorites: hasConfigured })
-    } catch (error) {
-      console.error('Error updating has_configured_favorites setting:', error)
-    }
+    // Ya no se hacen llamadas a la API, todo se maneja con localStorage
   }, [])
 
 
