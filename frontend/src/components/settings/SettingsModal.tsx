@@ -206,22 +206,36 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         },
       })
 
-      // Si falla con 405, intentar con el endpoint de test para diagnosticar
+      // Si falla con 405, usar método alternativo
       if (!response.ok && response.status === 405) {
-        console.log('Endpoint /workouts/export no disponible, probando endpoint de test...')
-        const testResponse = await fetch('/api/test-export', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        console.log('Endpoint /workouts/export no disponible, usando método alternativo...')
         
-        if (testResponse.ok) {
-          const testData = await testResponse.json()
-          console.log('Test endpoint funciona:', testData)
-          throw new Error('El servidor no se ha actualizado con la funcionalidad de exportación. Por favor, contacta al administrador.')
-        } else {
-          throw new Error('Error del servidor: ' + testResponse.status)
+        // Método alternativo: obtener datos y generar CSV en el frontend
+        try {
+          const workoutsResponse = await fetch('/api/workouts')
+          if (!workoutsResponse.ok) {
+            throw new Error('No se pudieron obtener los entrenamientos')
+          }
+          
+          const workouts = await workoutsResponse.json()
+          
+          // Generar CSV
+          const csvContent = generateCSVFromWorkouts(workouts)
+          
+          // Descargar archivo
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `entrenamientos_${new Date().toISOString().split('T')[0]}.csv`
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+          
+          return // Salir exitosamente
+        } catch (altError) {
+          throw new Error('Error generando archivo CSV: ' + (altError instanceof Error ? altError.message : 'Error desconocido'))
         }
       }
 
@@ -246,6 +260,33 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     } finally {
       setDownloading(false)
     }
+  }
+
+  // Función para generar CSV desde los datos de entrenamientos
+  const generateCSVFromWorkouts = (workouts: any[]) => {
+    const headers = ['Fecha', 'Ejercicio', 'Peso (kg)', 'Repeticiones', 'Serie', 'Tiempo (seg)', 'Observaciones', 'Día de Entrenamiento']
+    
+    let csvContent = '\uFEFF' // BOM para UTF-8
+    
+    // Agregar encabezados
+    csvContent += headers.map(header => `"${header}"`).join(',') + '\n'
+    
+    // Agregar datos
+    workouts.forEach(workout => {
+      const row = [
+        new Date(workout.created_at).toLocaleString('es-AR'),
+        workout.exercise_name || '',
+        workout.weight ? (workout.weight / 10).toFixed(1) : '',
+        workout.reps || '',
+        workout.set || '',
+        workout.seconds || '',
+        workout.observations || '',
+        workout.workout_day_name || ''
+      ]
+      csvContent += row.map(field => `"${field}"`).join(',') + '\n'
+    })
+    
+    return csvContent
   }
 
 
