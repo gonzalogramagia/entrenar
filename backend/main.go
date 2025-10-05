@@ -91,9 +91,6 @@ func main() {
 	api.HandleFunc("/welcome-notification", handlers.CreateWelcomeNotificationHandler).Methods("POST")
 	api.HandleFunc("/welcome-notification", handlers.GetWelcomeNotificationHandler).Methods("GET")
 
-	// User settings endpoints
-	api.HandleFunc("/user-settings", handlers.GetUserSettingsHandler).Methods("GET")
-	api.HandleFunc("/user-settings", handlers.UpdateUserSettingsHandler).Methods("PUT")
 
 	// Debug endpoint (temporal)
 	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")

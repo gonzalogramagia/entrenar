@@ -130,7 +130,7 @@ type AdminUser struct {
 	Role      string  `json:"role"`
 	CreatedAt string  `json:"created_at"`
 	LastLogin *string `json:"last_login"`
-	Settings  *UserSettings `json:"settings"`
+	Settings  *map[string]interface{} `json:"settings"`
 }
 
 // GetAdminUsersHandler obtiene todos los usuarios para el panel de administrador
@@ -190,10 +190,10 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			user.LastLogin = lastSignInAt
 		}
 		
-		// Agregar configuraciones
-		user.Settings = &UserSettings{
-			HasConfiguredFavorites: false,
-			FavoriteExercises: []int{},
+		// Agregar configuraciones por defecto
+		user.Settings = &map[string]interface{}{
+			"has_configured_favorites": false,
+			"favorite_exercises": []int{},
 		}
 		
 		users = append(users, user)
