@@ -148,12 +148,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
         
         // Método alternativo: obtener datos y generar CSV en el frontend
         try {
-          const workoutsResponse = await fetch('/api/workouts')
-          if (!workoutsResponse.ok) {
-            throw new Error('No se pudieron obtener los entrenamientos')
-          }
-          
-          const workouts = await workoutsResponse.json()
+          const workouts = await apiClient.getWorkouts() as any[]
           
           // Generar CSV
           const csvContent = generateCSVFromWorkouts(workouts)

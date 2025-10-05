@@ -21,6 +21,7 @@ import {
   AdminPanelSettings as AdminIcon,
   Download as DownloadIcon
 } from '@mui/icons-material'
+import { apiClient } from '../../lib/api'
 
 type Exercise = {
   id: number
@@ -212,12 +213,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         
         // Método alternativo: obtener datos y generar CSV en el frontend
         try {
-          const workoutsResponse = await fetch('/api/workouts')
-          if (!workoutsResponse.ok) {
-            throw new Error('No se pudieron obtener los entrenamientos')
-          }
-          
-          const workouts = await workoutsResponse.json()
+          const workouts = await apiClient.getWorkouts() as any[]
           
           // Generar CSV
           const csvContent = generateCSVFromWorkouts(workouts)
