@@ -198,16 +198,35 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     try {
       setDownloading(true)
       
-      // Crear un Google Sheet con los datos de entrenamientos
-      const response = await fetch('/api/workouts/export', {
+      // Intentar primero con el endpoint de exportación
+      let response = await fetch('/api/workouts/export', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       })
 
+      // Si falla con 405, intentar con el endpoint de test para diagnosticar
+      if (!response.ok && response.status === 405) {
+        console.log('Endpoint /workouts/export no disponible, probando endpoint de test...')
+        const testResponse = await fetch('/api/test-export', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        if (testResponse.ok) {
+          const testData = await testResponse.json()
+          console.log('Test endpoint funciona:', testData)
+          throw new Error('El servidor no se ha actualizado con la funcionalidad de exportación. Por favor, contacta al administrador.')
+        } else {
+          throw new Error('Error del servidor: ' + testResponse.status)
+        }
+      }
+
       if (!response.ok) {
-        throw new Error('Error al exportar entrenamientos')
+        throw new Error(`Error al exportar entrenamientos: ${response.status}`)
       }
 
       const blob = await response.blob()
@@ -222,7 +241,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       
     } catch (error) {
       console.error('Error downloading workouts:', error)
-      // Aquí podrías mostrar un mensaje de error al usuario
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
+      alert(`Error al descargar entrenamientos: ${errorMessage}`)
     } finally {
       setDownloading(false)
     }
