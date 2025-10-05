@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -616,6 +617,120 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// ExportWorkoutsHandler exporta todos los entrenamientos del usuario en formato CSV
+func ExportWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	// Consulta para obtener todos los entrenamientos del usuario con información detallada
+	query := `
+		SELECT 
+			w.created_at,
+			e.name as exercise_name,
+			w.weight,
+			w.reps,
+			w.set,
+			w.seconds,
+			w.observations,
+			wd.name as workout_day_name
+		FROM workouts w
+		JOIN exercises e ON w.exercise_id = e.id
+		LEFT JOIN workout_days wd ON w.workout_day_id = wd.id
+		WHERE w.user_id = $1
+		ORDER BY w.created_at DESC, w.workout_day_id, w.set
+	`
+
+	rows, err := database.DB.Query(query, userID)
+	if err != nil {
+		http.Error(w, "Error consultando entrenamientos", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	// Configurar headers para descarga de archivo CSV
+	filename := fmt.Sprintf("entrenamientos_%s.csv", time.Now().Format("2006-01-02"))
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+
+	// Escribir BOM para UTF-8 (para que Excel abra correctamente los caracteres especiales)
+	w.Write([]byte("\xEF\xBB\xBF"))
+
+	// Escribir encabezados CSV
+	headers := []string{
+		"Fecha",
+		"Ejercicio",
+		"Peso (kg)",
+		"Repeticiones",
+		"Serie",
+		"Tiempo (seg)",
+		"Observaciones",
+		"Día de Entrenamiento",
+	}
+	
+	// Escribir encabezados
+	for i, header := range headers {
+		if i > 0 {
+			w.Write([]byte(","))
+		}
+		w.Write([]byte(fmt.Sprintf("\"%s\"", header)))
+	}
+	w.Write([]byte("\n"))
+
+	// Escribir datos
+	for rows.Next() {
+		var createdAt time.Time
+		var exerciseName, observations, workoutDayName sql.NullString
+		var weight, reps, set, seconds sql.NullInt32
+
+		err := rows.Scan(
+			&createdAt,
+			&exerciseName,
+			&weight,
+			&reps,
+			&set,
+			&seconds,
+			&observations,
+			&workoutDayName,
+		)
+		if err != nil {
+			continue // Saltar filas con error
+		}
+
+		// Convertir fecha a zona horaria de Argentina
+		argentinaTime := convertToArgentinaTime(createdAt)
+		
+		// Escribir fila CSV
+		row := []string{
+			argentinaTime.Format("2006-01-02 15:04:05"),
+			exerciseName.String,
+			fmt.Sprintf("%.1f", float64(weight.Int32)/10.0), // Convertir de gramos a kg
+			fmt.Sprintf("%d", reps.Int32),
+			fmt.Sprintf("%d", set.Int32),
+			fmt.Sprintf("%d", seconds.Int32),
+			observations.String,
+			workoutDayName.String,
+		}
+
+		for i, field := range row {
+			if i > 0 {
+				w.Write([]byte(","))
+			}
+			// Escapar comillas dobles en el contenido
+			escapedField := fmt.Sprintf("\"%s\"", strings.ReplaceAll(field, "\"", "\"\""))
+			w.Write([]byte(escapedField))
+		}
+		w.Write([]byte("\n"))
+	}
+
+	if err = rows.Err(); err != nil {
+		http.Error(w, "Error procesando datos", http.StatusInternalServerError)
+		return
+	}
 }
 
 

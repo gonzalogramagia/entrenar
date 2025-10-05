@@ -18,7 +18,8 @@ import {
 } from '@mui/material'
 import {
   Close,
-  AdminPanelSettings as AdminIcon
+  AdminPanelSettings as AdminIcon,
+  Download as DownloadIcon
 } from '@mui/icons-material'
 
 type Exercise = {
@@ -39,6 +40,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [saving, setSaving] = useState(false)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
@@ -195,6 +197,40 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     onClose()
   }
 
+  const handleDownloadWorkouts = async () => {
+    try {
+      setDownloading(true)
+      
+      // Crear un Google Sheet con los datos de entrenamientos
+      const response = await fetch('/api/workouts/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al exportar entrenamientos')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `entrenamientos_${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+    } catch (error) {
+      console.error('Error downloading workouts:', error)
+      // Aquí podrías mostrar un mensaje de error al usuario
+    } finally {
+      setDownloading(false)
+    }
+  }
+
 
 
   return (
@@ -334,6 +370,29 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         <Divider sx={{ my: 2 }} /> */}
 
 
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Sección EXPORTAR DATOS */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            📊 EXPORTAR MIS DATOS
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Descarga todos tus entrenamientos en formato CSV para análisis o respaldo
+          </Typography>
+
+          <Button
+            variant="outlined"
+            startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+            onClick={handleDownloadWorkouts}
+            disabled={downloading}
+            sx={{ mb: 2 }}
+          >
+            {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
+          </Button>
+        </Box>
 
         <Divider sx={{ my: 2 }} />
 
