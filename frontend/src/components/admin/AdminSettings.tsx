@@ -10,6 +10,7 @@ import {
   Button,
   Snackbar
 } from '@mui/material'
+import { Download as DownloadIcon } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
 type Exercise = {
@@ -31,6 +32,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   const [tempFavoriteExercises, setTempFavoriteExercises] = useState<number[]>([])
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   // Cargar ejercicios y configuraciones al montar el componente
   useEffect(() => {
@@ -128,6 +130,40 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
     setExerciseSearchTerm('')
   }
 
+  const handleDownloadWorkouts = async () => {
+    try {
+      setDownloading(true)
+      
+      // Crear un CSV con los datos de entrenamientos
+      const response = await fetch('/api/workouts/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al exportar entrenamientos')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `entrenamientos_${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+    } catch (error) {
+      console.error('Error downloading workouts:', error)
+      // Aquí podrías mostrar un mensaje de error al usuario
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   // Filtrar ejercicios por término de búsqueda (mostrar todos, incluyendo deportes)
   const filteredExercises = useMemo(() => {
     if (!exerciseSearchTerm.trim()) {
@@ -174,7 +210,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
         pt: 2 // Padding superior para bajar el contenido
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-          ⚙️ Mis Configuraciones
+          Mis Configuraciones
         </Typography>
       </Box>
 
@@ -185,6 +221,27 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
         minHeight: 0,
         maxHeight: '400px' // Limitar altura para asegurar que los botones sean visibles
       }}>
+
+        {/* Sección EXPORTAR DATOS */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            📊 EXPORTAR MIS DATOS
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Descarga todos tus entrenamientos en formato CSV para análisis o respaldo
+          </Typography>
+
+          <Button
+            variant="outlined"
+            startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+            onClick={handleDownloadWorkouts}
+            disabled={downloading}
+            sx={{ mb: 2 }}
+          >
+            {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
+          </Button>
+        </Box>
 
         {/* Sección EJERCICIOS FAVORITOS */}
         <Box sx={{ mb: 4 }}>
