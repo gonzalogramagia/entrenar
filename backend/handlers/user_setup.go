@@ -100,20 +100,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	// 2. Crear configuración de usuario
-	_, err = tx.Exec(`
-		INSERT INTO user_settings (user_id, has_configured_favorites, favorite_exercises)
-		VALUES ($1, $2, $3)
-		ON CONFLICT (user_id) DO UPDATE SET
-			has_configured_favorites = EXCLUDED.has_configured_favorites,
-			favorite_exercises = EXCLUDED.favorite_exercises
-	`, req.UserID, false, []int{})
-
-	if err != nil {
-		fmt.Printf("Error creando configuración: %v\n", err)
-		http.Error(w, "Error creating user settings", http.StatusInternalServerError)
-		return
-	}
+	// 2. user_settings ya no se usa (se maneja con localStorage)
 
 	// 3. Crear notificación de bienvenida (solo si no existe)
 	fmt.Printf("Creando notificación de bienvenida para usuario %s\n", req.UserID)

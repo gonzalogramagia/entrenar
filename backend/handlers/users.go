@@ -246,12 +246,7 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 3. Eliminar de user_settings
-	_, err = tx.Exec("DELETE FROM user_settings WHERE user_id = $1", userID)
-	if err != nil {
-		http.Error(w, "Error eliminando configuraciones de usuario", http.StatusInternalServerError)
-		return
-	}
+	// 3. user_settings ya no se usa (se maneja con localStorage)
 
 	// 4. Eliminar de user_profiles
 	_, err = tx.Exec("DELETE FROM user_profiles WHERE user_id = $1", userID)
