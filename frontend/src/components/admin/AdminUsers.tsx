@@ -208,8 +208,8 @@ export function AdminUsers() {
         flexDirection: 'column',
         gap: 2
       }}>
-        <CircularProgress size={60} thickness={4} sx={{ color: '#1976d2' }} />
-        <Typography variant="body1" sx={{ fontWeight: 500, color: '#1976d2' }}>
+        <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
+        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
           Cargando usuarios...
         </Typography>
       </Box>
