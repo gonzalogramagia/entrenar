@@ -3,7 +3,7 @@ const BACKEND_URL = 'https://entrenar.up.railway.app';
 
 export async function apiProxy(endpoint: string, options: RequestInit = {}) {
   const url = `${BACKEND_URL}${endpoint}`;
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -39,9 +39,7 @@ export const api = {
   getExercises: () => apiProxy('/api/exercises'),
   getExercise: (id: string) => apiProxy(`/api/exercises/${id}`),
 
-  // Equipment
-  getEquipment: () => apiProxy('/api/equipment'),
-  getEquipmentById: (id: string) => apiProxy(`/api/equipment/${id}`),
+
 
   // User
   getCurrentUser: () => apiProxy('/api/me'),

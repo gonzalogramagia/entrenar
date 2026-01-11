@@ -25,7 +25,7 @@ class ApiClient {
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
     const { data: { session } } = await supabase.auth.getSession()
-    
+
     if (!session?.access_token) {
       throw new Error('No auth session found')
     }
@@ -54,7 +54,7 @@ class ApiClient {
       // Para desarrollo local, usar la URL completa
       url = `${this.baseUrl}${endpoint}`
     }
-    
+
     let requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       ...headers
@@ -82,10 +82,10 @@ class ApiClient {
 
     try {
       const response = await fetch(url, requestConfig)
-      
+
       if (!response.ok) {
         const errorText = await response.text()
-        
+
         // Si es un error 401, limpiar la sesión automáticamente
         if (response.status === 401) {
           console.log('🔒 401 Unauthorized - Limpiando sesión automáticamente')
@@ -97,7 +97,7 @@ class ApiClient {
             console.error('Error during automatic signout:', signOutError)
           }
         }
-        
+
         throw new Error(`API Error: ${response.status} - ${errorText}`)
       }
 
@@ -137,7 +137,7 @@ class ApiClient {
     const params = new URLSearchParams()
     if (date) params.append('date', date)
     if (workoutDayId) params.append('workout_day_id', workoutDayId)
-    
+
     const query = params.toString()
     const endpoint = query ? `/workouts?${query}` : '/workouts'
     return this.request(endpoint)
@@ -184,14 +184,7 @@ class ApiClient {
     return this.request(`/exercises/${id}`)
   }
 
-  // Equipment API
-  async getEquipment() {
-    return this.request('/equipment')
-  }
 
-  async getEquipmentById(id: number) {
-    return this.request(`/equipment/${id}`)
-  }
 
   // User API
   async getCurrentUser() {
@@ -321,7 +314,7 @@ class ApiClient {
     muscle_group: string
     primary_muscles: string[]
     secondary_muscles: string[]
-    equipment: string
+
     video_url?: string
     bodyweight?: boolean
     is_sport?: boolean

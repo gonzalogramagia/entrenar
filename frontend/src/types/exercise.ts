@@ -4,7 +4,7 @@ export interface Exercise {
   muscle_group: string
   primary_muscles: string[]
   secondary_muscles: string[]
-  equipment: string
+
   video_url?: string
   bodyweight: boolean
   is_sport: boolean
@@ -16,7 +16,7 @@ export interface CreateExerciseRequest {
   muscle_group: string
   primary_muscles: string[]
   secondary_muscles: string[]
-  equipment: string
+
   video_url?: string
   bodyweight?: boolean
   is_sport?: boolean
@@ -27,7 +27,7 @@ export interface UpdateExerciseRequest {
   muscle_group?: string
   primary_muscles?: string[]
   secondary_muscles?: string[]
-  equipment?: string
+
   video_url?: string
   bodyweight?: boolean
   is_sport?: boolean
@@ -35,7 +35,7 @@ export interface UpdateExerciseRequest {
 
 export interface ExerciseFilter {
   muscle_group?: string
-  equipment?: string
+
   search?: string
   is_sport?: boolean
 }

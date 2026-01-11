@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
-import EquipmentList from '../equipment/EquipmentList'
+
 import SocialList from '../social/SocialList'
 import RoutineList from '../routines/RoutineList'
 import AdminPanel from '../admin/AdminPanel'
@@ -76,12 +76,12 @@ function AuthenticatedAppContent() {
         apiClient.getWorkoutDays(),
         apiClient.getExercises()
       ])
-      
-      
+
+
       setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
       setWorkoutDays(Array.isArray(workoutDaysData) ? workoutDaysData : [])
       setExercises(Array.isArray(exercisesData) ? exercisesData : [])
-      
+
       // Inicializar todos los ejercicios como favoritos si no hay configuración previa
       // Usar setTimeout para asegurar que las configuraciones se hayan cargado primero
       if (Array.isArray(exercisesData) && exercisesData.length > 0) {
@@ -92,19 +92,19 @@ function AuthenticatedAppContent() {
       }
     } catch (error) {
       console.error('Error cargando datos del backend:', error)
-      
+
       // Fallback a localStorage si el backend falla
-          const savedWorkouts = localStorage.getItem('entrenar-workouts')
-    const savedWorkoutDays = localStorage.getItem('entrenar-workout-days')
-      
+      const savedWorkouts = localStorage.getItem('entrenar-workouts')
+      const savedWorkoutDays = localStorage.getItem('entrenar-workout-days')
+
       if (savedWorkouts) {
         setWorkouts(JSON.parse(savedWorkouts))
       }
-      
+
       if (savedWorkoutDays) {
         setWorkoutDays(JSON.parse(savedWorkoutDays))
       }
-      
+
       // Solo usar ejercicios por defecto si no hay ninguno cargado
       setExercises([])
     } finally {
@@ -133,14 +133,14 @@ function AuthenticatedAppContent() {
   // Guardar workouts cuando cambien
   useEffect(() => {
     if (workouts.length > 0) {
-              localStorage.setItem('entrenar-workouts', JSON.stringify(workouts))
+      localStorage.setItem('entrenar-workouts', JSON.stringify(workouts))
     }
   }, [workouts])
 
   // Guardar workout days cuando cambien
   useEffect(() => {
     if (workoutDays.length > 0) {
-              localStorage.setItem('entrenar-workout-days', JSON.stringify(workoutDays))
+      localStorage.setItem('entrenar-workout-days', JSON.stringify(workoutDays))
     }
   }, [workoutDays])
 
@@ -180,7 +180,7 @@ function AuthenticatedAppContent() {
     setActiveRoutine(routine)
     setRoutineProgress(0)
     setIsRoutinePaused(false)
-    
+
     // Guardar en localStorage para persistencia
     localStorage.setItem('activeRoutine', JSON.stringify({
       routine: routine,
@@ -188,7 +188,7 @@ function AuthenticatedAppContent() {
       isPaused: false,
       timestamp: Date.now()
     }))
-    
+
     // Auto-completar con el primer ejercicio de la rutina
     if (routine.exercises && routine.exercises.length > 0) {
       const firstExercise = {
@@ -209,7 +209,7 @@ function AuthenticatedAppContent() {
     setActiveRoutine(routine)
     setRoutineProgress(0)
     setIsRoutinePaused(false)
-    
+
     // Guardar en localStorage para persistencia
     localStorage.setItem('activeRoutine', JSON.stringify({
       routine: routine,
@@ -217,7 +217,7 @@ function AuthenticatedAppContent() {
       isPaused: false,
       timestamp: Date.now()
     }))
-    
+
     console.log('Rutina iniciada desde modal:', routine.name)
   }
 
@@ -230,7 +230,7 @@ function AuthenticatedAppContent() {
     setRoutineProgress(0)
     setIsRoutinePaused(false)
     setPreloadedExercise(exercise)
-    
+
     // Guardar en localStorage para persistencia
     localStorage.setItem('activeRoutine', JSON.stringify({
       routine: routine,
@@ -238,7 +238,7 @@ function AuthenticatedAppContent() {
       isPaused: false,
       timestamp: Date.now()
     }))
-    
+
     console.log('Iniciando rutina con ejercicio pre-cargado:', routine.name, exercise.exercise_name)
   }
 
@@ -250,7 +250,7 @@ function AuthenticatedAppContent() {
     setIsRoutinePaused(false)
     setRoutineProgress(0)
     setPreloadedExercise(null)
-    
+
     // Limpiar localStorage
     localStorage.removeItem('activeRoutine')
   }
@@ -258,7 +258,7 @@ function AuthenticatedAppContent() {
   // Función para calcular el progreso de la rutina basado en workouts del día
   const calculateRoutineProgress = async () => {
     console.log('🚀 calculateRoutineProgress iniciada')
-    
+
     if (!activeRoutine || !activeRoutine.exercises) {
       console.log('❌ No hay rutina activa o ejercicios')
       return 0
@@ -269,15 +269,15 @@ function AuthenticatedAppContent() {
       console.log('📅 Calculando progreso para fecha:', today)
       console.log('🏋️ Rutina activa:', activeRoutine.name)
       console.log('📋 Ejercicios de la rutina:', activeRoutine.exercises.map((ex: any) => ({ id: ex.exercise_id, name: ex.exercise_name, sets: ex.sets })))
-      
+
       // Obtener workouts del día actual
       const todayWorkouts = await apiClient.getWorkouts(today) as any[]
       console.log('✅ Workouts del día:', todayWorkouts.length)
       console.log('📊 Workouts:', todayWorkouts.map((w: any) => ({ exercise_id: w.exercise_id, set: w.set })))
-      
+
       // Crear un mapa de ejercicios completados
       const completedExercises = new Map()
-      
+
       todayWorkouts.forEach((workout: any) => {
         const exerciseId = workout.exercise_id
         if (!completedExercises.has(exerciseId)) {
@@ -285,32 +285,32 @@ function AuthenticatedAppContent() {
         }
         completedExercises.set(exerciseId, completedExercises.get(exerciseId) + 1)
       })
-      
+
       console.log('🎯 Ejercicios completados:', Object.fromEntries(completedExercises))
-      
+
       // Calcular progreso basado en series completadas vs total de series
       let completedSets = 0
       let totalSets = 0
-      
+
       activeRoutine.exercises.forEach((exercise: any) => {
         const exerciseId = exercise.exercise_id
         const completedForExercise = completedExercises.get(exerciseId) || 0
         const targetSets = exercise.sets
-        
+
         console.log(`💪 Ejercicio ${exercise.exercise_name} (ID: ${exerciseId}): ${completedForExercise}/${targetSets} series completadas`)
-        
+
         completedSets += Math.min(completedForExercise, targetSets)
         totalSets += targetSets
       })
-      
+
       console.log(`📈 Total: ${completedSets}/${totalSets} series completadas`)
-      
+
       // Calcular porcentaje
       const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
       console.log('🎉 Progreso calculado:', progress + '%')
-      
+
       return Math.min(100, Math.max(0, progress))
-      
+
     } catch (error) {
       console.error('❌ Error calculando progreso de rutina:', error)
       return 0
@@ -328,7 +328,7 @@ function AuthenticatedAppContent() {
     if (currentExerciseIndex === -1) return null
 
     const currentExerciseData = activeRoutine.exercises[currentExerciseIndex]
-    
+
     // Si hay más series del mismo ejercicio
     if (currentSet < currentExerciseData.sets) {
       return {
@@ -336,7 +336,7 @@ function AuthenticatedAppContent() {
         currentSet: currentSet + 1
       }
     }
-    
+
     // Si no hay más series, buscar el siguiente ejercicio
     if (currentExerciseIndex < activeRoutine.exercises.length - 1) {
       const nextExercise = activeRoutine.exercises[currentExerciseIndex + 1]
@@ -345,7 +345,7 @@ function AuthenticatedAppContent() {
         currentSet: 1
       }
     }
-    
+
     // Si no hay más ejercicios, la rutina está completa
     return null
   }
@@ -359,16 +359,16 @@ function AuthenticatedAppContent() {
           const parsed = JSON.parse(savedRoutine)
           const now = Date.now()
           const timeDiff = now - parsed.timestamp
-          
+
           // Solo restaurar si no han pasado más de 24 horas
           if (timeDiff < 24 * 60 * 60 * 1000) {
             setActiveRoutine(parsed.routine)
             setIsRoutinePaused(parsed.isPaused || false)
-            
+
             // Calcular progreso real basado en workouts del día
             const realProgress = await calculateRoutineProgress()
             setRoutineProgress(realProgress)
-            
+
             console.log('Rutina activa restaurada desde localStorage:', parsed.routine.name, 'Progreso real:', realProgress + '%')
           } else {
             // Limpiar si es muy antigua
@@ -381,7 +381,7 @@ function AuthenticatedAppContent() {
         }
       }
     }
-    
+
     loadActiveRoutine()
   }, [])
 
@@ -412,11 +412,11 @@ function AuthenticatedAppContent() {
       setIsRoutinePaused(false)
       setRoutineProgress(0)
       localStorage.removeItem('activeRoutine')
-      
+
       // Disparar evento para resetear el cronómetro
       const resetTimerEvent = new CustomEvent('resetTimer', {})
       window.dispatchEvent(resetTimerEvent)
-      
+
       console.log('✅ Rutina parada exitosamente')
       console.log('📍 Tab actual después de parar:', activeTab)
     }
@@ -438,7 +438,7 @@ function AuthenticatedAppContent() {
     window.addEventListener('stopRoutine', handleStopRoutine as EventListener)
     window.addEventListener('navigateToWorkout', handleNavigateToWorkout as EventListener)
     window.addEventListener('routineCompletedManually', handleRoutineCompletedManually as EventListener)
-    
+
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
       window.removeEventListener('startRoutineFromModal', handleStartRoutineFromModalEvent as EventListener)
@@ -463,7 +463,7 @@ function AuthenticatedAppContent() {
       const today = new Date().toISOString().split('T')[0]
 
       // Buscar si ya existe un workout day para hoy
-      let currentWorkoutDay = workoutDays.find(day => 
+      let currentWorkoutDay = workoutDays.find(day =>
         day.date === today
       )
 
@@ -488,19 +488,19 @@ function AuthenticatedAppContent() {
       }
 
       await apiClient.createWorkout(workoutData) as Workout
-      
+
       // Si hay una rutina activa, auto-completar con el siguiente ejercicio o serie
       if (activeRoutine && preloadedExercise) {
         const nextExercise = getNextExerciseOrSet(preloadedExercise, data.set)
-        
+
         if (nextExercise) {
           // Auto-completar con el siguiente ejercicio/serie
           setPreloadedExercise(nextExercise)
-          
+
           // Calcular progreso real basado en workouts del día
           const newProgress = await calculateRoutineProgress()
           setRoutineProgress(newProgress)
-          
+
           // Actualizar localStorage
           localStorage.setItem('activeRoutine', JSON.stringify({
             routine: activeRoutine,
@@ -508,7 +508,7 @@ function AuthenticatedAppContent() {
             isPaused: isRoutinePaused,
             timestamp: Date.now()
           }))
-          
+
           console.log('Auto-completando con siguiente ejercicio/serie:', nextExercise.exercise_name, 'Serie:', nextExercise.currentSet, 'Progreso:', newProgress + '%')
         } else {
           // La rutina está completa
@@ -517,7 +517,7 @@ function AuthenticatedAppContent() {
           setActiveRoutine(null)
           setPreloadedExercise(null)
           setRoutineProgress(100)
-          
+
           // Limpiar localStorage
           localStorage.removeItem('activeRoutine')
         }
@@ -539,17 +539,17 @@ function AuthenticatedAppContent() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <Navigation 
-          activeTab={activeTab} 
-          onTabChange={handleTabChange}
-          onOpenSettings={handleOpenSettings}
-          onOpenNotifications={handleOpenNotifications}
-          onOpenAdminPanel={() => setAdminPanelOpen(true)}
-          unreadNotifications={unreadNotifications}
-        />
-      
-      <Box sx={{ 
-        flexGrow: 1, 
+      <Navigation
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onOpenSettings={handleOpenSettings}
+        onOpenNotifications={handleOpenNotifications}
+        onOpenAdminPanel={() => setAdminPanelOpen(true)}
+        unreadNotifications={unreadNotifications}
+      />
+
+      <Box sx={{
+        flexGrow: 1,
         p: 2,
         pb: 0,
         overflow: 'auto',
@@ -564,9 +564,9 @@ function AuthenticatedAppContent() {
       }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
-          <Box sx={{ 
-            position: 'relative', 
-            zIndex: 1, 
+          <Box sx={{
+            position: 'relative',
+            zIndex: 1,
             height: '100%',
             overflow: activeRoutine ? 'auto' : 'hidden',
             px: { xs: 2, sm: 1 },
@@ -580,8 +580,8 @@ function AuthenticatedAppContent() {
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'
           }}>
-            <WorkoutForm 
-              exercises={exercises} 
+            <WorkoutForm
+              exercises={exercises}
               onSubmit={handleWorkoutSubmit}
               isLoading={isSubmittingWorkout}
               activeRoutine={activeRoutine}
@@ -600,106 +600,58 @@ function AuthenticatedAppContent() {
           <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
             <ExerciseList
               exercises={[
-                { 
-                  id: 1, 
-                  name: 'Press de Banca', 
-                  muscle_group: 'Pecho', 
+                {
+                  id: 1,
+                  name: 'Press de Banca',
+                  muscle_group: 'Pecho',
                   primary_muscles: ['Pectoral Mayor', 'Tríceps'],
                   secondary_muscles: ['Deltoides Anterior', 'Serrato Anterior'],
                   equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=rT7DgCr-3pg'
                 },
-                { 
-                  id: 2, 
-                  name: 'Sentadilla', 
-                  muscle_group: 'Piernas', 
+                {
+                  id: 2,
+                  name: 'Sentadilla',
+                  muscle_group: 'Piernas',
                   primary_muscles: ['Cuádriceps', 'Glúteos'],
                   secondary_muscles: ['Isquiotibiales', 'Gastrocnemio', 'Core'],
                   equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=aclHkVaku9U'
                 },
-                { 
-                  id: 3, 
-                  name: 'Peso Muerto', 
-                  muscle_group: 'Espalda', 
+                {
+                  id: 3,
+                  name: 'Peso Muerto',
+                  muscle_group: 'Espalda',
                   primary_muscles: ['Erector Espinal', 'Glúteos', 'Isquiotibiales'],
                   secondary_muscles: ['Trapecio', 'Romboides', 'Core'],
                   equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=op9kVnSso6Q'
                 },
-                { 
-                  id: 4, 
-                  name: 'Press Militar', 
-                  muscle_group: 'Hombros', 
+                {
+                  id: 4,
+                  name: 'Press Militar',
+                  muscle_group: 'Hombros',
                   primary_muscles: ['Deltoides Anterior', 'Deltoides Medio'],
                   secondary_muscles: ['Tríceps', 'Trapecio Superior'],
                   equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=2yjwXTZQDDI'
                 },
-                { 
-                  id: 5, 
-                  name: 'Curl de Bíceps', 
-                  muscle_group: 'Brazos', 
+                {
+                  id: 5,
+                  name: 'Curl de Bíceps',
+                  muscle_group: 'Brazos',
                   primary_muscles: ['Bíceps Braquial'],
                   secondary_muscles: ['Braquiorradial', 'Braquial'],
                   equipment: 'Mancuernas',
                   video_url: 'https://www.youtube.com/watch?v=ykJmrZ5v0Oa'
                 },
-              ]} 
-              onSelectExercise={(exercise) => console.log('Ejercicio seleccionado:', exercise)} 
+              ]}
+              onSelectExercise={(exercise) => console.log('Ejercicio seleccionado:', exercise)}
             />
           </Box>
         )}
 
-        {/* Pestaña Equipamiento */}
-        {activeTab === TABS.EQUIPMENT && (
-          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
-            <EquipmentList 
-              equipment={[
-                {
-                  id: 1,
-                  name: 'Barra Olímpica',
-                  category: 'BARRA',
-                  observations: 'Barra estándar de 20kg con roscas para discos',
-                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
-                  created_at: '2024-01-01T00:00:00Z'
-                },
-                {
-                  id: 2,
-                  name: 'Mancuernas Ajustables',
-                  category: 'MANCUERNAS',
-                  observations: 'Par de mancuernas ajustables de 5-25kg',
-                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
-                  created_at: '2024-01-02T00:00:00Z'
-                },
-                {
-                  id: 3,
-                  name: 'Rack de Sentadillas',
-                  category: 'RACK',
-                  observations: 'Rack de potencia con soporte para sentadillas y press de banca',
-                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
-                  created_at: '2024-01-03T00:00:00Z'
-                },
-                {
-                  id: 4,
-                  name: 'Banco de Ejercicios',
-                  category: 'BANCO',
-                  observations: 'Banco ajustable para press de banca y ejercicios variados',
-                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
-                  created_at: '2024-01-04T00:00:00Z'
-                },
-                {
-                  id: 5,
-                  name: 'Cinta de Correr',
-                  category: 'CARDIO',
-                  observations: 'Cinta de correr profesional con inclinación ajustable',
-                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
-                  created_at: '2024-01-05T00:00:00Z'
-                }
-              ]}
-            />
-          </Box>
-        )}
+
 
         {/* Pestaña Historial */}
         {activeTab === TABS.HISTORY && (
@@ -730,7 +682,7 @@ function AuthenticatedAppContent() {
         autoHideDuration={3000}
         onClose={() => setDeleteMessage('')}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ 
+        sx={{
           mt: 6,
           width: { xs: '95%', sm: '90%', md: '70%' },
           left: '50%',
@@ -738,9 +690,9 @@ function AuthenticatedAppContent() {
           zIndex: 99998
         }}
       >
-        <Alert 
-          severity="success" 
-          sx={{ 
+        <Alert
+          severity="success"
+          sx={{
             width: '100%',
             minWidth: '300px',
             fontSize: '0.95rem',
@@ -762,7 +714,7 @@ function AuthenticatedAppContent() {
         autoHideDuration={4000}
         onClose={() => setDeleteError('')}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ 
+        sx={{
           mt: 6,
           width: { xs: '95%', sm: '90%', md: '70%' },
           left: '50%',
@@ -770,9 +722,9 @@ function AuthenticatedAppContent() {
           zIndex: 99999
         }}
       >
-        <Alert 
-          severity="error" 
-          sx={{ 
+        <Alert
+          severity="error"
+          sx={{
             width: '100%',
             minWidth: '300px',
             fontSize: '0.95rem',
@@ -817,16 +769,16 @@ function AuthenticatedAppContent() {
             marginTop: '-60px' // Posicionar más arriba como en el login
           }}
         >
-          <CircularProgress 
-            size={48} 
-            thickness={4} 
-            sx={{ 
+          <CircularProgress
+            size={48}
+            thickness={4}
+            sx={{
               color: 'white',
               backgroundColor: 'transparent',
               '& .MuiCircularProgress-circle': {
                 strokeLinecap: 'round'
               }
-            }} 
+            }}
           />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
             {isLoggingOut ? 'Cerrando sesión...' : isSigningIn ? 'Iniciando sesión...' : 'Cargando...'}
@@ -835,15 +787,15 @@ function AuthenticatedAppContent() {
       </Backdrop>
 
       {/* Botón flotante para navegación rápida */}
-              <FloatingNavButton 
-          currentTab={activeTab} 
-          onTabChange={handleTabChange}
-          activeRoutine={activeRoutine}
-        />
+      <FloatingNavButton
+        currentTab={activeTab}
+        onTabChange={handleTabChange}
+        activeRoutine={activeRoutine}
+      />
 
       {/* Modal de configuración */}
-      <SettingsModal 
-        open={settingsModalOpen} 
+      <SettingsModal
+        open={settingsModalOpen}
         onClose={handleCloseSettings}
         exercises={exercises}
       />
@@ -851,8 +803,8 @@ function AuthenticatedAppContent() {
 
 
       {/* Modal de notificaciones */}
-      <NotificationsModal 
-        open={notificationsModalOpen} 
+      <NotificationsModal
+        open={notificationsModalOpen}
         onClose={handleCloseNotifications}
         onMarkAsRead={async () => {
           // Recargar el contador real desde el backend
@@ -862,8 +814,8 @@ function AuthenticatedAppContent() {
 
       {/* Modal del Panel de Administrador */}
       {adminPanelOpen && (
-        <AdminPanel 
-          open={adminPanelOpen} 
+        <AdminPanel
+          open={adminPanelOpen}
           onClose={() => setAdminPanelOpen(false)}
         />
       )}
@@ -872,7 +824,7 @@ function AuthenticatedAppContent() {
       <FloatingNavButtons />
 
       {/* Animación de confeti cuando se completa una rutina */}
-      <ConfettiAnimation 
+      <ConfettiAnimation
         trigger={showConfetti}
         onComplete={() => setShowConfetti(false)}
       />

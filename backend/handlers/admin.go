@@ -14,22 +14,22 @@ import (
 
 // AdminNotification representa una notificación del administrador
 type AdminNotification struct {
-	ID          int       `json:"id"`
-	Title       string    `json:"title"`
-	Message     string    `json:"message"`
-	Type        string    `json:"type"` // 'info', 'warning', 'success', 'error'
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	CreatedBy   string    `json:"created_by"`
-	UpdatedBy   string    `json:"updated_by"`
+	ID        int       `json:"id"`
+	Title     string    `json:"title"`
+	Message   string    `json:"message"`
+	Type      string    `json:"type"` // 'info', 'warning', 'success', 'error'
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedBy string    `json:"created_by"`
+	UpdatedBy string    `json:"updated_by"`
 }
 
 // AdminExercise representa un ejercicio para el panel de admin
 type AdminExercise struct {
-	ID               int       `json:"id"`
-	Name             string    `json:"name"`
-	MuscleGroup      string    `json:"muscle_group"`
-	Equipment        string    `json:"equipment"`
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	MuscleGroup string `json:"muscle_group"`
+
 	PrimaryMuscles   []string  `json:"primary_muscles"`
 	SecondaryMuscles []string  `json:"secondary_muscles"`
 	VideoURL         *string   `json:"video_url"`
@@ -39,38 +39,38 @@ type AdminExercise struct {
 
 // CreateNotificationRequest representa la solicitud para crear una notificación
 type CreateNotificationRequest struct {
-	Title    string `json:"title"`
-	Message  string `json:"message"`
-	Type     string `json:"type"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
+	Type    string `json:"type"`
 }
 
 // UpdateNotificationRequest representa la solicitud para actualizar una notificación
 type UpdateNotificationRequest struct {
-	Title    string `json:"title"`
-	Message  string `json:"message"`
-	Type     string `json:"type"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
+	Type    string `json:"type"`
 }
 
 // NotificationHistory representa un registro en el historial de cambios
 type NotificationHistory struct {
-	ID          int       `json:"id"`
-	NotificationID int    `json:"notification_id"`
-	Action      string    `json:"action"` // 'created', 'updated'
-	OldTitle    *string   `json:"old_title"`
-	NewTitle    *string   `json:"new_title"`
-	OldMessage  *string   `json:"old_message"`
-	NewMessage  *string   `json:"new_message"`
-	OldType     *string   `json:"old_type"`
-	NewType     *string   `json:"new_type"`
-	ChangedBy   string    `json:"changed_by"`
-	ChangedAt   time.Time `json:"changed_at"`
+	ID             int       `json:"id"`
+	NotificationID int       `json:"notification_id"`
+	Action         string    `json:"action"` // 'created', 'updated'
+	OldTitle       *string   `json:"old_title"`
+	NewTitle       *string   `json:"new_title"`
+	OldMessage     *string   `json:"old_message"`
+	NewMessage     *string   `json:"new_message"`
+	OldType        *string   `json:"old_type"`
+	NewType        *string   `json:"new_type"`
+	ChangedBy      string    `json:"changed_by"`
+	ChangedAt      time.Time `json:"changed_at"`
 }
 
 // CreateExerciseRequest representa la solicitud para crear un ejercicio
 type CreateExerciseRequest struct {
-	Name             string   `json:"name"`
-	MuscleGroup      string   `json:"muscle_group"`
-	Equipment        string   `json:"equipment"`
+	Name        string `json:"name"`
+	MuscleGroup string `json:"muscle_group"`
+
 	PrimaryMuscles   []string `json:"primary_muscles"`
 	SecondaryMuscles []string `json:"secondary_muscles"`
 	VideoURL         *string  `json:"video_url"`
@@ -553,8 +553,6 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-
-
 	// Primero verificar si la tabla existe
 	var tableExists bool
 	err := database.DB.QueryRow("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'exercises')").Scan(&tableExists)
@@ -572,7 +570,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			id, name, muscle_group, equipment, video_url, created_at
+			id, name, muscle_group, video_url, created_at
 		FROM exercises
 		ORDER BY name ASC
 	`
@@ -589,14 +587,14 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var exercise AdminExercise
 		var muscleGroup sql.NullString
-		var equipment sql.NullString
+
 		var videoURL sql.NullString
-		
+
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.Name,
 			&muscleGroup,
-			&equipment,
+
 			&videoURL,
 			&exercise.CreatedAt,
 		)
@@ -611,13 +609,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			exercise.MuscleGroup = "General"
 		}
-		
-		if equipment.Valid {
-			exercise.Equipment = equipment.String
-		} else {
-			exercise.Equipment = "Peso libre"
-		}
-		
+
 		if videoURL.Valid {
 			exercise.VideoURL = &videoURL.String
 		} else {
@@ -627,7 +619,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 		// Arrays vacíos por defecto
 		exercise.PrimaryMuscles = []string{}
 		exercise.SecondaryMuscles = []string{}
-		
+
 		exercises = append(exercises, exercise)
 		count++
 	}
@@ -652,19 +644,15 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := `
-		INSERT INTO exercises (name, muscle_group, equipment, video_url, bodyweight)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO exercises (name, muscle_group, video_url, bodyweight)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id, created_at
 	`
 
-	// Usar "Peso libre" como default
-	equipment := "Peso libre"
-
 	var exercise AdminExercise
-	err := database.DB.QueryRow(query, 
-		req.Name, 
-		req.MuscleGroup, 
-		equipment,
+	err := database.DB.QueryRow(query,
+		req.Name,
+		req.MuscleGroup,
 		req.VideoURL,
 		req.Bodyweight,
 	).Scan(&exercise.ID, &exercise.CreatedAt)
@@ -676,7 +664,7 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 
 	exercise.Name = req.Name
 	exercise.MuscleGroup = req.MuscleGroup
-	exercise.Equipment = "Peso libre"
+
 	exercise.PrimaryMuscles = []string{}
 	exercise.SecondaryMuscles = []string{}
 	exercise.VideoURL = req.VideoURL

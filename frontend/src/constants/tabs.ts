@@ -2,12 +2,12 @@
 export const TABS = {
   WORKOUT: 0,
   EXERCISES: 1,
-  EQUIPMENT: 2,
-  HISTORY: 3,
-  SOCIAL: 4,
-  ROUTINES: 5,
-  NOTIFICATIONS: 6,
-  ADMIN: 7
+  // EQUIPMENT: 2 removed
+  HISTORY: 2,
+  SOCIAL: 3,
+  ROUTINES: 4,
+  NOTIFICATIONS: 5,
+  ADMIN: 6
 } as const
 
 export type TabType = typeof TABS[keyof typeof TABS]

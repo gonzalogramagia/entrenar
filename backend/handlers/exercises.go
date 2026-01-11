@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/goalritmo/gym/backend/database"
 	"github.com/goalritmo/gym/backend/models"
+	"github.com/gorilla/mux"
 	"github.com/lib/pq"
 )
 
@@ -64,20 +64,18 @@ func GetExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		SELECT e.id, e.name, e.muscle_group,
 			   COALESCE(array_agg(DISTINCT mp.name) FILTER (WHERE mp.name IS NOT NULL AND emg_p.role = 'primary'), '{}') as primary_muscles,
 			   COALESCE(array_agg(DISTINCT ms.name) FILTER (WHERE ms.name IS NOT NULL AND emg_s.role = 'secondary'), '{}') as secondary_muscles,
-			   eq.name as equipment, e.video_url, e.bodyweight, e.is_sport, e.created_at
+			   e.video_url, e.bodyweight, e.is_sport, e.created_at
 		FROM exercises e
-		LEFT JOIN equipment eq ON e.equipment_id = eq.id
 		LEFT JOIN exercise_muscle_groups emg_p ON e.id = emg_p.exercise_id AND emg_p.role = 'primary'
 		LEFT JOIN muscle_groups mp ON emg_p.muscle_group_id = mp.id
 		LEFT JOIN exercise_muscle_groups emg_s ON e.id = emg_s.exercise_id AND emg_s.role = 'secondary'
 		LEFT JOIN muscle_groups ms ON emg_s.muscle_group_id = ms.id
 		WHERE e.id = $1
-		GROUP BY e.id, e.name, e.muscle_group, eq.name, e.video_url, e.bodyweight, e.is_sport, e.created_at
+		GROUP BY e.id, e.name, e.muscle_group, e.video_url, e.bodyweight, e.is_sport, e.created_at
 	`
 
 	var exercise models.Exercise
 	var primaryMuscles, secondaryMuscles pq.StringArray
-	var equipmentName *string
 
 	err = database.DB.QueryRow(query, id).Scan(
 		&exercise.ID,
@@ -85,7 +83,7 @@ func GetExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		&exercise.MuscleGroup,
 		&primaryMuscles,
 		&secondaryMuscles,
-		&equipmentName,
+
 		&exercise.VideoURL,
 		&exercise.Bodyweight,
 		&exercise.IsSport,
@@ -99,10 +97,6 @@ func GetExerciseHandler(w http.ResponseWriter, r *http.Request) {
 
 	exercise.PrimaryMuscles = []string(primaryMuscles)
 	exercise.SecondaryMuscles = []string(secondaryMuscles)
-	
-	if equipmentName != nil {
-		exercise.Equipment = *equipmentName
-	}
 
 	json.NewEncoder(w).Encode(exercise)
 }

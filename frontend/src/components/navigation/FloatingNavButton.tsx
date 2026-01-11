@@ -14,7 +14,7 @@ type FloatingNavButtonProps = {
 export default function FloatingNavButton({ currentTab, onTabChange, activeRoutine }: FloatingNavButtonProps) {
   const { getRoutineProgress } = useUserSettings()
   const [isVisible, setIsVisible] = useState(true)
-  
+
   // Detectar si la rutina está completa
   const isRoutineComplete = activeRoutine ? (() => {
     const today = new Date().toISOString().split('T')[0]
@@ -48,7 +48,7 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
         }
       }
     } else {
-      // En otras tabs (EXERCISES, EQUIPMENT, NOTIFICATIONS), ocultar el botón
+      // En otras tabs (EXERCISES, NOTIFICATIONS), ocultar el botón
       setIsVisible(false)
     }
   }, [currentTab, activeRoutine])

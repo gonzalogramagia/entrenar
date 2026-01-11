@@ -64,9 +64,7 @@ func main() {
 	api.HandleFunc("/exercises", handlers.GetExercisesHandler).Methods("GET")
 	api.HandleFunc("/exercises/{id}", handlers.GetExerciseHandler).Methods("GET")
 
-	// Equipment endpoints
-	api.HandleFunc("/equipment", handlers.GetEquipmentHandler).Methods("GET")
-	api.HandleFunc("/equipment/{id}", handlers.GetEquipmentByIdHandler).Methods("GET")
+
 
 	// Users endpoints (usando Supabase Auth)
 	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")

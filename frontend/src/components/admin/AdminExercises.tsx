@@ -27,7 +27,7 @@ type AdminExercise = {
   id: number
   name: string
   muscle_group: string
-  equipment: string
+
   primary_muscles: string[] | null
   secondary_muscles: string[] | null
   video_url?: string
@@ -87,7 +87,7 @@ export function AdminExercises() {
       await apiClient.createAdminExercise({
         name: form.name,
         muscle_group: 'General',
-        equipment: 'Peso libre',
+
         primary_muscles: [],
         secondary_muscles: [],
         video_url: undefined,
@@ -111,13 +111,13 @@ export function AdminExercises() {
     const date = new Date(dateString)
     const weekdays = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
     const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
-    
+
     const weekday = weekdays[date.getDay()]
     const day = date.getDate()
     const month = months[date.getMonth()]
     const hours = date.getHours().toString().padStart(2, '0')
     const minutes = date.getMinutes().toString().padStart(2, '0')
-    
+
     return `${weekday} ${day} de ${month} a las ${hours}:${minutes}`
   }
 
@@ -128,10 +128,10 @@ export function AdminExercises() {
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         minHeight: '400px',
         flexDirection: 'column',
         gap: 2
@@ -145,8 +145,8 @@ export function AdminExercises() {
   }
 
   return (
-    <Box sx={{ 
-      maxWidth: '900px', 
+    <Box sx={{
+      maxWidth: '900px',
       mx: 'auto',
       px: { xs: 2, sm: 3, md: 4 },
       height: 'calc(100vh - 300px)',
@@ -154,10 +154,10 @@ export function AdminExercises() {
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         mb: 3,
         pt: 2 // Padding superior para bajar el contenido
       }}>
@@ -169,7 +169,7 @@ export function AdminExercises() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setOpenDialog(true)}
-            sx={{ 
+            sx={{
               fontWeight: 600,
               // En mobile, solo mostrar el ícono
               '@media (max-width: 767px)': {
@@ -181,7 +181,7 @@ export function AdminExercises() {
               }
             }}
           >
-            <Box sx={{ 
+            <Box sx={{
               display: { xs: 'none', sm: 'inline' } // Ocultar texto en mobile
             }}>
               Agregar
@@ -210,7 +210,7 @@ export function AdminExercises() {
       )}
 
       {/* Exercises List */}
-      <Box sx={{ 
+      <Box sx={{
         flex: 1,
         overflowY: 'auto',
         pr: 1,
@@ -240,59 +240,59 @@ export function AdminExercises() {
             </Card>
           ) : (
             filteredExercises.map((exercise) => (
-            <Card key={exercise.id} sx={{ 
-              border: '1px solid',
-              borderColor: 'divider',
-              '&:hover': {
-                boxShadow: 2,
-                transform: 'translateY(-1px)',
-                transition: 'all 0.2s ease-in-out'
-              }
-            }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                  {/* Icon */}
-                  <Box sx={{ mt: 0.5 }}>
-                    <ExerciseIcon sx={{ color: 'primary.main' }} />
-                  </Box>
-
-                  {/* Content */}
-                  <Box sx={{ flex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {exercise.name}
-                      </Typography>
-                      {exercise.bodyweight && (
-                        <Chip
-                          label="Peso Corporal"
-                          size="small"
-                          color="primary"
-                          sx={{ 
-                            fontSize: '0.7rem',
-                            height: 20,
-                            '& .MuiChip-label': {
-                              px: 1
-                            }
-                          }}
-                        />
-                      )}
+              <Card key={exercise.id} sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:hover': {
+                  boxShadow: 2,
+                  transform: 'translateY(-1px)',
+                  transition: 'all 0.2s ease-in-out'
+                }
+              }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    {/* Icon */}
+                    <Box sx={{ mt: 0.5 }}>
+                      <ExerciseIcon sx={{ color: 'primary.main' }} />
                     </Box>
 
-                    <Typography variant="caption" color="text.secondary">
-                      Creado el {formatDate(exercise.created_at)}
-                    </Typography>
+                    {/* Content */}
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {exercise.name}
+                        </Typography>
+                        {exercise.bodyweight && (
+                          <Chip
+                            label="Peso Corporal"
+                            size="small"
+                            color="primary"
+                            sx={{
+                              fontSize: '0.7rem',
+                              height: 20,
+                              '& .MuiChip-label': {
+                                px: 1
+                              }
+                            }}
+                          />
+                        )}
+                      </Box>
+
+                      <Typography variant="caption" color="text.secondary">
+                        Creado el {formatDate(exercise.created_at)}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </Stack>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </Stack>
       </Box>
 
       {/* Create Exercise Dialog */}
-      <Dialog 
-        open={openDialog} 
+      <Dialog
+        open={openDialog}
         onClose={() => setOpenDialog(false)}
         maxWidth="md"
         fullWidth
@@ -300,16 +300,16 @@ export function AdminExercises() {
           sx: { borderRadius: 2 }
         }}
       >
-        <DialogTitle sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <DialogTitle sx={{
+          display: 'flex',
+          alignItems: 'center',
           gap: 1,
           fontWeight: 'bold'
         }}>
           <AddIcon sx={{ color: 'primary.main' }} />
           Agregar Ejercicio
         </DialogTitle>
-        
+
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <TextField
@@ -321,7 +321,7 @@ export function AdminExercises() {
               placeholder="Ej: Press de banca"
               autoFocus
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
@@ -336,7 +336,7 @@ export function AdminExercises() {
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
+          <Button
             onClick={() => setOpenDialog(false)}
             disabled={creating}
           >

@@ -1,120 +1,54 @@
-# Entrenar App — Registro de Entrenamientos
+# 🚀 Entrenar App
 
-Aplicación web para registrar entrenamientos (peso, repeticiones, series, tiempo) con soporte de cronómetro, visualización de ejercicios/equipos y enfoque TDD.
+**A comprehensive workout logging and tracking application designed for serious training.**
 
+"Entrenar App" is your digital partner for tracking progress, managing routines, and visualizing gym equipment. Built with performance and usability in mind, it helps you focus on what matters: your training.
 
-## 🚀 Versión 1.2.3 - Completada
+---
 
-**Estado**: ✅ **PRODUCCIÓN** - Aplicación completamente funcional y desplegada
+## ✨ Key Features
 
-### Características implementadas:
-- ✅ **Registro de entrenamientos** con formulario completo
-- ✅ **Cronómetro** para descanso entre series
-- ✅ **Listado de ejercicios y equipos** con filtros
-- ✅ **Sistema de notificaciones** (manual y automático)
-- ✅ **API REST completa** en Go con autenticación
-- ✅ **Autenticación Google OAuth** con Supabase
-- ✅ **Sistema de rutinas** personalizadas
-- ✅ **Panel de administración** para usuarios y contenido
-- ✅ **Deployment completo** en Railway (backend) y Vercel (frontend)
+- **✅ Workout Logging**: Detailed tracking for weight, reps, sets, and time with a complete form.
+- **⏱️ Smart Stopwatch**: Integrated timer to manage rest periods efficiently between sets.
+- **🏋️ Exercise Library**: Browse exercises and equipment with advanced filtering capabilities.
+- **🔔 Notification System**: Stay on track with manual and automatic notifications.
+- **📊 Progress Tracking**: Visual insights into your training history and improvements.
+- **🔄 Custom Routines**: Create and manage personalized workout routines.
+- **🔐 Secure Auth**: Seamless Google OAuth authentication powered by Supabase.
+- **⚡ High Performance**: Fast and responsive with a Go backend and Vite frontend.
 
-### URLs de producción:
-- **Frontend**: https://www.entrenar.app
-- **Backend API**: https://entrenar.up.railway.app
-- **Documentación**: https://github.com/gonzalogramagia/entrenar
+---
 
-## Documentación
-- Especificaciones funcionales (detalladas): `docs/especificaciones.md`
-- Plan técnico (resumen): `docs/plan-tecnico.md`
-- Guía de deployment: `DEPLOYMENT.md`
+## 🛠️ Technology Stack
 
-## Resumen (TL;DR)
-- Pestañas: Registro, Cronómetro, Ejercicios, Notificaciones, Rutinas, Admin
-- DB (Supabase): `equipment`, `exercises`, `workouts`, `muscle_groups`, `exercise_muscle_groups`, `routines`, `notifications`
-- API: REST (Go) con endpoints completos y autenticación
-- Frontend: React + TypeScript + Vite
-- Testing: Vitest + React Testing Library (frontend), Go testing stdlib (backend)
-- Autenticación: Google OAuth con Supabase
-- Deployment: Railway (backend) + Vercel (frontend)
+- **Framework**: [Vite](https://vitejs.dev/) + [React](https://react.dev/)
+- **Styling**: [Material UI](https://mui.com/) + [Emotion](https://emotion.sh/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/) + [Go](https://go.dev/)
+- **Database**: [Supabase](https://supabase.com/)
+- **Testing**: [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/)
 
-## Requisitos
-- Node.js 20+ (recomendado 20.19+)
-- npm 10+
-- Cuenta/proyecto en Supabase
+---
 
-## Estructura
-```
-.
-├── frontend/               # Vite + React + Vitest
-├── backend/                # Go API + Docker
-├── docs/
-│   ├── especificaciones.md
-│   └── plan-tecnico.md
-├── DEPLOYMENT.md           # Guía de deployment
-└── README.md               # Este archivo
-```
+## � Usage
 
-## Arranque Rápido (Desarrollo)
+### 🏋️ Logging Workouts
+- **Record**: Enter your sets, reps, and weights easily.
+- **Track**: View your history and analyze progress over time.
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### ⏱️ Using Tools
+- **Stopwatch**: Use the built-in timer for consistent rest intervals.
+- **Library**: Search for specific exercises.
 
-### Backend
-```bash
-cd backend
-go mod download
-go run main.go
-```
+### 📋 Managing Routines
+- **Create**: Setup custom routines for different training days.
+- **Follow**: Execute your planned routines with guided tracking.
 
-### Testing (Frontend)
-```bash
-npm test         # ejecución en CI
-npm run test:ui  # interfaz interactiva
-npm run test:watch
-npm run test:coverage
-```
+---
 
-## API (Completa)
-- **Workouts**: GET, POST, PUT, DELETE `/api/workouts`
-- **Exercises**: GET `/api/exercises`
-- **Equipment**: GET `/api/equipment`
-- **User**: GET `/api/me`, POST `/api/me/setup`
-- **Routines**: GET, POST, PUT, DELETE `/api/routines`
-- **Notifications**: GET, POST, PUT, DELETE `/api/notifications`
-- **Admin**: GET, POST, PUT, DELETE `/api/admin/*`
-- **Health**: GET `/api/health`
+## 📄 License
 
-## Base de Datos (Supabase)
-Tablas principales: `equipment`, `exercises`, `workouts`, `routines`, `notifications`, `users`, `muscle_groups`, `exercise_muscle_groups`.
-Ver definiciones SQL en `especificaciones.md`.
+This project is created for personal use and is shared as-is. Feel free to explore and modify it!
 
-## TDD — Resumen
-- **Frontend** (Vitest + RTL): Componentes completos, hooks, integración de flujos
-- **Backend** (Go stdlib): Handlers completos, middleware, validaciones
-- **Cobertura**: >80% frontend, >85% backend
+---
 
-## Roadmap (Completado ✅)
-- [x] **Registro de entrenamientos** (form + persistencia)
-- [x] **Cronómetro** para descanso entre series
-- [x] **Listado/buscador** de ejercicios y equipos
-- [x] **Notificaciones** (manual y automático)
-- [x] **API REST completa** en Go
-- [x] **Autenticación** Google OAuth
-- [x] **Sistema de rutinas** personalizadas
-- [x] **Panel de administración**
-- [x] **Deployment** en producción
-- [x] **Tests** con cobertura >80% FE, >85% BE
-
-## Próximas versiones
-- **v1.3.0**: Mejoras de UX y performance
-- **v1.4.0**: Funcionalidades sociales
-- **v2.0.0**: App móvil nativa
-
-## Notas
-- Autenticación implementada con Supabase Auth y Google OAuth.
-- Deployment automatizado con CI/CD en GitHub.
-- CORS configurado para dominios de producción.
+Made with 💛 by [Gonza](https://github.com/gonzalogramagia)
