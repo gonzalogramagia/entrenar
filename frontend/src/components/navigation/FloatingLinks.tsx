@@ -59,7 +59,7 @@ const FloatingLinks: React.FC = () => {
             >
                 <IconButton
                     component="a"
-                    href="https://gonzalogramagia.com"
+                    href="https://home.gonzalogramagia.com"
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
@@ -115,7 +115,6 @@ const FloatingLinks: React.FC = () => {
                 </IconButton>
             </Box>
 
-            {/* Botón de GitHub derecha - fuera del contenedor */}
             <Box
                 sx={{
                     position: 'fixed',
