@@ -14,7 +14,8 @@
 - **🔔 Notification System**: Stay on track with manual and automatic notifications.
 - **📊 Progress Tracking**: Visual insights into your training history and improvements.
 - **🔄 Custom Routines**: Create and manage personalized workout routines.
-- **🔐 Secure Auth**: Seamless Google OAuth authentication powered by Supabase.
+- **� Quick Navigation**: Floating navigation buttons for easy access to Home, Emojis, Music apps, and GitHub repository.
+- **�🔐 Secure Auth**: Seamless Google OAuth authentication powered by Supabase.
 - **⚡ High Performance**: Fast and responsive with a Go backend and Vite frontend.
 
 ---
@@ -29,7 +30,7 @@
 
 ---
 
-## � Usage
+## 🕹 Usage
 
 ### 🏋️ Logging Workouts
 - **Record**: Enter your sets, reps, and weights easily.

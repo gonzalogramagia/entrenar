@@ -1,5 +1,6 @@
-import { Box, CssBaseline, ThemeProvider, createTheme, Typography, Link } from '@mui/material'
+import { Box, CssBaseline, ThemeProvider, createTheme, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
+import FloatingLinks from '../navigation/FloatingLinks'
 
 const theme = createTheme({
   palette: {
@@ -53,17 +54,16 @@ const theme = createTheme({
 type AppLayoutProps = {
   children: ReactNode
   showFooter?: boolean
-  disableFooterLink?: boolean
 }
 
-export default function AppLayout({ children, showFooter = true, disableFooterLink = false }: AppLayoutProps) {
+export default function AppLayout({ children, showFooter = true }: AppLayoutProps) {
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
         height: '100vh',
         width: '100vw',
         maxWidth: '100vw',
@@ -123,8 +123,8 @@ export default function AppLayout({ children, showFooter = true, disableFooterLi
           }
         }
       }}>
-        <Box sx={{ 
-          flexGrow: 1, 
+        <Box sx={{
+          flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -144,63 +144,43 @@ export default function AppLayout({ children, showFooter = true, disableFooterLi
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}>
-          <Box sx={{ 
-            flexGrow: 1, 
-            overflow: 'hidden', 
+          <Box sx={{
+            flexGrow: 1,
+            overflow: 'hidden',
             minHeight: 0,
             touchAction: 'none'
           }}>
             {children}
           </Box>
-                      {showFooter && (
-            <Box 
-              sx={{ 
+          {showFooter && (
+            <Box
+              sx={{
                 py: 1.5,
                 textAlign: 'center',
                 flexShrink: 0,
                 backgroundColor: 'white'
               }}
             >
-              {disableFooterLink ? (
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    fontSize: '0.8rem', 
-                    letterSpacing: '0.5px',
-                    color: '#666666',
-                    fontWeight: 500,
-                    opacity: 1,
-                    display: 'inline-block'
-                  }}
-                >
-                  💻 🧉 Desarrollado por Gonza
-                </Typography>
-              ) : (
-                <Link 
-                  href="https://gonza.gr" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  sx={{ 
-                    textDecoration: 'none',
-                    color: '#666666',
-                    fontWeight: 500,
-                    opacity: 1,
-                    display: 'inline-block',
-                    transition: 'all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                    '&:hover': {
-                      color: '#888888'
-                    }
-                  }}
-                >
-                  <Typography variant="caption" sx={{ fontSize: '0.8rem', letterSpacing: '0.5px' }}>
-                    💻 🧉 Desarrollado por Gonza
-                  </Typography>
-                </Link>
-              )}
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.5px',
+                  color: '#666666',
+                  fontWeight: 500,
+                  opacity: 1,
+                  display: 'inline-block'
+                }}
+              >
+                Mens sana in corpore sano
+              </Typography>
             </Box>
           )}
         </Box>
       </Box>
+
+      {/* Enlaces flotantes externos - FUERA del contenedor para que sean visibles */}
+      <FloatingLinks />
     </ThemeProvider>
   )
 }
