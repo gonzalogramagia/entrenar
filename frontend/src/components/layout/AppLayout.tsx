@@ -155,7 +155,7 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
           {showFooter && (
             <Box
               sx={{
-                py: 1.5,
+                py: 2,
                 textAlign: 'center',
                 flexShrink: 0,
                 backgroundColor: 'white'
