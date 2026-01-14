@@ -48,12 +48,13 @@ const FloatingLinks: React.FC = () => {
                     position: 'fixed',
                     bottom: 32,
                     left: 32,
-                    display: 'flex',
+                    display: 'none',
                     flexDirection: 'row',
                     gap: 1.5,
                     zIndex: 999,
                     '@media (min-width: 768px)': {
                         left: 32,
+                        display: 'flex',
                     },
                 }}
             >
@@ -120,9 +121,11 @@ const FloatingLinks: React.FC = () => {
                     position: 'fixed',
                     bottom: 32,
                     right: 32,
+                    display: 'none',
                     zIndex: 999,
                     '@media (min-width: 768px)': {
                         right: 32,
+                        display: 'block',
                     },
                 }}
             >
