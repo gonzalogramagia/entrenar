@@ -61,6 +61,20 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {/* Fondo con wallpaper */}
+      <Box sx={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: 'url(/wallpaper.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        opacity: 0.05,
+        zIndex: -1
+      }} />
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -73,7 +87,6 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)', // Gradiente azul de marca
         '&::-webkit-scrollbar': {
           display: 'none'
         },

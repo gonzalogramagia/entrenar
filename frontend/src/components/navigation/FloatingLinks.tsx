@@ -137,7 +137,7 @@ const FloatingLinks: React.FC = () => {
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
-                            color: '#3b82f6',
+                            color: '#6866D6',
                         },
                     }}
                     aria-label="Ver en GitHub"
