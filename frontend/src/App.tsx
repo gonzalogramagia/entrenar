@@ -1,5 +1,6 @@
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TabProvider } from './contexts/TabContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import LoginComponent from './components/auth/LoginComponent'
 import AuthenticatedApp from './components/app/AuthenticatedApp'
 import AppLayout from './components/layout/AppLayout'
@@ -8,9 +9,9 @@ import './App.css'
 
 function AppContent() {
   const { isAuthenticated } = useAuth()
-  
+
   return (
-    <AppLayout 
+    <AppLayout
       showFooter={isAuthenticated}
     >
       <AppContentInner />
@@ -41,12 +42,15 @@ function App() {
   }
 
   return (
-    <AuthProvider>
-      <TabProvider>
-        <AppContent />
-      </TabProvider>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <TabProvider>
+          <AppContent />
+        </TabProvider>
+      </AuthProvider>
+    </LanguageProvider>
   )
 }
 
 export default App
+

@@ -1,11 +1,13 @@
 import { Box, CssBaseline, ThemeProvider, createTheme, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
 import FloatingLinks from '../navigation/FloatingLinks'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#6866D6',
     },
     secondary: {
       main: '#dc004e',
@@ -57,6 +59,8 @@ type AppLayoutProps = {
 }
 
 export default function AppLayout({ children, showFooter = true }: AppLayoutProps) {
+  const { language } = useLanguage()
+  const t = translations[language].navigation
 
   return (
     <ThemeProvider theme={theme}>
@@ -185,7 +189,7 @@ export default function AppLayout({ children, showFooter = true }: AppLayoutProp
                   display: 'inline-block'
                 }}
               >
-                Mens sana in corpore sano
+                {t.footer}
               </Typography>
             </Box>
           )}

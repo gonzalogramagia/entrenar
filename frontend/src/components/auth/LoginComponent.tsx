@@ -2,32 +2,36 @@ import { useState } from 'react'
 import { Button, Typography, Alert, Box, Backdrop, CircularProgress } from '@mui/material'
 import { Google as GoogleIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 export default function LoginComponent() {
   const [error, setError] = useState('')
   const { signInWithGoogle, isSigningIn } = useAuth()
+  const { language } = useLanguage()
+  const t = translations[language].login
 
 
 
   const handleGoogleSignIn = async () => {
     setError('')
-    
+
     try {
       const { error } = await signInWithGoogle()
       if (error) {
-        setError('Error al iniciar sesión con Google. Inténtalo de nuevo.')
+        setError(t.errorGoogle)
         console.error('Google sign in error:', error)
       }
     } catch (error) {
-      setError('Error inesperado. Inténtalo de nuevo.')
+      setError(t.errorUnexpected)
       console.error('Unexpected error:', error)
     }
   }
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
+    <Box sx={{
+      display: 'flex',
+      justifyContent: 'center',
       alignItems: 'center', // Centrado en todos los dispositivos
       height: '100%',
       backgroundColor: '#FFD700', // Amarillo dorado
@@ -57,28 +61,28 @@ export default function LoginComponent() {
         zIndex: 9999
       }
     }}>
-      <Box sx={{ 
-        bgcolor: 'white', 
-        p: 3, 
-        borderRadius: 4, 
+      <Box sx={{
+        bgcolor: 'white',
+        p: 3,
+        borderRadius: 4,
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         maxWidth: '330px',
         width: '100%'
       }}>
-        <Typography 
-          variant="h4" 
-          component="h1" 
-          gutterBottom 
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
           textAlign="center"
-          sx={{ 
-            mb: 2.5, 
-            fontWeight: 'bold', 
+          sx={{
+            mb: 2.5,
+            fontWeight: 'bold',
             color: '#FFB732'
           }}
         >
-          Entrenar.app
+          {t.title}
         </Typography>
-        
+
         {/* Google OAuth Login */}
         <Button
           onClick={handleGoogleSignIn}
@@ -97,10 +101,19 @@ export default function LoginComponent() {
             '&:hover': {
               borderColor: '#357ae8',
               backgroundColor: 'rgba(66, 133, 244, 0.04)'
+            },
+            // En pantallas grandes, usar color púrpura
+            '@media (min-width: 768px)': {
+              borderColor: '#6866D6',
+              color: '#6866D6',
+              '&:hover': {
+                borderColor: '#5854c7',
+                backgroundColor: 'rgba(104, 102, 214, 0.04)'
+              }
             }
           }}
         >
-          {isSigningIn ? 'Iniciando...' : 'Continuar con Google'}
+          {isSigningIn ? t.signingIn : t.continueWithGoogle}
         </Button>
 
         {error && (
@@ -142,19 +155,19 @@ export default function LoginComponent() {
             marginTop: '-60px' // Mover más arriba
           }}
         >
-          <CircularProgress 
-            size={48} 
-            thickness={4} 
-            sx={{ 
+          <CircularProgress
+            size={48}
+            thickness={4}
+            sx={{
               color: 'white',
               backgroundColor: 'transparent',
               '& .MuiCircularProgress-circle': {
                 strokeLinecap: 'round'
               }
-            }} 
+            }}
           />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-            Iniciando sesión...
+            {t.signingInProgress}
           </Typography>
         </Box>
       </Backdrop>

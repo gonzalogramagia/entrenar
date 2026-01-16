@@ -2,10 +2,14 @@ import React from 'react'
 import { Box, IconButton } from '@mui/material'
 import { Home, Smile, Music, BicepsFlexed } from 'lucide-react'
 import { GitHub as GithubIcon } from '@mui/icons-material'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const FloatingLinks: React.FC = () => {
-    // URLs para emojis según idioma (puedes ajustar según tu lógica de i18n)
-    const emojisUrl = 'https://emojis.gonzalogramagia.com'
+    const { language } = useLanguage()
+    const langPrefix = language === 'en' ? '/en' : ''
+
+    // URLs para emojis según idioma
+    const emojisUrl = `https://milemojis.com${langPrefix}`
 
     const buttonStyles = {
         p: 1.5,
@@ -60,7 +64,7 @@ const FloatingLinks: React.FC = () => {
             >
                 <IconButton
                     component="a"
-                    href="https://home.gonzalogramagia.com"
+                    href={`https://home.gonzalogramagia.com${langPrefix}`}
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
@@ -92,7 +96,7 @@ const FloatingLinks: React.FC = () => {
                 {/* Music */}
                 <IconButton
                     component="a"
-                    href="https://music.gonzalogramagia.com"
+                    href={`https://music.gonzalogramagia.com${langPrefix}`}
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
@@ -150,3 +154,4 @@ const FloatingLinks: React.FC = () => {
 }
 
 export default FloatingLinks
+

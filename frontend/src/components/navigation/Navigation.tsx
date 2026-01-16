@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { 
-  Box, 
-  IconButton, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
+import {
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
   AppBar,
   Toolbar,
@@ -21,6 +21,8 @@ import PeopleIcon from '@mui/icons-material/People'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import UserAvatar from '../user/UserAvatar'
 import { TABS, type TabType } from '../../constants/tabs'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 
 type NavigationProps = {
@@ -34,6 +36,8 @@ type NavigationProps = {
 }
 
 export default function Navigation({ activeTab, onTabChange, onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: Omit<NavigationProps, 'onLogout'>) {
+  const { language } = useLanguage()
+  const t = translations[language].navigation
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
@@ -74,7 +78,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
       setShowToolbarElements(true)
     }, 50) as unknown as number
     timeoutsRef.current.push(timer)
-    
+
     return () => clearTimeout(timer)
   }, [])
 
@@ -85,7 +89,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
       setShowToolbarElements(true)
     }, 80) as unknown as number
     timeoutsRef.current.push(timer)
-    
+
     return () => clearTimeout(timer)
   }, [activeTab])
 
@@ -93,7 +97,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
     // Limpiar timeouts existentes
     timeoutsRef.current.forEach(clearTimeout)
     timeoutsRef.current = []
-    
+
     if (!drawerOpen) {
       setDrawerOpen(true)
       setIsClosing(false)
@@ -115,7 +119,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
         }, index * 20) as unknown as number // 20ms entre cada item (más rápido)
         timeoutsRef.current.push(timeoutId)
       })
-      
+
       // Cerrar el menú después de la animación
       setTimeout(() => {
         setDrawerOpen(false)
@@ -135,7 +139,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
       }, index * 20) as unknown as number // 20ms entre cada item (más rápido)
       timeoutsRef.current.push(timeoutId)
     })
-    
+
     // Cerrar el menú después de la animación
     setTimeout(() => {
       setDrawerOpen(false)
@@ -144,14 +148,14 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
   }
 
   const menuItems = [
-    { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
-    { label: 'Mis Rutinas', icon: <HistoryIcon />, value: TABS.ROUTINES },
-    { label: 'Entrenamientos', icon: <FitnessCenterIcon />, value: TABS.HISTORY },
-    { label: 'Feed Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
+    { label: t.workout, icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
+    { label: t.routines, icon: <HistoryIcon />, value: TABS.ROUTINES },
+    { label: t.history, icon: <FitnessCenterIcon />, value: TABS.HISTORY },
+    { label: t.social, icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       position: 'relative',
       zIndex: 99998,
       '@keyframes slideInFromLeft': {
@@ -287,10 +291,10 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
         }
       }
     }}>
-      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
+      <AppBar position="static" sx={{ backgroundColor: '#6866D6' }}>
         <Toolbar>
           {showToolbarElements && (
-            <Box sx={{ 
+            <Box sx={{
               transform: 'translateX(0)',
               transition: 'all 0.3s ease-in-out',
               animation: isClosing ? 'slideOutToLeft 0.3s ease-out' : 'slideInFromLeft 0.3s ease-out'
@@ -306,13 +310,13 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
               </IconButton>
             </Box>
           )}
-          
+
           {showToolbarElements && (
-            <Typography 
-              variant="h6" 
-              component="div" 
-              sx={{ 
-                flexGrow: 1, 
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                flexGrow: 1,
                 textAlign: 'center',
                 fontWeight: 'bold',
                 transform: 'translateY(0)',
@@ -320,32 +324,32 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                 animation: 'slideInFromTop 0.3s ease-out'
               }}
             >
-              Entrenar.app
+              {t.appTitle}
             </Typography>
           )}
-          
+
           {showToolbarElements && (
-            <Box sx={{ 
+            <Box sx={{
               transform: 'translateX(0)',
               transition: 'all 0.3s ease-in-out',
               animation: 'slideInFromRight 0.3s ease-out'
             }}>
-                              <UserAvatar 
-                  onOpenSettings={onOpenSettings} 
-                  onOpenNotifications={onOpenNotifications}
-                  onOpenAdminPanel={onOpenAdminPanel}
-                  unreadNotifications={unreadNotifications}
-                />
+              <UserAvatar
+                onOpenSettings={onOpenSettings}
+                onOpenNotifications={onOpenNotifications}
+                onOpenAdminPanel={onOpenAdminPanel}
+                unreadNotifications={unreadNotifications}
+              />
             </Box>
           )}
         </Toolbar>
       </AppBar>
 
       <Collapse in={drawerOpen} timeout="auto" unmountOnExit>
-        <Box 
+        <Box
           ref={menuRef}
-          sx={{ 
-            backgroundColor: '#1976d2',
+          sx={{
+            backgroundColor: '#6866D6',
             color: 'white',
             width: '100%',
             position: 'absolute',
@@ -354,20 +358,20 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
             right: 0,
             zIndex: 9999,
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-          }} 
+          }}
           role="presentation"
         >
 
           <List>
             {menuItems.map((item, index) => (
-              <Fade 
-                key={item.value} 
-                in={visibleItems.includes(index)} 
+              <Fade
+                key={item.value}
+                in={visibleItems.includes(index)}
                 timeout={300}
                 style={{ transitionDelay: `${index * 50}ms` }}
               >
                 <ListItem disablePadding>
-                  <ListItemButton 
+                  <ListItemButton
                     selected={activeTab === item.value}
                     onClick={() => handleTabChange(item.value)}
                     sx={{
@@ -376,12 +380,12 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                       transform: visibleItems.includes(index) ? 'translateY(0)' : 'translateY(-15px)',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: '#1565c0',
+                        backgroundColor: '#5854c7',
                       },
                       '&.Mui-selected': {
-                        backgroundColor: '#1565c0',
+                        backgroundColor: '#5854c7',
                         '&:hover': {
-                          backgroundColor: '#0d47a1',
+                          backgroundColor: '#4a46b8',
                         },
                       },
                     }}
@@ -389,9 +393,9 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                     <ListItemIcon sx={{ color: 'white' }}>
                       {item.icon}
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary={item.label}
-                      sx={{ 
+                      sx={{
                         color: 'white',
                         fontWeight: activeTab === item.value ? 'bold' : 'normal'
                       }}

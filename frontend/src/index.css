@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); /* Gradiente azul de marca */
+  background: linear-gradient(135deg, #6866D6 0%, #5854c7 100%); /* Gradiente púrpura de marca */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -43,7 +43,7 @@ body {
   overflow: hidden;
   position: fixed;
   width: 100%;
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); /* Gradiente azul de marca */
+  background: linear-gradient(135deg, #6866D6 0%, #5854c7 100%); /* Gradiente púrpura de marca */
   touch-action: none; /* Previene scroll en móviles */
   -webkit-overflow-scrolling: touch;
 }
@@ -75,7 +75,7 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); /* Gradiente azul de marca también en modo claro */
+    background: linear-gradient(135deg, #6866D6 0%, #5854c7 100%); /* Gradiente púrpura de marca también en modo claro */
   }
   a:hover {
     color: #747bff;
