@@ -7,7 +7,7 @@ import { translations } from '../../i18n/translations'
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#6866D6',
+      main: '#1976d2',
     },
     secondary: {
       main: '#dc004e',

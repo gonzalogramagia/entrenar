@@ -291,7 +291,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
         }
       }
     }}>
-      <AppBar position="static" sx={{ backgroundColor: '#6866D6' }}>
+      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
         <Toolbar>
           {showToolbarElements && (
             <Box sx={{
@@ -349,7 +349,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
         <Box
           ref={menuRef}
           sx={{
-            backgroundColor: '#6866D6',
+            backgroundColor: '#1976d2',
             color: 'white',
             width: '100%',
             position: 'absolute',
@@ -380,12 +380,12 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                       transform: visibleItems.includes(index) ? 'translateY(0)' : 'translateY(-15px)',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: '#5854c7',
+                        backgroundColor: '#1565c0',
                       },
                       '&.Mui-selected': {
-                        backgroundColor: '#5854c7',
+                        backgroundColor: '#1565c0',
                         '&:hover': {
-                          backgroundColor: '#4a46b8',
+                          backgroundColor: '#0d47a1',
                         },
                       },
                     }}
