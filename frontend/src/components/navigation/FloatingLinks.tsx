@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, IconButton } from '@mui/material'
-import { Home, Smile, Music, BicepsFlexed } from 'lucide-react'
+import { ClipboardClock, Smile, Music, BicepsFlexed } from 'lucide-react'
 import { GitHub as GithubIcon } from '@mui/icons-material'
 import { useLanguage } from '../../contexts/LanguageContext'
 
@@ -74,7 +74,7 @@ const FloatingLinks: React.FC = () => {
                     aria-label="Ir a Today"
                     title="Go to Today"
                 >
-                    <Home className="icon" style={iconStyles} />
+                    <ClipboardClock className="icon" style={iconStyles} />
                 </IconButton>
 
                 {/* Emojis */}
@@ -110,14 +110,15 @@ const FloatingLinks: React.FC = () => {
                 </IconButton>
 
                 {/* Entrenar (deshabilitado) */}
-                <IconButton
-                    disabled
-                    sx={disabledButtonStyles}
-                    aria-label="Ya estás acá!"
-                    title="You are here!"
-                >
-                    <BicepsFlexed style={iconStyles} />
-                </IconButton>
+                <span title="You are here!" style={{ display: 'inline-block' }}>
+                    <IconButton
+                        disabled
+                        sx={disabledButtonStyles}
+                        aria-label="Ya estás acá!"
+                    >
+                        <BicepsFlexed style={iconStyles} />
+                    </IconButton>
+                </span>
             </Box>
 
             <Box
@@ -141,7 +142,7 @@ const FloatingLinks: React.FC = () => {
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
-                            color: '#6866D6',
+                            color: '#eab308',
                         },
                     }}
                     aria-label="Ver en GitHub"
