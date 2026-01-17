@@ -44,7 +44,7 @@ export default function LoginComponent() {
       // En desktop, mover un poco hacia arriba del centro
       '@media (min-width: 768px)': {
         alignItems: 'flex-start',
-        paddingTop: '32vh' // 32% del viewport height desde arriba
+        paddingTop: '25vh' // 25% del viewport height desde arriba
       },
       // Solo en mobile, ocupar toda la pantalla
       '@media (max-width: 767px)': {
@@ -63,25 +63,34 @@ export default function LoginComponent() {
     }}>
       <Box sx={{
         bgcolor: 'white',
-        p: 3,
+        mb: { xs: '8vh', md: 0 }, // Subir visualmente en mobile
+        px: 3,
+        pb: 3,
+        pt: 2,
         borderRadius: 4,
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         maxWidth: '330px',
         width: '100%'
       }}>
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          textAlign="center"
-          sx={{
-            mb: 2.5,
-            fontWeight: 'bold',
-            color: '#FFB732'
-          }}
-        >
-          {t.title}
-        </Typography>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mb: 2,
+          height: '144px',
+          overflow: 'hidden'
+        }}>
+          <img
+            src="/entrenar-emoji.png"
+            alt="Entrenar.app"
+            style={{
+              height: '240px',
+              width: 'auto',
+              maxWidth: '100%',
+              objectFit: 'contain',
+              marginTop: '-48px'
+            }}
+          />
+        </Box>
 
         {/* Google OAuth Login */}
         <Button

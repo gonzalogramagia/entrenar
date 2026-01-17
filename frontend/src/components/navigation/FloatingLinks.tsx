@@ -9,7 +9,7 @@ const FloatingLinks: React.FC = () => {
     const langPrefix = language === 'en' ? '/en' : ''
 
     // URLs para emojis según idioma
-    const emojisUrl = `https://milemojis.com${langPrefix}`
+    const emojisUrl = `https://emojis.gonzalogramagia.com${langPrefix}`
 
     const buttonStyles = {
         p: 1.5,
@@ -64,15 +64,15 @@ const FloatingLinks: React.FC = () => {
             >
                 <IconButton
                     component="a"
-                    href={`https://home.gonzalogramagia.com${langPrefix}`}
+                    href={`https://today.gonzalogramagia.com${langPrefix}`}
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
                             color: '#eab308',
                         },
                     }}
-                    aria-label="Ir a Home"
-                    title="Ir a Home"
+                    aria-label="Ir a Today"
+                    title="Go to Today"
                 >
                     <Home className="icon" style={iconStyles} />
                 </IconButton>
@@ -88,7 +88,7 @@ const FloatingLinks: React.FC = () => {
                         },
                     }}
                     aria-label="Ir a Emojis"
-                    title="Ir a Emojis"
+                    title="Go to Emojis"
                 >
                     <Smile className="icon" style={iconStyles} />
                 </IconButton>
@@ -103,8 +103,8 @@ const FloatingLinks: React.FC = () => {
                             color: '#eab308',
                         },
                     }}
-                    aria-label="Ir a Music"
-                    title="Ir a Music"
+                    aria-label="Ir a Música"
+                    title="Go to Music"
                 >
                     <Music className="icon" style={iconStyles} />
                 </IconButton>
@@ -113,8 +113,8 @@ const FloatingLinks: React.FC = () => {
                 <IconButton
                     disabled
                     sx={disabledButtonStyles}
-                    aria-label="Ir a Entrenar"
-                    title="Ir a Entrenar"
+                    aria-label="Ya estás acá!"
+                    title="You are here!"
                 >
                     <BicepsFlexed style={iconStyles} />
                 </IconButton>
