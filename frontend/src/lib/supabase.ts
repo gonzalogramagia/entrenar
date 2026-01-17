@@ -26,7 +26,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export const auth = {
   // Sign in with Google
   async signInWithGoogle() {
-    const redirectTo = window.location.href
+    // Asegurarse de incluir el pathname actual (ej. /en) pero limpiar hashes o query params previos
+    const redirectTo = `${window.location.origin}${window.location.pathname}`
+    console.log('Redirecting to:', redirectTo)
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

@@ -22,6 +22,8 @@ import {
   Download as DownloadIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 type Exercise = {
   id: number
@@ -36,6 +38,8 @@ type SettingsModalProps = {
 }
 
 export default function SettingsModal({ open, onClose, exercises = [] }: SettingsModalProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState<{ favoriteExercises: number[] }>({ favoriteExercises: [] })
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
@@ -61,7 +65,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           ...prev,
           favoriteExercises: allExerciseIds
         }))
-        
+
         // Guardar automáticamente todos los ejercicios como favoritos en localStorage
         const settingsToSave = {
           favoriteExercises: allExerciseIds,
@@ -77,7 +81,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         ...prev,
         favoriteExercises: allExerciseIds
       }))
-      
+
       // Guardar automáticamente en localStorage
       const settingsToSave = {
         favoriteExercises: allExerciseIds,
@@ -90,7 +94,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   // Verificar si hay cambios solo en ejercicios favoritos
   useEffect(() => {
     let hasFavoriteChanges = false
-    
+
     try {
       const adminSettings = localStorage.getItem('admin-exercise-settings')
       if (adminSettings) {
@@ -104,7 +108,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       console.error('Error checking settings changes:', error)
       hasFavoriteChanges = false
     }
-    
+
     setHasChanges(hasFavoriteChanges)
   }, [tempSettings.favoriteExercises])
 
@@ -137,15 +141,15 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const handleSave = async () => {
     try {
       setSaving(true)
-      
+
       // Guardar en localStorage para todos los usuarios
       const settingsToSave = {
         favoriteExercises: tempSettings.favoriteExercises,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
-      
-      
+
+
       setHasChanges(false)
       setShowSuccessMessage(true)
       // Cerrar el modal después de un breve delay para mostrar el mensaje
@@ -198,7 +202,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const handleDownloadWorkouts = async () => {
     try {
       setDownloading(true)
-      
+
       // Intentar primero con el endpoint de exportación
       let response = await fetch('/api/workouts/export', {
         method: 'POST',
@@ -210,14 +214,14 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       // Si falla con 405, usar método alternativo
       if (!response.ok && response.status === 405) {
         console.log('Endpoint /workouts/export no disponible, usando método alternativo...')
-        
+
         // Método alternativo: obtener datos y generar CSV en el frontend
         try {
           const workouts = await apiClient.getWorkouts() as any[]
-          
+
           // Generar CSV
           const csvContent = generateCSVFromWorkouts(workouts)
-          
+
           // Descargar archivo
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
           const url = window.URL.createObjectURL(blob)
@@ -228,7 +232,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           a.click()
           window.URL.revokeObjectURL(url)
           document.body.removeChild(a)
-          
+
           return // Salir exitosamente
         } catch (altError) {
           throw new Error('Error generando archivo CSV: ' + (altError instanceof Error ? altError.message : 'Error desconocido'))
@@ -248,7 +252,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      
+
     } catch (error) {
       console.error('Error downloading workouts:', error)
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
@@ -261,12 +265,12 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   // Función para generar CSV desde los datos de entrenamientos
   const generateCSVFromWorkouts = (workouts: any[]) => {
     const headers = ['Fecha', 'Ejercicio', 'Peso (kg)', 'Repeticiones', 'Serie', 'Tiempo (seg)', 'Observaciones', 'Día de Entrenamiento']
-    
+
     let csvContent = '\uFEFF' // BOM para UTF-8
-    
+
     // Agregar encabezados
     csvContent += headers.map(header => `"${header}"`).join(',') + '\n'
-    
+
     // Agregar datos
     workouts.forEach(workout => {
       const row = [
@@ -281,7 +285,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       ]
       csvContent += row.map(field => `"${field}"`).join(',') + '\n'
     })
-    
+
     return csvContent
   }
 
@@ -314,7 +318,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <AdminIcon sx={{ fontSize: 24, color: 'white' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            Panel de Usuario
+            {t.navigation.userPanel}
           </Typography>
         </Box>
         <IconButton
@@ -333,8 +337,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
       <DialogContent sx={{ p: 0, overflow: 'auto', flex: 1 }}>
         <Box sx={{ p: { xs: 1, sm: 2 } }}>
-        {/* Sección NOTIFICACIONES UNC - OCULTA */}
-        {/* <Box sx={{ mb: 3 }}>
+          {/* Sección NOTIFICACIONES UNC - OCULTA */}
+          {/* <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             NOTIFICACIONES
           </Typography>
@@ -378,8 +382,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
         <Divider sx={{ my: 2 }} /> */}
 
-        {/* Sección FEED SOCIAL - OCULTA */}
-        {/* <Box sx={{ mb: 3 }}>
+          {/* Sección FEED SOCIAL - OCULTA */}
+          {/* <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             FEED SOCIAL
           </Typography>
@@ -425,117 +429,117 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
 
 
-        <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-        {/* Sección EXPORTAR DATOS */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            📊 EXPORTAR MIS DATOS
-          </Typography>
+          {/* Sección EXPORTAR DATOS */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              📊 {language === 'es' ? 'EXPORTAR MIS DATOS' : 'EXPORT MY DATA'}
+            </Typography>
 
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Descarga todos tus entrenamientos en formato CSV para análisis o respaldo
-          </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {language === 'es' ? 'Descarga todos tus entrenamientos en formato CSV para análisis o respaldo' : 'Download all your workouts in CSV format for analysis or backup'}
+            </Typography>
 
-          <Button
-            variant="outlined"
-            startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
-            onClick={handleDownloadWorkouts}
-            disabled={downloading}
-            sx={{ mb: 2 }}
-          >
-            {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
-          </Button>
-        </Box>
+            <Button
+              variant="outlined"
+              startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+              onClick={handleDownloadWorkouts}
+              disabled={downloading}
+              sx={{ mb: 2 }}
+            >
+              {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
+            </Button>
+          </Box>
 
-        <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-        {/* Sección EJERCICIOS FAVORITOS */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            💪 EJERCICIOS DEL REGISTRO
-          </Typography>
+          {/* Sección EJERCICIOS FAVORITOS */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              💪 {language === 'es' ? 'EJERCICIOS DEL REGISTRO' : 'LOG EXERCISES'}
+            </Typography>
 
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Configura qué ejercicios aparecen en tu selector del registro de entrenamiento
-          </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {language === 'es' ? 'Configura qué ejercicios aparecen en tu selector del registro de entrenamiento' : 'Configure which exercises appear in your workout log selector'}
+            </Typography>
 
-          {/* Buscador de ejercicios */}
-          <TextField
-            placeholder="Buscar ejercicios..."
-            value={exerciseSearchTerm}
-            onChange={(e) => setExerciseSearchTerm(e.target.value)}
-            size="small"
-            fullWidth
-            sx={{ mb: 2 }}
-          />
+            {/* Buscador de ejercicios */}
+            <TextField
+              placeholder={t.exercises.searchPlaceholder}
+              value={exerciseSearchTerm}
+              onChange={(e) => setExerciseSearchTerm(e.target.value)}
+              size="small"
+              fullWidth
+              sx={{ mb: 2 }}
+            />
 
-          {availableExercises.length > 0 ? (
-            <Box>
-              <Box sx={{
-                maxHeight: 300,
-                overflowY: 'auto',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                p: 1,
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                gap: 1,
-                alignItems: 'start'
-              }}>
-                {filteredExercises.map(exercise => (
-                  <Box
-                    key={exercise.id}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      py: 0.5,
-                      px: 1,
-                      borderRadius: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.50' : 'background.paper',
-                      minHeight: '40px',
-                      width: '100%',
-                      '&:hover': {
-                        backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.100' : 'grey.50'
-                      }
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={tempSettings.favoriteExercises.includes(exercise.id)}
-                          onChange={() => handleToggleFavoriteExercise(exercise.id)}
-                          size="small"
-                          color="primary"
-                        />
-                      }
-                      label={exercise.name}
+            {availableExercises.length > 0 ? (
+              <Box>
+                <Box sx={{
+                  maxHeight: 300,
+                  overflowY: 'auto',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  p: 1,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: 1,
+                  alignItems: 'start'
+                }}>
+                  {filteredExercises.map(exercise => (
+                    <Box
+                      key={exercise.id}
                       sx={{
-                        m: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        py: 0.5,
+                        px: 1,
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.50' : 'background.paper',
+                        minHeight: '40px',
                         width: '100%',
-                        '& .MuiFormControlLabel-label': {
-                          fontSize: '0.875rem',
-                          fontWeight: tempSettings.favoriteExercises.includes(exercise.id) ? 500 : 400
+                        '&:hover': {
+                          backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) ? 'primary.100' : 'grey.50'
                         }
                       }}
-                    />
-                  </Box>
-                ))}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={tempSettings.favoriteExercises.includes(exercise.id)}
+                            onChange={() => handleToggleFavoriteExercise(exercise.id)}
+                            size="small"
+                            color="primary"
+                          />
+                        }
+                        label={exercise.name}
+                        sx={{
+                          m: 0,
+                          width: '100%',
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: '0.875rem',
+                            fontWeight: tempSettings.favoriteExercises.includes(exercise.id) ? 500 : 400
+                          }
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-            </Box>
-          ) : (
-            <Alert severity="info">
-              <Typography variant="body2">
-                Los ejercicios se cargarán automáticamente cuando estén disponibles
-              </Typography>
-            </Alert>
-          )}
-        </Box>
+            ) : (
+              <Alert severity="info">
+                <Typography variant="body2">
+                  {language === 'es' ? 'Los ejercicios se cargarán automáticamente cuando estén disponibles' : 'Exercises will load automatically when available'}
+                </Typography>
+              </Alert>
+            )}
+          </Box>
 
-        <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
         </Box>
       </DialogContent>
@@ -546,7 +550,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           variant="outlined"
           sx={{ minWidth: 100 }}
         >
-          Cancelar
+          {t.common.cancel}
         </Button>
         <Button
           onClick={handleSave}
@@ -557,10 +561,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           {saving ? (
             <>
               <CircularProgress size={16} sx={{ mr: 1 }} />
-              Guardando...
+              {language === 'es' ? 'Guardando...' : 'Saving...'}
             </>
           ) : (
-            'Guardar'
+            t.common.save
           )}
         </Button>
       </DialogActions>
@@ -572,12 +576,12 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         onClose={() => setShowSuccessMessage(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={() => setShowSuccessMessage(false)} 
-          severity="success" 
+        <Alert
+          onClose={() => setShowSuccessMessage(false)}
+          severity="success"
           sx={{ width: '100%' }}
         >
-          ✅ Configuraciones guardadas exitosamente
+          {language === 'es' ? '✅ Configuraciones guardadas exitosamente' : '✅ Settings saved successfully'}
         </Alert>
       </Snackbar>
     </Dialog>

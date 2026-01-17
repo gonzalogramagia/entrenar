@@ -4,6 +4,8 @@ import { AllInclusive, People, FitnessCenter } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 import { TABS, type TabType } from '../../constants/tabs'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 type FloatingNavButtonProps = {
   currentTab: TabType
@@ -12,6 +14,8 @@ type FloatingNavButtonProps = {
 }
 
 export default function FloatingNavButton({ currentTab, onTabChange, activeRoutine }: FloatingNavButtonProps) {
+  const { language } = useLanguage()
+  const t = translations[language].navigation
   const { getRoutineProgress } = useUserSettings()
   const [isVisible, setIsVisible] = useState(true)
 
@@ -84,15 +88,15 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
 
   const getTooltip = () => {
     if (currentTab === TABS.ROUTINES && activeRoutine) {
-      return isRoutineComplete ? 'Ver entrenamientos' : 'Registrar entrenamiento'
+      return isRoutineComplete ? t.viewWorkouts : t.logWorkout
     } else if (currentTab === TABS.WORKOUT) {
-      return 'Ver historial'
+      return t.viewHistory
     } else if (currentTab === TABS.HISTORY) {
-      return 'Ver social'
+      return t.viewSocial
     } else if (currentTab === TABS.SOCIAL) {
-      return 'Registrar entrenamiento'
+      return t.logWorkout
     }
-    return 'Registrar entrenamiento'
+    return t.logWorkout
   }
 
   return (

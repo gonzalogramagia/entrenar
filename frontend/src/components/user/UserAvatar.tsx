@@ -13,7 +13,8 @@ import {
 } from '@mui/material'
 import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
-// import { useUserSettings } from '../../contexts/UserSettingsContext' // Ya no se usa
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 type UserAvatarProps = {
   onOpenSettings?: () => void
@@ -23,6 +24,8 @@ type UserAvatarProps = {
 }
 
 export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: UserAvatarProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
   const { user, logout, isAdmin, userRole } = useAuth()
   // const { settings } = useUserSettings() // Ya no se usa
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -65,7 +68,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
   // Función para obtener iniciales del usuario
   const getUserInitials = () => {
     if (!user?.email) return 'U'
-    
+
     if (user.user_metadata?.full_name) {
       return user.user_metadata.full_name
         .split(' ')
@@ -74,7 +77,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         .substring(0, 2)
         .toUpperCase()
     }
-    
+
     return user.email[0].toUpperCase()
   }
 
@@ -91,8 +94,8 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
       >
-        <Badge 
-          badgeContent={unreadNotifications} 
+        <Badge
+          badgeContent={unreadNotifications}
           sx={{
             '& .MuiBadge-badge': {
               fontSize: '0.7rem',
@@ -105,8 +108,8 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           invisible={unreadNotifications === 0}
         >
           <Avatar
-            sx={{ 
-              width: 32, 
+            sx={{
+              width: 32,
               height: 32,
               bgcolor: avatarUrl ? 'transparent' : 'primary.main',
               fontSize: '14px',
@@ -158,8 +161,8 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #e0e0e0' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <Avatar
-              sx={{ 
-                width: 40, 
+              sx={{
+                width: 40,
                 height: 40,
                 mr: 1.5,
                 bgcolor: avatarUrl ? 'transparent' : 'primary.main'
@@ -170,7 +173,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
             </Avatar>
             <Box>
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuario'}
+                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || (language === 'es' ? 'Usuario' : 'User')}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {user?.email}
@@ -188,9 +191,9 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
               <AdminIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>
-              {userRole === 'profe' ? 'Panel de Profe' : 
-               userRole === 'staff' ? 'Panel de Staff' : 
-               'Panel de Admin'}
+              {userRole === 'profe' ? (language === 'es' ? 'Panel de Profe' : 'Coach Panel') :
+                userRole === 'staff' ? (language === 'es' ? 'Panel de Staff' : 'Staff Panel') :
+                  'Panel de Admin'}
             </ListItemText>
           </MenuItem>
         )}
@@ -201,7 +204,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
             <ListItemIcon>
               <AdminIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Panel de Usuario</ListItemText>
+            <ListItemText>{t.navigation.userPanel}</ListItemText>
           </MenuItem>
         )}
 
@@ -234,7 +237,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
             </Box>
           </ListItemIcon>
           <ListItemText>
-            Notificaciones
+            {t.navigation.notifications}
           </ListItemText>
         </MenuItem>
 
@@ -243,7 +246,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Cerrar Sesión</ListItemText>
+          <ListItemText>{t.navigation.logout}</ListItemText>
         </MenuItem>
       </Menu>
     </>

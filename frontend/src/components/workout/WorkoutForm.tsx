@@ -483,7 +483,7 @@ export default function WorkoutForm({
             alignItems: 'center'
           }}>
             <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
-              {realRoutineProgress}% {language === 'es' ? 'completa' : 'complete'}
+              {realRoutineProgress}% {t.routineCompleteLabel}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -777,9 +777,9 @@ export default function WorkoutForm({
                 return optionName.includes(searchTerm)
               })
             }}
-            noOptionsText="No se encontraron ejercicios"
+            noOptionsText={t.noExercisesFound}
             loading={isLoading}
-            loadingText="Cargando ejercicios..."
+            loadingText={t.loadingExercises}
             clearOnBlur={false}
             blurOnSelect={true}
           />
@@ -787,7 +787,7 @@ export default function WorkoutForm({
           {/* Interfaz para deportes */}
           {isSportExercise ? (
             <TextField
-              label="Tiempo en cancha (minutos)"
+              label={t.sportTime}
               type="number"
               disabled={isLoading}
               error={Boolean(errors.seconds)}
@@ -819,7 +819,7 @@ export default function WorkoutForm({
               flexDirection: { xs: 'row' }
             }}>
               <TextField
-                label={isRunningOrBiciExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
+                label={isRunningOrBiciExercise ? t.distance : (isBodyweightExercise ? t.weightOptional : t.weightKg)}
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.weight)}
@@ -845,7 +845,7 @@ export default function WorkoutForm({
               {/* Ocultar campo Reps para Running y Bici */}
               {!isRunningOrBiciExercise && (
                 <TextField
-                  label="Reps"
+                  label={t.reps}
                   type="number"
                   disabled={isLoading}
                   error={Boolean(errors.reps)}
@@ -875,11 +875,11 @@ export default function WorkoutForm({
                 sx={{ flex: 1 }}
               >
                 <InputLabel id="serie-select-label">
-                  {isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
+                  {isRunningOrBiciExercise ? t.lap : t.set}
                 </InputLabel>
                 <Select
                   labelId="serie-select-label"
-                  label={isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
+                  label={isRunningOrBiciExercise ? t.lap : t.set}
                   value={watch('set')}
                   {...register('set', { valueAsNumber: true })}
                 >
@@ -896,7 +896,7 @@ export default function WorkoutForm({
           {/* Campo de descanso en segundos - Oculto para deportes */}
           {!isSportExercise && (
             <TextField
-              label="Pausa luego de la serie (segs)"
+              label={t.restAfterSet}
               type="number"
               disabled={isLoading}
               error={Boolean(errors.restSeconds)}
@@ -933,7 +933,7 @@ export default function WorkoutForm({
             </Box>
           ) : (
             <TextField
-              label="Observaciones (opcional)"
+              label={t.observationsOptional}
               multiline
               rows={activeRoutine ? 1 : 2}
               disabled={isLoading}
@@ -966,7 +966,7 @@ export default function WorkoutForm({
               }
             }}
           >
-            {isLoading ? 'Registrando...' : 'Registrar Entrenamiento'}
+            {isLoading ? t.registering : t.submitWorkout}
           </Button>
         </Stack>
       </form>
@@ -987,7 +987,7 @@ export default function WorkoutForm({
       >
         <DialogContent sx={{ textAlign: 'center', py: 3 }}>
           <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
-            Descansando luego de hacer
+            {t.restingAfter}
           </Typography>
 
           <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>

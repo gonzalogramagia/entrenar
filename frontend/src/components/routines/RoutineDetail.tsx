@@ -22,6 +22,8 @@ import {
 } from '@mui/icons-material'
 import type { RoutineWithExercises } from '../../types/routine'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 interface RoutineDetailProps {
   routine: RoutineWithExercises
@@ -35,10 +37,10 @@ interface RoutineDetailProps {
   onNavigateToWorkout?: () => void
 }
 
-const RoutineDetail: React.FC<RoutineDetailProps> = ({ 
-  routine, 
-  onClose, 
-  onEdit, 
+const RoutineDetail: React.FC<RoutineDetailProps> = ({
+  routine,
+  onClose,
+  onEdit,
   onStart,
   onDelete,
   isActiveRoutine = false,
@@ -46,13 +48,15 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   onExerciseClick,
   onNavigateToWorkout
 }) => {
+  const { language } = useLanguage()
+  const t = translations[language]
   const { toggleExerciseCompleted, getCompletedExercisesForRoutine, getRoutineProgress, resetCompletedExercisesForDate } = useUserSettings()
-  
+
   // Obtener fecha actual y ejercicios completados
   const today = new Date().toISOString().split('T')[0]
   const completedExercisesForRoutine = getCompletedExercisesForRoutine(today, routine.id)
   const realRoutineProgress = getRoutineProgress(today, routine.id, routine)
-  
+
   // Detectar si la rutina está completa
   const isRoutineComplete = realRoutineProgress === 100
   const formatTime = (seconds: number) => {
@@ -89,7 +93,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   }
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       p: 2,
       maxWidth: '100%',
       width: '100%',
@@ -98,17 +102,17 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
 
 
       {/* Header de la rutina */}
-      <Card 
+      <Card
         elevation={3}
         onClick={isActiveRoutine && onNavigateToWorkout ? onNavigateToWorkout : undefined}
-        sx={{ 
+        sx={{
           mb: 3,
           border: '2px solid',
           borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
           borderRadius: '16px',
-          background: isRoutineComplete 
+          background: isRoutineComplete
             ? 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
-            : (isActiveRoutine 
+            : (isActiveRoutine
               ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
               : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'),
           cursor: isActiveRoutine && onNavigateToWorkout ? 'pointer' : 'default',
@@ -128,10 +132,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             gap: 2
           }}>
             <Box sx={{ flex: 1 }}>
-              <Typography 
-                variant="h5" 
-                component="h2" 
-                sx={{ 
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{
                   fontWeight: 800,
                   color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
                   textShadow: '0 1px 2px rgba(0,0,0,0.1)',
@@ -143,12 +147,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               >
                 🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
               </Typography>
-              
+
               {routine.description && (
-                <Typography 
-                  variant="body1" 
-                  color="text.secondary" 
-                  sx={{ 
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{
                     mt: 1,
                     fontStyle: 'italic',
                     fontSize: '1.1rem'
@@ -158,9 +162,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 </Typography>
               )}
             </Box>
-            
-            <Box sx={{ 
-              display: 'flex', 
+
+            <Box sx={{
+              display: 'flex',
               gap: 1,
               flexShrink: 0,
               flexWrap: 'wrap',
@@ -170,14 +174,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             }}>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {onDelete && (isRoutineComplete || !isActiveRoutine) && (
-                  <Tooltip title="Eliminar rutina">
+                  <Tooltip title={language === 'es' ? 'Eliminar rutina' : 'Delete routine'}>
                     <IconButton
                       color="error"
                       onClick={(e) => {
                         e.stopPropagation()
                         onDelete()
                       }}
-                      sx={{ 
+                      sx={{
                         backgroundColor: 'transparent',
                         color: 'error.main',
                         ml: { xs: -1, sm: 0 },
@@ -191,9 +195,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     </IconButton>
                   </Tooltip>
                 )}
-                
+
                 <Chip
-                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
+                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? (language === 'es' ? 'ejercicio' : 'exercise') : (language === 'es' ? 'ejercicios' : 'exercises')}`}
                   sx={{
                     backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
                     color: 'white',
@@ -203,9 +207,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   variant="filled"
                   size="medium"
                 />
-                
+
                 {onEdit && (isRoutineComplete || !isActiveRoutine) && (
-                  <Tooltip title="Editar rutina">
+                  <Tooltip title={language === 'es' ? 'Editar rutina' : 'Edit routine'}>
                     <IconButton
                       sx={{
                         color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main')
@@ -221,7 +225,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 )}
               </Box>
               {onStart && !isRoutineComplete && (
-                <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
+                <Tooltip title={isActiveRoutine ? (language === 'es' ? "Parar rutina" : "Stop routine") : (language === 'es' ? "Comenzar rutina" : "Start routine")}>
                   <IconButton
                     onClick={(e) => {
                       e.stopPropagation()
@@ -232,7 +236,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         window.dispatchEvent(navigateEvent)
                       }
                     }}
-                    sx={{ 
+                    sx={{
                       backgroundColor: isActiveRoutine ? '#FFB732' : 'primary.main',
                       color: 'white',
                       cursor: 'pointer',
@@ -255,10 +259,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             gap: 2
           }}>
             {/* Nombre de la rutina */}
-            <Typography 
-              variant="h5" 
-              component="h2" 
-              sx={{ 
+            <Typography
+              variant="h5"
+              component="h2"
+              sx={{
                 fontWeight: 800,
                 color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
                 textShadow: '0 1px 2px rgba(0,0,0,0.1)',
@@ -267,12 +271,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             >
               🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
             </Typography>
-            
+
             {routine.description && (
-              <Typography 
-                variant="body1" 
-                color="text.secondary" 
-                sx={{ 
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{
                   fontStyle: 'italic',
                   fontSize: '1.1rem',
                   textAlign: 'center'
@@ -285,7 +289,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             {/* Pill de ejercicios */}
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <Chip
-                label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
+                label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? (language === 'es' ? 'ejercicio' : 'exercise') : (language === 'es' ? 'ejercicios' : 'exercises')}`}
                 sx={{
                   backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main'),
                   color: 'white',
@@ -298,22 +302,22 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             </Box>
 
             {/* Botones */}
-            <Box sx={{ 
-              display: 'flex', 
+            <Box sx={{
+              display: 'flex',
               gap: 1,
               justifyContent: 'center',
               alignItems: 'center',
               flexWrap: 'wrap'
             }}>
               {onDelete && (isRoutineComplete || !isActiveRoutine) && (
-                <Tooltip title="Eliminar rutina">
+                <Tooltip title={language === 'es' ? 'Eliminar rutina' : 'Delete routine'}>
                   <IconButton
                     color="error"
                     onClick={(e) => {
                       e.stopPropagation()
                       onDelete()
                     }}
-                    sx={{ 
+                    sx={{
                       backgroundColor: 'transparent',
                       color: 'error.main',
                       '&:hover': {
@@ -326,9 +330,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   </IconButton>
                 </Tooltip>
               )}
-              
+
               {onEdit && (isRoutineComplete || !isActiveRoutine) && (
-                <Tooltip title="Editar rutina">
+                <Tooltip title={language === 'es' ? 'Editar rutina' : 'Edit routine'}>
                   <IconButton
                     sx={{
                       color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'primary.main')
@@ -344,7 +348,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               )}
 
               {onStart && !isRoutineComplete && (
-                <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
+                <Tooltip title={isActiveRoutine ? (language === 'es' ? "Parar rutina" : "Stop routine") : (language === 'es' ? "Comenzar rutina" : "Start routine")}>
                   <IconButton
                     onClick={(e) => {
                       e.stopPropagation()
@@ -355,7 +359,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         window.dispatchEvent(navigateEvent)
                       }
                     }}
-                    sx={{ 
+                    sx={{
                       backgroundColor: isActiveRoutine ? '#FFB732' : 'primary.main',
                       color: 'white',
                       cursor: 'pointer',
@@ -380,17 +384,17 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-              Progreso de la rutina
+              {language === 'es' ? 'Progreso de la rutina' : 'Routine progress'}
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 600, color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary') }}>
               {realRoutineProgress}%
             </Typography>
           </Box>
-          <LinearProgress 
-            variant="determinate" 
-            value={realRoutineProgress} 
-            sx={{ 
-              height: 8, 
+          <LinearProgress
+            variant="determinate"
+            value={realRoutineProgress}
+            sx={{
+              height: 8,
               borderRadius: 4,
               backgroundColor: 'grey.200',
               '& .MuiLinearProgress-bar': {
@@ -410,10 +414,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
             const isCompleted = completedSets.length === exercise.sets
             return (
-              <Card 
-                key={exercise.id} 
+              <Card
+                key={exercise.id}
                 elevation={2}
-                sx={{ 
+                sx={{
                   border: '2px solid',
                   borderColor: isCompleted ? (isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main')) : 'grey.300',
                   backgroundColor: isCompleted ? (isRoutineComplete ? '#f0f8f0' : (isActiveRoutine ? '#fff3e0' : '#f0f8f0')) : 'transparent',
@@ -430,186 +434,186 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 }}
                 onClick={() => isActiveRoutine && onExerciseClick?.(exercise)}
               >
-            <CardContent sx={{ p: 3 }}>
-              {/* Header del ejercicio */}
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'flex-start', 
-                gap: 2
-              }}>
-                {/* Checkboxes por serie */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
-                  {Array.from({ length: exercise.sets }, (_, setIndex) => {
-                    const setNumber = setIndex + 1
-                    const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
-                    const isSetCompleted = completedSets.includes(setNumber)
-                    
-                    return (
-                      <Checkbox
-                        key={setNumber}
-                        checked={isSetCompleted}
-                        disabled={!isActiveRoutine}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={(e) => {
-                          e.stopPropagation()
-                          if (isActiveRoutine) {
-                            toggleExerciseCompleted(today, routine.id, exercise.exercise_id, setNumber, routine)
-                          }
-                        }}
-                        sx={{
-                          color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main'),
-                          '&.Mui-checked': {
-                            color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main'),
-                          },
-                          '&.Mui-disabled': {
-                            color: isSetCompleted ? (isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main')) : 'grey.400',
-                          },
-                          p: 0.5
-                        }}
-                      />
-                    )
-                  })}
-                </Box>
-                
-
-                
-                {/* Información del ejercicio */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    gap: 2,
-                    flexWrap: 'wrap'
+                <CardContent sx={{ p: 3 }}>
+                  {/* Header del ejercicio */}
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 2
                   }}>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        fontWeight: 700,
-                        color: isActiveRoutine ? 'text.primary' : 'text.secondary'
-                      }}
-                    >
-                      {exercise.exercise_name}
-                    </Typography>
-                    
-                    {/* Chips de información y notas */}
-                    <Box sx={{ 
-                      display: 'flex', 
-                      gap: 1, 
-                      flexWrap: 'wrap',
-                      alignItems: 'center'
-                    }}>
-                      <Chip
-                        label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
-                        size="small"
-                        sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
-                          fontWeight: 600,
-                          '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
-                          }
-                        }}
-                        variant="filled"
-                      />
-                      <Chip
-                        label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
-                        size="small"
-                        sx={{
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
-                          fontWeight: 600,
-                          '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
-                          }
-                        }}
-                        variant="filled"
-                      />
-                      {exercise.weight && exercise.weight > 0 && (
-                        <Chip
-                          label={`${exercise.weight} kg`}
-                          size="small"
+                    {/* Checkboxes por serie */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
+                      {Array.from({ length: exercise.sets }, (_, setIndex) => {
+                        const setNumber = setIndex + 1
+                        const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
+                        const isSetCompleted = completedSets.includes(setNumber)
+
+                        return (
+                          <Checkbox
+                            key={setNumber}
+                            checked={isSetCompleted}
+                            disabled={!isActiveRoutine}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              e.stopPropagation()
+                              if (isActiveRoutine) {
+                                toggleExerciseCompleted(today, routine.id, exercise.exercise_id, setNumber, routine)
+                              }
+                            }}
+                            sx={{
+                              color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main'),
+                              '&.Mui-checked': {
+                                color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main'),
+                              },
+                              '&.Mui-disabled': {
+                                color: isSetCompleted ? (isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'success.main')) : 'grey.400',
+                              },
+                              p: 0.5
+                            }}
+                          />
+                        )
+                      })}
+                    </Box>
+
+
+
+                    {/* Información del ejercicio */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        flexWrap: 'wrap'
+                      }}>
+                        <Typography
+                          variant="h6"
                           sx={{
-                            backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted || isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400')),
-                            color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
-                            fontWeight: 600,
-                            '&:hover': {
-                              backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
-                            }
+                            fontWeight: 700,
+                            color: isActiveRoutine ? 'text.primary' : 'text.secondary'
                           }}
-                          variant="filled"
-                        />
-                      )}
-                      <Chip
-                        label={`${formatTime(exercise.rest_time_seconds)} descanso`}
-                        size="small"
-                        color={isRoutineComplete ? "success" : (isCompleted || isActiveRoutine ? "warning" : "default")}
-                        variant="filled"
-                        icon={<TimerIcon />}
-                        sx={{ 
-                          fontWeight: 600,
-                          backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'warning.main')),
-                          color: 'white',
-                          '&:hover': {
-                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : (!isActiveRoutine && !isCompleted ? 'grey.400' : 'warning.dark'))
-                          }
-                        }}
-                      />
-                      
-                      {/* Notas del ejercicio */}
-                      {exercise.notes && (
-                        <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: 0.5,
-                          px: 1.5,
-                          py: 0.5,
-                          backgroundColor: 'grey.100',
-                          borderRadius: '12px',
-                          border: '1px solid',
-                          borderColor: 'grey.300'
+                        >
+                          {exercise.exercise_name}
+                        </Typography>
+
+                        {/* Chips de información y notas */}
+                        <Box sx={{
+                          display: 'flex',
+                          gap: 1,
+                          flexWrap: 'wrap',
+                          alignItems: 'center'
                         }}>
-                          <NotesIcon sx={{ 
-                            color: 'text.secondary', 
-                            fontSize: 16
-                          }} />
-                          <Typography 
-                            variant="caption" 
-                            color="text.secondary"
-                            sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}
-                          >
-                            {exercise.notes}
-                          </Typography>
+                          <Chip
+                            label={`${exercise.sets} ${exercise.sets === 1 ? (language === 'es' ? 'serie' : 'set') : (language === 'es' ? 'series' : 'sets')}`}
+                            size="small"
+                            sx={{
+                              backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                              color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
+                              fontWeight: 600,
+                              '&:hover': {
+                                backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
+                              }
+                            }}
+                            variant="filled"
+                          />
+                          <Chip
+                            label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
+                            size="small"
+                            sx={{
+                              backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted ? (isActiveRoutine ? '#FFB732' : 'success.main') : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400'))),
+                              color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
+                              fontWeight: 600,
+                              '&:hover': {
+                                backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
+                              }
+                            }}
+                            variant="filled"
+                          />
+                          {exercise.weight && exercise.weight > 0 && (
+                            <Chip
+                              label={`${exercise.weight} kg`}
+                              size="small"
+                              sx={{
+                                backgroundColor: isRoutineComplete ? 'success.main' : (isCompleted || isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'grey.400')),
+                                color: !isActiveRoutine && !isCompleted ? 'grey.600' : 'white',
+                                fontWeight: 600,
+                                '&:hover': {
+                                  backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : 'grey.400')
+                                }
+                              }}
+                              variant="filled"
+                            />
+                          )}
+                          <Chip
+                            label={`${formatTime(exercise.rest_time_seconds)} ${language === 'es' ? 'descanso' : 'rest'}`}
+                            size="small"
+                            color={isRoutineComplete ? "success" : (isCompleted || isActiveRoutine ? "warning" : "default")}
+                            variant="filled"
+                            icon={<TimerIcon />}
+                            sx={{
+                              fontWeight: 600,
+                              backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : (!isActiveRoutine && !isCompleted ? 'grey.300' : 'warning.main')),
+                              color: 'white',
+                              '&:hover': {
+                                backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? '#FFA000' : (!isActiveRoutine && !isCompleted ? 'grey.400' : 'warning.dark'))
+                              }
+                            }}
+                          />
+
+                          {/* Notas del ejercicio */}
+                          {exercise.notes && (
+                            <Box sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              px: 1.5,
+                              py: 0.5,
+                              backgroundColor: 'grey.100',
+                              borderRadius: '12px',
+                              border: '1px solid',
+                              borderColor: 'grey.300'
+                            }}>
+                              <NotesIcon sx={{
+                                color: 'text.secondary',
+                                fontSize: 16
+                              }} />
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}
+                              >
+                                {exercise.notes}
+                              </Typography>
+                            </Box>
+                          )}
                         </Box>
-                      )}
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              </Box>
 
 
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
             )
           })
         ) : (
-          <Box sx={{ 
-            textAlign: 'center', 
+          <Box sx={{
+            textAlign: 'center',
             py: 4,
             color: 'text.secondary'
           }}>
             <Typography variant="h6">
-              No hay ejercicios en esta rutina
+              {language === 'es' ? 'No hay ejercicios en esta rutina' : 'No exercises in this routine'}
             </Typography>
           </Box>
         )}
       </Box>
 
       {/* Resumen de la rutina */}
-      <Card sx={{ 
-        mt: 3, 
-        backgroundColor: isRoutineComplete 
+      <Card sx={{
+        mt: 3,
+        backgroundColor: isRoutineComplete
           ? 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
-          : (isActiveRoutine 
+          : (isActiveRoutine
             ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
             : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'),
         border: '2px solid',
@@ -619,26 +623,26 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         overflow: 'hidden'
       }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              mb: 3, 
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 3,
               fontWeight: 800,
               color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? '#FFB732' : 'text.secondary'),
               textAlign: 'center',
               textShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}
           >
-            📊 Resumen de la rutina
+            📊 {language === 'es' ? 'Resumen de la rutina' : 'Routine summary'}
           </Typography>
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             gap: { xs: 2, sm: 3 },
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            <Box sx={{ 
+            <Box sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -656,14 +660,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               </Typography>
               <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')}
+                  🏋️ {(getCompletedExercises() === 1 ? (language === 'es' ? 'Ejercicio' : 'Exercise') : (language === 'es' ? 'Ejercicios' : 'Exercises'))}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  completados
+                  {language === 'es' ? 'completados' : 'completed'}
                 </Typography>
               </Box>
             </Box>
-            <Box sx={{ 
+            <Box sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -681,14 +685,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               </Typography>
               <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')}
+                  🔄 {(getCompletedSets() === 1 ? (language === 'es' ? 'Serie' : 'Set') : (language === 'es' ? 'Series' : 'Sets'))}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  completadas
+                  {language === 'es' ? 'completadas' : 'completed'}
                 </Typography>
               </Box>
             </Box>
-            <Box sx={{ 
+            <Box sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -709,7 +713,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  completadas
+                  {language === 'es' ? 'completadas' : 'completed'}
                 </Typography>
               </Box>
             </Box>
@@ -737,7 +741,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 }
               }}
             >
-              Resetear
+              {language === 'es' ? 'Resetear' : 'Reset'}
             </Button>
             <Button
               variant="contained"
@@ -749,7 +753,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 }
               }}
             >
-              Aceptar
+              {language === 'es' ? 'Aceptar' : 'OK'}
             </Button>
           </>
         ) : (
@@ -765,7 +769,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               }
             }}
           >
-            Cerrar
+            {t.common.close}
           </Button>
         )}
         {!isRoutineComplete && onStart && (
@@ -785,7 +789,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               }
             }}
           >
-            {isActiveRoutine ? 'Parar' : 'Iniciar'}
+            {isActiveRoutine ? (language === 'es' ? 'Parar' : 'Stop') : (language === 'es' ? 'Iniciar' : 'Start')}
           </Button>
         )}
       </Box>

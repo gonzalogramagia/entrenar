@@ -538,7 +538,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                             window.dispatchEvent(navigateEvent)
                           } catch (error) {
                             console.error('Error obteniendo detalles de la rutina:', error)
-                            setError('Error al cargar los detalles de la rutina')
+                            setError(language === 'es' ? 'Error al cargar los detalles de la rutina' : 'Error loading routine details')
                           }
                         }
                       }}
@@ -851,7 +851,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               }
             }}
           >
-            Cancelar
+            {translations[language].common.cancel}
           </Button>
           <Button
             onClick={handleSaveRoutineName}
@@ -870,14 +870,14 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               }
             }}
           >
-            Guardar
+            {translations[language].common.save}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Botón flotante para crear rutina */}
       <Fab
-        aria-label="crear rutina"
+        aria-label={language === 'es' ? 'crear rutina' : 'create routine'}
         onClick={() => setOpenCreateDialog(true)}
         sx={{
           position: 'fixed',
