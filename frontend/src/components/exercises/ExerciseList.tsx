@@ -24,6 +24,8 @@ import PlayCircleIcon from '@mui/icons-material/PlayCircle'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
 import FitnessCenter from '@mui/icons-material/FitnessCenter'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 type Exercise = {
   id: number
@@ -41,6 +43,8 @@ type ExerciseListProps = {
 }
 
 export default function ExerciseList({ exercises }: ExerciseListProps) {
+  const { language } = useLanguage()
+  const t = translations[language].exercises
   const [searchTerm, setSearchTerm] = useState('')
   const [muscleGroupFilter, setMuscleGroupFilter] = useState('')
   const [equipmentFilter, setEquipmentFilter] = useState('')
@@ -74,7 +78,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
       const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesMuscleGroup = !muscleGroupFilter || exercise.muscle_group === muscleGroupFilter
       const matchesEquipment = !equipmentFilter || exercise.equipment === equipmentFilter
-      
+
       return matchesSearch && matchesMuscleGroup && matchesEquipment
     })
   }, [exercises, searchTerm, muscleGroupFilter, equipmentFilter])
@@ -105,9 +109,9 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
   // Función para renderizar el estado vacío con mejor estilo
   const renderEmptyState = (isInitialEmpty: boolean = false) => (
-    <Box 
-      sx={{ 
-        textAlign: 'center', 
+    <Box
+      sx={{
+        textAlign: 'center',
         py: 8,
         px: 4,
         display: 'flex',
@@ -122,12 +126,12 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
         <SearchOffIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
       )}
       <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 'bold' }}>
-        {isInitialEmpty ? 'No hay ejercicios disponibles' : 'Sin resultados'}
+        {isInitialEmpty ? t.noExercises : t.noResults}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
-        {isInitialEmpty 
-          ? 'Aún no se han cargado ejercicios en el sistema.'
-          : 'No se encontraron ejercicios que coincidan con tu búsqueda. Intenta modificar los filtros.'
+        {isInitialEmpty
+          ? (language === 'es' ? 'Aún no se han cargado ejercicios en el sistema.' : 'No exercises have been loaded in the system yet.')
+          : (language === 'es' ? 'No se encontraron ejercicios que coincidan con tu búsqueda. Intenta modificar los filtros.' : 'No exercises found matching your search. Try adjusting the filters.')
         }
       </Typography>
     </Box>
@@ -143,14 +147,14 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      
+
       <Stack spacing={3}>
         {/* Filtros */}
-        <Box sx={{ 
-          p: 3, 
+        <Box sx={{
+          p: 3,
           mx: 2,
-          bgcolor: 'primary.main', 
-          borderRadius: 3, 
+          bgcolor: 'primary.main',
+          borderRadius: 3,
           boxShadow: 3,
           background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
           color: 'white',
@@ -158,10 +162,10 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
         }}>
           <Stack spacing={3}>
             <TextField
-              placeholder="Buscar ejercicios..."
+              placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{ 
+              sx={{
                 width: '100%',
                 '& .MuiOutlinedInput-root': {
                   bgcolor: 'rgba(255, 255, 255, 0.95)',
@@ -182,22 +186,22 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                 }
               }}
             />
-            <Box sx={{ 
-              display: 'flex', 
+            <Box sx={{
+              display: 'flex',
               flexDirection: { xs: 'column', sm: 'row' },
               gap: 3
             }}>
               <FormControl sx={{ flex: 1 }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: 'white', 
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'white',
                     fontSize: '0.875rem',
                     fontWeight: 500,
                     mb: 1
                   }}
                 >
-                  Grupo muscular
+                  {t.muscleGroup}
                 </Typography>
                 <Select
                   value={muscleGroupFilter}
@@ -217,7 +221,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                     }
                   }}
                 >
-                  <MenuItem value="">Elegir</MenuItem>
+                  <MenuItem value="">{t.choose}</MenuItem>
                   {muscleGroups.map(group => (
                     <MenuItem key={group} value={group}>
                       {capitalizeFirstLetter(group)}
@@ -226,16 +230,16 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                 </Select>
               </FormControl>
               <FormControl sx={{ flex: 1 }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: 'white', 
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'white',
                     fontSize: '0.875rem',
                     fontWeight: 500,
                     mb: 1
                   }}
                 >
-                  Equipamiento
+                  {t.equipment}
                 </Typography>
                 <Select
                   value={equipmentFilter}
@@ -255,7 +259,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                     }
                   }}
                 >
-                  <MenuItem value="">Elegir</MenuItem>
+                  <MenuItem value="">{t.choose}</MenuItem>
                   {equipmentTypes.map(equipment => (
                     <MenuItem key={equipment} value={equipment}>
                       {capitalizeFirstLetter(equipment)}
@@ -269,78 +273,78 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
         {/* Ejercicios o estado vacío */}
         {filteredExercises.length > 0 ? (
-          <Box sx={{ 
-            display: 'grid', 
+          <Box sx={{
+            display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
             gap: 2,
             mx: 2
           }}>
             {filteredExercises.map((exercise) => (
-            <Card 
-              key={exercise.id}
-              sx={{ 
-                cursor: 'pointer', 
-                height: '100%',
-                '&:hover': { 
-                  boxShadow: 4,
-                  transform: 'translateY(-2px)',
-                  transition: 'all 0.2s ease'
-                },
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider'
-              }}
-              onClick={() => handleExerciseClick(exercise)}
-            >
-              <CardContent sx={{ 
-                p: 3, 
-                height: '100%', 
-                display: 'flex', 
-                flexDirection: 'column',
-                textAlign: 'center'
-              }}>
-                <Box display="flex" justifyContent="center" alignItems="center" sx={{ mb: 2 }}>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontWeight: 'bold', 
-                      color: 'primary.main',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {exercise.name}
-                  </Typography>
-                  <IconButton 
-                    size="small" 
-                    color="primary" 
-                    sx={{ 
-                      color: exercise.video_url ? 'primary.main' : 'text.secondary',
-                      ml: 0.5,
-                      p: 0.5
-                    }}
-                  >
-                    {exercise.video_url ? <PlayCircleIcon /> : <PlayCircleOutlineIcon />}
-                  </IconButton>
-                </Box>
-                <Box sx={{ mt: 'auto', textAlign: 'center' }}>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ justifyContent: 'center' }}>
-                    <Chip 
-                      label={capitalizeFirstLetter(exercise.muscle_group)} 
-                      size="small" 
-                      color="primary" 
-                      sx={{ fontWeight: 'bold' }}
-                    />
-                    <Chip 
-                      label={capitalizeFirstLetter(exercise.equipment)} 
-                      size="small" 
-                      variant="outlined" 
-                      sx={{ borderColor: 'primary.main' }}
-                    />
-                  </Stack>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+              <Card
+                key={exercise.id}
+                sx={{
+                  cursor: 'pointer',
+                  height: '100%',
+                  '&:hover': {
+                    boxShadow: 4,
+                    transform: 'translateY(-2px)',
+                    transition: 'all 0.2s ease'
+                  },
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+                onClick={() => handleExerciseClick(exercise)}
+              >
+                <CardContent sx={{
+                  p: 3,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  textAlign: 'center'
+                }}>
+                  <Box display="flex" justifyContent="center" alignItems="center" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 'bold',
+                        color: 'primary.main',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {exercise.name}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      sx={{
+                        color: exercise.video_url ? 'primary.main' : 'text.secondary',
+                        ml: 0.5,
+                        p: 0.5
+                      }}
+                    >
+                      {exercise.video_url ? <PlayCircleIcon /> : <PlayCircleOutlineIcon />}
+                    </IconButton>
+                  </Box>
+                  <Box sx={{ mt: 'auto', textAlign: 'center' }}>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ justifyContent: 'center' }}>
+                      <Chip
+                        label={capitalizeFirstLetter(exercise.muscle_group)}
+                        size="small"
+                        color="primary"
+                        sx={{ fontWeight: 'bold' }}
+                      />
+                      <Chip
+                        label={capitalizeFirstLetter(exercise.equipment)}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderColor: 'primary.main' }}
+                      />
+                    </Stack>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
           </Box>
         ) : (
           renderEmptyState()
@@ -349,17 +353,17 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
       {/* Modal informativo mejorado */}
       {selectedExercise && (
-        <Dialog 
-          open={openDialog} 
-          onClose={handleCloseDialog} 
-          maxWidth="sm" 
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          maxWidth="sm"
           fullWidth
           PaperProps={{
             sx: {
               borderRadius: { xs: '12px', sm: 3 },
               maxWidth: { xs: '85vw', sm: '90vw', md: '500px' },
               maxHeight: { xs: '75vh', sm: '80vh', md: '70vh' },
-              m: { xs: '22vh 3vw'},
+              m: { xs: '22vh 3vw' },
               width: { xs: '85vw', sm: '90vw', md: '500px' },
               height: { xs: '70vh', sm: 'auto', md: 'auto' },
               position: { xs: 'fixed', sm: 'relative' },
@@ -367,7 +371,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
               left: { xs: '5vw', sm: 'auto' },
               right: { xs: '5vw', sm: 'auto' },
               boxShadow: { xs: '0 -4px 20px rgba(0,0,0,0.3)', sm: 3 },
-              pb: {xs: 2}
+              pb: { xs: 2 }
             }
           }}
           BackdropProps={{
@@ -376,7 +380,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
             }
           }}
         >
-          <DialogTitle sx={{ 
+          <DialogTitle sx={{
             background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
             color: 'white',
             borderRadius: '12px 12px 0 0',
@@ -385,10 +389,10 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
             position: 'relative'
           }}>
             {/* Handle para móviles */}
-            <Box sx={{ 
-              position: 'absolute', 
-              top: { xs: 8, sm: 12 }, 
-              left: '50%', 
+            <Box sx={{
+              position: 'absolute',
+              top: { xs: 8, sm: 12 },
+              left: '50%',
               transform: 'translateX(-50%)',
               width: 40,
               height: 4,
@@ -400,9 +404,9 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
               <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                 {selectedExercise.name}
               </Typography>
-              <IconButton 
+              <IconButton
                 onClick={handleCloseDialog}
-                sx={{ 
+                sx={{
                   color: 'white',
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.1)'
@@ -413,19 +417,19 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
               </IconButton>
             </Box>
           </DialogTitle>
-          
+
           <DialogContent sx={{ p: { xs: 2 }, maxHeight: { xs: '60vh', sm: '70vh' }, overflow: 'auto' }}>
             <Stack spacing={1}>
               {/* Video del ejercicio */}
               {selectedExercise.video_url && (
                 <Box sx={{ pt: 1 }}>
                   <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' }, mb: 1 }}>
-                    Video del Ejercicio
+                    {language === 'es' ? 'Video del Ejercicio' : 'Exercise Video'}
                   </Typography>
-                  <Box sx={{ 
-                    position: 'relative', 
-                    width: '100%', 
-                    height: 0, 
+                  <Box sx={{
+                    position: 'relative',
+                    width: '100%',
+                    height: 0,
                     paddingBottom: '56.25%', // Aspect ratio 16:9
                     borderRadius: 2,
                     overflow: 'hidden'
@@ -451,32 +455,32 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
               <Box sx={{ pt: 0, mt: 0.5 }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
-                  Información del Ejercicio
+                  {language === 'es' ? 'Información del Ejercicio' : 'Exercise Information'}
                 </Typography>
-                
+
                 <Stack spacing={0.5}>
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                      Grupo Muscular Principal:
+                      {language === 'es' ? 'Grupo Muscular Principal:' : 'Primary Muscle Group:'}
                     </Typography>
-                    <Chip 
-                      label={capitalizeFirstLetter(selectedExercise.muscle_group)} 
-                      color="primary" 
+                    <Chip
+                      label={capitalizeFirstLetter(selectedExercise.muscle_group)}
+                      color="primary"
                       sx={{ fontWeight: 'bold' }}
                     />
                   </Box>
-                  
+
                   {selectedExercise.primary_muscles && selectedExercise.primary_muscles.length > 0 && (
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                        Músculos Primarios:
+                        {language === 'es' ? 'Músculos Primarios:' : 'Primary Muscles:'}
                       </Typography>
                       <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                         {selectedExercise.primary_muscles.map((muscle, index) => (
-                          <Chip 
+                          <Chip
                             key={index}
-                            label={capitalizeFirstLetter(muscle)} 
-                            color="primary" 
+                            label={capitalizeFirstLetter(muscle)}
+                            color="primary"
                             size="small"
                             sx={{ fontWeight: 'bold' }}
                           />
@@ -484,18 +488,18 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                       </Stack>
                     </Box>
                   )}
-                  
+
                   {selectedExercise.secondary_muscles && selectedExercise.secondary_muscles.length > 0 && (
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                        Músculos Secundarios:
+                        {language === 'es' ? 'Músculos Secundarios:' : 'Secondary Muscles:'}
                       </Typography>
                       <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                         {selectedExercise.secondary_muscles.map((muscle, index) => (
-                          <Chip 
+                          <Chip
                             key={index}
-                            label={capitalizeFirstLetter(muscle)} 
-                            variant="outlined" 
+                            label={capitalizeFirstLetter(muscle)}
+                            variant="outlined"
                             size="small"
                             sx={{ borderColor: 'primary.main' }}
                           />
@@ -503,14 +507,14 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                       </Stack>
                     </Box>
                   )}
-                  
+
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                      Equipamiento:
+                      {language === 'es' ? 'Equipamiento:' : 'Equipment:'}
                     </Typography>
-                    <Chip 
-                      label={capitalizeFirstLetter(selectedExercise.equipment)} 
-                      variant="outlined" 
+                    <Chip
+                      label={capitalizeFirstLetter(selectedExercise.equipment)}
+                      variant="outlined"
                       sx={{ borderColor: 'primary.main' }}
                     />
                   </Box>
@@ -518,24 +522,24 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
               </Box>
             </Stack>
           </DialogContent>
-          
-          <DialogActions sx={{ 
-            p: { xs: 1, sm: 3 }, 
+
+          <DialogActions sx={{
+            p: { xs: 1, sm: 3 },
             pt: { xs: 0.5, sm: 0 },
             pb: { xs: 0.5, sm: 1 },
             justifyContent: 'center'
           }}>
-            <Button 
+            <Button
               onClick={handleCloseDialog}
               variant="contained"
-              sx={{ 
+              sx={{
                 borderRadius: 2,
                 px: { xs: 3, sm: 4 },
                 py: { xs: 1, sm: 1.5 },
                 minWidth: { xs: 120, sm: 140 }
               }}
             >
-              Cerrar
+              {translations[language].common.close}
             </Button>
           </DialogActions>
         </Dialog>
@@ -545,16 +549,16 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
       <Snackbar
         open={showTestAlert}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ 
+        sx={{
           mt: 6,
           width: { xs: '95%', sm: '90%', md: '70%' },
           left: '50%',
           transform: 'translateX(-50%)'
         }}
       >
-        <Alert 
-          severity="warning" 
-          sx={{ 
+        <Alert
+          severity="warning"
+          sx={{
             width: '100%',
             minWidth: '300px',
             fontSize: '0.95rem',
@@ -567,7 +571,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
             }
           }}
         >
-          ⚠️ Información de prueba: Los datos mostrados no son reales.
+          {language === 'es' ? '⚠️ Información de prueba: Los datos mostrados no son reales.' : '⚠️ Test Information: The data shown is not real.'}
         </Alert>
       </Snackbar>
     </Box>

@@ -29,6 +29,8 @@ import type { RoutineWithExercises, CreateRoutineRequest, UpdateRoutineRequest }
 import RoutineForm from './RoutineForm'
 import RoutineDetail from './RoutineDetail'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 interface RoutineListProps {
   activeRoutine?: any
@@ -36,9 +38,11 @@ interface RoutineListProps {
 }
 
 const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgress = 0 }) => {
+  const { language } = useLanguage()
+  const t = translations[language].routines
   const { getRoutineProgress, resetCompletedExercisesForDate } = useUserSettings()
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
-  
+
   // Función para detectar si una rutina está completa
   const isRoutineComplete = (routine: any) => {
     const today = new Date().toISOString().split('T')[0]
@@ -69,10 +73,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       setLoading(true)
       setError(null)
       const data = await apiClient.getUserRoutines()
-      
+
       // Validar que data sea un array
       if (Array.isArray(data)) {
-        
+
         // Cargar las rutinas completas con ejercicios
         const fullRoutines = await Promise.all(
           data.map(async (routine: any) => {
@@ -84,7 +88,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             }
           })
         )
-        
+
         setRoutines(fullRoutines)
       } else if (data === null || data === undefined) {
         // Si no hay rutinas, establecer array vacío
@@ -120,10 +124,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   const handleEditRoutine = async (id: number, routineData: UpdateRoutineRequest): Promise<void> => {
     try {
       await apiClient.updateUserRoutine(id, routineData)
-      
+
       // Recargar todas las rutinas para obtener los datos actualizados del servidor
       await loadRoutines()
-      
+
       setOpenEditDialog(false)
       setSelectedRoutine(null)
     } catch (err) {
@@ -137,7 +141,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     // La rutina activa siempre va primero
     if (activeRoutine?.id === a.id) return -1
     if (activeRoutine?.id === b.id) return 1
-    
+
     // Luego ordenar por fecha de creación (más recientes primero)
     const dateA = new Date(a.created_at).getTime()
     const dateB = new Date(b.created_at).getTime()
@@ -188,11 +192,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
     try {
       await apiClient.updateUserRoutine(editNameModal.routineId, { name: editNameModal.newName.trim() })
-      
+
       // Actualizar el estado local
-      setRoutines(prevRoutines => 
-        prevRoutines.map(routine => 
-          routine.id === editNameModal.routineId 
+      setRoutines(prevRoutines =>
+        prevRoutines.map(routine =>
+          routine.id === editNameModal.routineId
             ? { ...routine, name: editNameModal.newName.trim() }
             : routine
         )
@@ -209,25 +213,25 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         minHeight: 'calc(100vh - 200px)',
         flexDirection: 'column',
         gap: 2
       }}>
         <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
         <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-          Cargando rutinas...
+          {translations[language].common.loading}
         </Typography>
       </Box>
     )
   }
 
   return (
-    <Box sx={{ 
-      p: 1, 
+    <Box sx={{
+      p: 1,
       height: (!routines || routines.length === 0) ? 'auto' : '100%',
       overflow: (!routines || routines.length === 0) ? 'visible' : 'hidden'
     }}>
@@ -239,10 +243,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       )}
 
       {(!routines || routines.length === 0) ? (
-        <Card 
+        <Card
           elevation={3}
-          sx={{ 
-            textAlign: 'center', 
+          sx={{
+            textAlign: 'center',
             py: 6,
             mx: { xs: 1, sm: 0 },
             border: '2px solid',
@@ -252,38 +256,38 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           }}
         >
           <CardContent>
-            <FitnessCenterIcon sx={{ 
-              fontSize: 80, 
-              color: 'primary.main', 
+            <FitnessCenterIcon sx={{
+              fontSize: 80,
+              color: 'primary.main',
               mb: 3,
               opacity: 0.7
             }} />
-            <Typography 
-              variant="h4" 
-              color="primary.main" 
+            <Typography
+              variant="h4"
+              color="primary.main"
               gutterBottom
               sx={{ fontWeight: 700, mb: 2 }}
             >
-              0 rutinas creadas
+              {t.noRoutines}
             </Typography>
-            <Typography 
-              variant="body1" 
-              color="text.secondary" 
-              sx={{ 
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{
                 mb: 3,
                 maxWidth: '400px',
                 mx: 'auto',
                 lineHeight: 1.6
               }}
             >
-              Crea tu primera rutina personalizada para organizar mejor tus entrenamientos y alcanzar tus objetivos
+              {t.createFirst}
             </Typography>
             <Button
               variant="contained"
               size="large"
               startIcon={<AddIcon sx={{ color: '#fff' }} />}
               onClick={() => setOpenCreateDialog(true)}
-              sx={{ 
+              sx={{
                 fontWeight: 600,
                 borderRadius: '12px',
                 px: 4,
@@ -297,12 +301,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 }
               }}
             >
-               Crear
+              {t.create}
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <Box sx={{ 
+        <Box sx={{
           height: '100%',
           overflow: 'auto',
           '&::-webkit-scrollbar': {
@@ -314,284 +318,284 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}>
-          
-          <Box sx={{ 
-            display: 'grid', 
+
+          <Box sx={{
+            display: 'grid',
             gap: 2,
-            gridTemplateColumns: { 
-              xs: '1fr', 
-              sm: 'repeat(auto-fill, minmax(250px, 1fr))', 
-              md: 'repeat(auto-fill, minmax(280px, 1fr))' 
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(auto-fill, minmax(250px, 1fr))',
+              md: 'repeat(auto-fill, minmax(280px, 1fr))'
             },
             width: '100%',
             maxWidth: '100%',
             overflow: 'hidden'
           }}>
-A            {sortedRoutines?.map((routine) => (
-            <Card 
-              key={routine.id} 
-              elevation={2}
-              onClick={() => handleViewRoutine(routine)}
-              sx={{ 
-                height: 'fit-content',
-                width: '100%',
-                border: '1px solid',
-                borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'grey.300'),
-                borderRadius: '16px',
-                overflow: 'hidden',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                cursor: 'pointer',
-                backgroundColor: isRoutineComplete(routine) 
-                  ? '#f0f8f0'  // Verde muy claro para completadas
-                  : (activeRoutine?.id === routine.id 
+            A            {sortedRoutines?.map((routine) => (
+              <Card
+                key={routine.id}
+                elevation={2}
+                onClick={() => handleViewRoutine(routine)}
+                sx={{
+                  height: 'fit-content',
+                  width: '100%',
+                  border: '1px solid',
+                  borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'grey.300'),
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  backgroundColor: isRoutineComplete(routine)
+                    ? '#f0f8f0'  // Verde muy claro para completadas
+                    : (activeRoutine?.id === routine.id
                       ? '#fff3e0'  // Amarillo muy claro para activas (siempre visible)
                       : 'transparent'  // Transparente para inactivas
                     ),
-                '&:hover': {
-                  backgroundColor: isRoutineComplete(routine) 
-                    ? '#f0f8f0'  // Verde muy claro para completadas
-                    : (activeRoutine?.id === routine.id 
+                  '&:hover': {
+                    backgroundColor: isRoutineComplete(routine)
+                      ? '#f0f8f0'  // Verde muy claro para completadas
+                      : (activeRoutine?.id === routine.id
                         ? '#fff3e0'  // Amarillo muy claro para activas
                         : '#f0f8ff'  // Azul muy claro para inactivas
                       ),
-                  borderColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'grey.400'),
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                }
-              }}
-            >
-              {/* Porcentaje de progreso en esquina superior derecha */}
-              {activeRoutine?.id === routine.id && (
-                <Box sx={{
-                  position: 'absolute',
-                  top: 20,
-                  right: 16,
-                  backgroundColor: 'transparent',
-                  border: '2px solid',
-                  borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                  color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                  borderRadius: '12px',
-                  px: 1.5,
-                  py: 0.5,
-                  zIndex: 1,
-                  mr: 1
-                }}>
-                  <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
-                    {(() => {
-                      const today = new Date().toISOString().split('T')[0]
-                      return getRoutineProgress(today, routine.id, routine)
-                    })()}%
-                  </Typography>
-                </Box>
-              )}
-              
-              <CardContent sx={{ p: 3, pb: 1, pr: 6 }}>
-                {/* Layout para desktop */}
-                <Box sx={{ 
-                  display: { xs: 'none', sm: 'flex' }, 
-                  alignItems: 'center', 
-                  gap: 1,
-                  mb: 2,
-                  justifyContent: 'flex-start'
-                }}>
-                  <Typography 
-                    variant="h5" 
-                    component="h2" 
-                    sx={{ 
-                      fontWeight: 700,
-                      color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                      textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                      cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      textAlign: 'left',
-                      '&:hover': {
-                        textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
-                      }
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                    borderColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'grey.400'),
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  }
+                }}
+              >
+                {/* Porcentaje de progreso en esquina superior derecha */}
+                {activeRoutine?.id === routine.id && (
+                  <Box sx={{
+                    position: 'absolute',
+                    top: 20,
+                    right: 16,
+                    backgroundColor: 'transparent',
+                    border: '2px solid',
+                    borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                    color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                    borderRadius: '12px',
+                    px: 1.5,
+                    py: 0.5,
+                    zIndex: 1,
+                    mr: 1
+                  }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                      {(() => {
+                        const today = new Date().toISOString().split('T')[0]
+                        return getRoutineProgress(today, routine.id, routine)
+                      })()}%
+                    </Typography>
+                  </Box>
+                )}
+
+                <CardContent sx={{ p: 3, pb: 1, pr: 6 }}>
+                  {/* Layout para desktop */}
+                  <Box sx={{
+                    display: { xs: 'none', sm: 'flex' },
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 2,
+                    justifyContent: 'flex-start'
+                  }}>
+                    <Typography
+                      variant="h5"
+                      component="h2"
+                      sx={{
+                        fontWeight: 700,
+                        color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                        textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                        cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        textAlign: 'left',
+                        '&:hover': {
+                          textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                      }}
+                    >
+                      🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
+                    </Typography>
+                  </Box>
+
+                  {/* Layout para mobile */}
+                  <Box sx={{
+                    display: { xs: 'flex', sm: 'none' },
+                    flexDirection: 'column',
+                    gap: 2,
+                    mb: 2
+                  }}>
+                    {/* Nombre de la rutina */}
+                    <Typography
+                      variant="h5"
+                      component="h2"
+                      sx={{
+                        fontWeight: 700,
+                        color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                        textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                        cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
+                        textAlign: 'left',
+                        '&:hover': {
+                          textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                      }}
+                    >
+                      🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
+                    </Typography>
+
+
+                  </Box>
+
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      display: 'block',
+                      fontStyle: 'italic',
+                      opacity: 0.8,
+                      mb: 0.5,
+                      textAlign: 'left'
                     }}
                   >
-                    🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
+                    {routine.updated_at && routine.updated_at !== routine.created_at ? t.updated : t.created} {new Date(routine.updated_at || routine.created_at).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', {
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </Typography>
-                </Box>
 
-                {/* Layout para mobile */}
-                <Box sx={{ 
-                  display: { xs: 'flex', sm: 'none' }, 
-                  flexDirection: 'column',
-                  gap: 2,
-                  mb: 2
+
+
+
+                </CardContent>
+
+                <CardActions sx={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  px: 3,
+                  pb: 3,
+                  pt: 1
                 }}>
-                  {/* Nombre de la rutina */}
-                  <Typography 
-                    variant="h5" 
-                    component="h2" 
-                    sx={{ 
-                      fontWeight: 700,
-                      color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                      textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                      cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
-                      textAlign: 'left',
-                      '&:hover': {
-                        textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
-                      }
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      activeRoutine?.id !== routine.id && handleEditNameClick(routine)
-                    }}
-                  >
-                    🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
-                  </Typography>
-
-
-                </Box>
-
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  sx={{ 
-                    display: 'block',
-                    fontStyle: 'italic',
-                    opacity: 0.8,
-                    mb: 0.5,
-                    textAlign: 'left'
-                  }}
-                >
-                  {routine.updated_at && routine.updated_at !== routine.created_at ? 'Actualizada' : 'Creada'} el {new Date(routine.updated_at || routine.created_at).toLocaleDateString('es-ES', {
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </Typography>
-
-
-
-
-              </CardContent>
-
-              <CardActions sx={{ 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                px: 3, 
-                pb: 3,
-                pt: 1
-              }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleViewRoutine(routine)
-                  }}
-                  sx={{ 
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark')
-                    },
-                    '&:focus': {
-                      outline: 'none'
-                    }
-                  }}
-                >
-                  Ver detalles
-                </Button>
-
-                {/* Botón play/stop para rutinas no completadas */}
-                {!isRoutineComplete(routine) && (
-                  <IconButton
+                  <Button
+                    variant="contained"
                     size="small"
-                    onClick={async (e) => {
+                    onClick={(e) => {
                       e.stopPropagation()
-                      if (activeRoutine?.id === routine.id) {
-                        // Detener la rutina activa
-                        const event = new CustomEvent('stopRoutine', { 
-                          detail: { routine: routine } 
-                        })
-                        window.dispatchEvent(event)
-                      } else {
-                        // Obtener la rutina completa, abrir el modal E iniciar la rutina
-                        try {
-                          const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
-                          setSelectedRoutine(fullRoutine)
-                          setOpenDetailDialog(true)
-                          
-                          // Iniciar la rutina automáticamente sin cambiar de tab
-                          const event = new CustomEvent('startRoutineFromModal', { 
-                            detail: { routine: fullRoutine } 
+                      handleViewRoutine(routine)
+                    }}
+                    sx={{
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark')
+                      },
+                      '&:focus': {
+                        outline: 'none'
+                      }
+                    }}
+                  >
+                    {t.details}
+                  </Button>
+
+                  {/* Botón play/stop para rutinas no completadas */}
+                  {!isRoutineComplete(routine) && (
+                    <IconButton
+                      size="small"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        if (activeRoutine?.id === routine.id) {
+                          // Detener la rutina activa
+                          const event = new CustomEvent('stopRoutine', {
+                            detail: { routine: routine }
                           })
                           window.dispatchEvent(event)
-                          
-                          // Navegar al registro con la rutina activa
-                          const navigateEvent = new CustomEvent('navigateToWorkout', {})
-                          window.dispatchEvent(navigateEvent)
-                        } catch (error) {
-                          console.error('Error obteniendo detalles de la rutina:', error)
-                          setError('Error al cargar los detalles de la rutina')
-                        }
-                      }
-                    }}
-                    sx={{ 
-                      color: 'white',
-                      backgroundColor: activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main',
-                      '&:hover': {
-                        backgroundColor: activeRoutine?.id === routine.id ? '#FFA000' : 'primary.light',
-                        color: 'white'
-                      },
-                      '&:focus': {
-                        outline: 'none'
-                      },
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}
-                  >
-                    {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
-                  </IconButton>
-                )}
+                        } else {
+                          // Obtener la rutina completa, abrir el modal E iniciar la rutina
+                          try {
+                            const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+                            setSelectedRoutine(fullRoutine)
+                            setOpenDetailDialog(true)
 
-                {/* Botón resetear para rutinas completadas */}
-                {isRoutineComplete(routine) && (
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      // Resetear el progreso de la rutina para hoy
-                      const today = new Date().toISOString().split('T')[0]
-                      resetCompletedExercisesForDate(today)
-                    }}
-                    sx={{ 
-                      color: 'white',
-                      backgroundColor: 'success.main',
-                      '&:hover': {
-                        backgroundColor: 'success.dark',
-                        color: 'white'
-                      },
-                      '&:focus': {
-                        outline: 'none'
-                      },
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}
-                    title="Resetear rutina"
-                  >
-                    <AutorenewIcon />
-                  </IconButton>
-                )}
-              </CardActions>
-            </Card>
+                            // Iniciar la rutina automáticamente sin cambiar de tab
+                            const event = new CustomEvent('startRoutineFromModal', {
+                              detail: { routine: fullRoutine }
+                            })
+                            window.dispatchEvent(event)
+
+                            // Navegar al registro con la rutina activa
+                            const navigateEvent = new CustomEvent('navigateToWorkout', {})
+                            window.dispatchEvent(navigateEvent)
+                          } catch (error) {
+                            console.error('Error obteniendo detalles de la rutina:', error)
+                            setError('Error al cargar los detalles de la rutina')
+                          }
+                        }
+                      }}
+                      sx={{
+                        color: 'white',
+                        backgroundColor: activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main',
+                        '&:hover': {
+                          backgroundColor: activeRoutine?.id === routine.id ? '#FFA000' : 'primary.light',
+                          color: 'white'
+                        },
+                        '&:focus': {
+                          outline: 'none'
+                        },
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                      }}
+                    >
+                      {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
+                    </IconButton>
+                  )}
+
+                  {/* Botón resetear para rutinas completadas */}
+                  {isRoutineComplete(routine) && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        // Resetear el progreso de la rutina para hoy
+                        const today = new Date().toISOString().split('T')[0]
+                        resetCompletedExercisesForDate(today)
+                      }}
+                      sx={{
+                        color: 'white',
+                        backgroundColor: 'success.main',
+                        '&:hover': {
+                          backgroundColor: 'success.dark',
+                          color: 'white'
+                        },
+                        '&:focus': {
+                          outline: 'none'
+                        },
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                      }}
+                      title="Resetear rutina"
+                    >
+                      <AutorenewIcon />
+                    </IconButton>
+                  )}
+                </CardActions>
+              </Card>
             ))}
 
             {/* Card para agregar nueva rutina - al final */}
             {sortedRoutines && sortedRoutines.length > 0 && (
-              <Card 
+              <Card
                 elevation={2}
                 onClick={() => setOpenCreateDialog(true)}
-                sx={{ 
+                sx={{
                   height: 'fit-content',
                   width: '100%',
                   border: '2px solid',
@@ -608,23 +612,23 @@ A            {sortedRoutines?.map((routine) => (
                 }}
               >
                 <CardContent sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography 
-                    variant="h6" 
-                    component="h2" 
-                    sx={{ 
+                  <Typography
+                    variant="h6"
+                    component="h2"
+                    sx={{
                       fontWeight: 700,
                       color: 'primary.main',
                       mb: 1
                     }}
                   >
-                    ➕ Agregar Nueva Rutina
+                    ➕ {language === 'es' ? 'Agregar Nueva Rutina' : 'Add New Routine'}
                   </Typography>
-                  <Typography 
-                    variant="body2" 
+                  <Typography
+                    variant="body2"
                     color="text.secondary"
                     sx={{ fontStyle: 'italic' }}
                   >
-                    Crear una nueva rutina personalizada
+                    {language === 'es' ? 'Crear una nueva rutina personalizada' : 'Create a new personalized routine'}
                   </Typography>
                 </CardContent>
               </Card>
@@ -682,9 +686,9 @@ A            {sortedRoutines?.map((routine) => (
           }
         }}
       >
-        <DialogTitle sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <DialogTitle sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           pb: 1
         }}>
@@ -716,14 +720,14 @@ A            {sortedRoutines?.map((routine) => (
               onStart={() => {
                 if (activeRoutine?.id === selectedRoutine?.id) {
                   // Detener la rutina activa
-                  const event = new CustomEvent('stopRoutine', { 
-                    detail: { routine: selectedRoutine } 
+                  const event = new CustomEvent('stopRoutine', {
+                    detail: { routine: selectedRoutine }
                   })
                   window.dispatchEvent(event)
                 } else {
                   // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
-                  const event = new CustomEvent('startRoutineFromModal', { 
-                    detail: { routine: selectedRoutine } 
+                  const event = new CustomEvent('startRoutineFromModal', {
+                    detail: { routine: selectedRoutine }
                   })
                   window.dispatchEvent(event)
                 }
@@ -736,8 +740,8 @@ A            {sortedRoutines?.map((routine) => (
               routineProgress={routineProgress}
               onExerciseClick={(exercise) => {
                 // Navegar al registro y autocompletar con el ejercicio clickeado
-                const event = new CustomEvent('startRoutineWithExercise', { 
-                  detail: { routine: selectedRoutine, exercise: exercise } 
+                const event = new CustomEvent('startRoutineWithExercise', {
+                  detail: { routine: selectedRoutine, exercise: exercise }
                 })
                 window.dispatchEvent(event)
                 setOpenDetailDialog(false)
@@ -798,7 +802,7 @@ A            {sortedRoutines?.map((routine) => (
           }
         }}
       >
-        <DialogTitle sx={{ 
+        <DialogTitle sx={{
           pb: 1,
           fontWeight: 600,
           fontSize: '1.2rem',

@@ -17,6 +17,8 @@ import {
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 
 
 type SocialWorkout = {
@@ -43,6 +45,8 @@ type SocialExercise = {
 }
 
 export default function SocialList() {
+  const { language } = useLanguage()
+  const t = translations[language].social
   const { user } = useAuth()
   const { setOnSocialSettingsChange } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
@@ -55,20 +59,22 @@ export default function SocialList() {
   const loadingMoreRef = useRef(false)
   const hasMoreRef = useRef(true)
 
-  
+
 
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString)
-      
-      const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
-      const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-      
-      const weekday = weekdays[date.getDay()]
+
+      const weekday = date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { weekday: 'long' })
       const day = date.getDate()
-      const month = months[date.getMonth()]
-      
-      return `${weekday} ${day} de ${month}`
+      const month = date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
+
+      const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1)
+      const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1)
+
+      return language === 'es'
+        ? `${capitalizedWeekday} ${day} de ${capitalizedMonth}`
+        : `${capitalizedWeekday}, ${capitalizedMonth} ${day}`
     } catch (error) {
       console.error('Error formateando fecha:', error)
       return dateString
@@ -80,19 +86,19 @@ export default function SocialList() {
       const date = new Date(dateString)
       const now = new Date()
       const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
-      
-      if (diffInMinutes < 1) return 'Hace un momento'
-      if (diffInMinutes === 1) return 'Hace 1 minuto'
-      if (diffInMinutes < 60) return `Hace ${diffInMinutes} minutos`
-      
+
+      if (diffInMinutes < 1) return t.moment
+      if (diffInMinutes === 1) return language === 'es' ? 'Hace 1 minuto' : '1 minute ago'
+      if (diffInMinutes < 60) return language === 'es' ? `Hace ${diffInMinutes} minutos` : `${diffInMinutes} minutes ago`
+
       const diffInHours = Math.floor(diffInMinutes / 60)
-      if (diffInHours === 1) return 'Hace 1 hora'
-      if (diffInHours < 24) return `Hace ${diffInHours} horas`
-      
+      if (diffInHours === 1) return language === 'es' ? 'Hace 1 hora' : '1 hour ago'
+      if (diffInHours < 24) return language === 'es' ? `Hace ${diffInHours} horas` : `${diffInHours} hours ago`
+
       const diffInDays = Math.floor(diffInHours / 24)
-      if (diffInDays === 1) return 'Ayer'
-      if (diffInDays < 7) return `Hace ${diffInDays} días`
-      
+      if (diffInDays === 1) return t.yesterday
+      if (diffInDays < 7) return language === 'es' ? `Hace ${diffInDays} días` : `${diffInDays} days ago`
+
       return formatDate(dateString)
     } catch (error) {
       console.error('Error formateando tiempo relativo:', error)
@@ -118,7 +124,7 @@ export default function SocialList() {
       console.log('🔍 Tipo de respuesta:', typeof workouts)
       console.log('🔍 Es array?', Array.isArray(workouts))
       console.log('🔍 Offset actual:', offset)
-      
+
       if (Array.isArray(workouts) && workouts.length > 0) {
         console.log('🔍 Primer workout detalle:', {
           sessionId: workouts[0].session_id,
@@ -127,7 +133,7 @@ export default function SocialList() {
           totalExercises: workouts[0].total_exercises
         })
       }
-      
+
       if (workouts === null || workouts === undefined) {
         console.log('🔍 API devolvió null/undefined, estableciendo array vacío')
         if (reset) {
@@ -137,7 +143,7 @@ export default function SocialList() {
         hasMoreRef.current = false
       } else if (Array.isArray(workouts)) {
         console.log('🔍 Estableciendo workouts:', workouts.length)
-        
+
         if (reset) {
           setSocialWorkouts(workouts)
         } else {
@@ -153,7 +159,7 @@ export default function SocialList() {
             return [...prev, ...newWorkouts]
           })
         }
-        
+
         // Si recibimos menos de 10 workouts, no hay más datos
         if (workouts.length < 10) {
           setHasMore(false)
@@ -188,17 +194,17 @@ export default function SocialList() {
 
   const handleKudos = async (workoutId: number) => {
     if (!user) return
-    
+
     // Solo permitir dar kudos si no se ha dado ya
     const workout = socialWorkouts.find(w => w.session_id === workoutId)
     if (!workout || workout.has_kudos) return
-    
+
     try {
       setLoadingKudos(prev => new Set(prev).add(workoutId))
-      
+
       // Llamada a la API para dar kudos
       await apiClient.giveKudos(workoutId)
-      
+
       // Actualizar estado local
       setSocialWorkouts(prev => prev.map(workout => {
         if (workout.session_id === workoutId) {
@@ -210,7 +216,7 @@ export default function SocialList() {
         }
         return workout
       }))
-      
+
     } catch (error) {
       console.error('Error dando kudos:', error)
       // Mostrar error más específico
@@ -228,23 +234,23 @@ export default function SocialList() {
   // Filtrar y agrupar workouts por día
   const groupedWorkouts = useMemo(() => {
     const groups: { [key: string]: SocialWorkout[] } = {}
-    
+
     console.log('🔍 Debug SocialList:', {
       totalWorkouts: socialWorkouts.length,
       workouts: socialWorkouts.map(w => ({ sessionId: w.session_id, userId: w.user_id, userName: w.user_name }))
     })
-    
+
     socialWorkouts.forEach(workout => {
       // Agrupar por fecha de creación (created_at) en zona horaria local
       const workoutDate = new Date(workout.created_at)
       // Agregar un día para corregir el offset de zona horaria
       workoutDate.setDate(workoutDate.getDate() + 1)
-      
+
       const year = workoutDate.getFullYear()
       const month = String(workoutDate.getMonth() + 1).padStart(2, '0')
       const day = String(workoutDate.getDate()).padStart(2, '0')
       const dayKey = `${year}-${month}-${day}` // YYYY-MM-DD con día agregado
-      
+
       console.log('🔍 Debug agrupamiento:', {
         sessionId: workout.session_id,
         userName: workout.user_name,
@@ -252,13 +258,13 @@ export default function SocialList() {
         workoutDate: workoutDate.toISOString(),
         dayKey: dayKey
       })
-      
+
       if (!groups[dayKey]) {
         groups[dayKey] = []
       }
       groups[dayKey].push(workout)
     })
-    
+
     return Object.entries(groups)
       .map(([date, workouts]) => ({
         date,
@@ -276,10 +282,10 @@ export default function SocialList() {
   // Registrar callback para recargar cuando cambien las configuraciones sociales
   useEffect(() => {
     setOnSocialSettingsChange(() => () => loadSocialWorkouts(true))
-    
+
     // Cleanup: remover callback cuando se desmonte el componente
     return () => {
-      setOnSocialSettingsChange(() => {})
+      setOnSocialSettingsChange(() => { })
     }
   }, [setOnSocialSettingsChange])
 
@@ -292,7 +298,7 @@ export default function SocialList() {
 
     // Escuchar eventos personalizados para actualizar el feed social
     window.addEventListener('socialFeedRefresh', handleSocialRefresh)
-    
+
     // Cleanup: remover listener cuando se desmonte el componente
     return () => {
       window.removeEventListener('socialFeedRefresh', handleSocialRefresh)
@@ -311,7 +317,7 @@ export default function SocialList() {
     sentinel.style.height = '1px'
     sentinel.style.width = '100%'
     sentinel.id = 'scroll-sentinel'
-    
+
     // Agregar el sentinel al final del contenido
     const contentContainer = document.querySelector('[data-testid="social-feed-container"]')
     if (!contentContainer) {
@@ -319,7 +325,7 @@ export default function SocialList() {
       return
     }
     contentContainer.appendChild(sentinel)
-    
+
     // Crear IntersectionObserver
     const observer = new IntersectionObserver(
       (entries) => {
@@ -330,7 +336,7 @@ export default function SocialList() {
           loadingMore: loadingMoreRef.current,
           currentWorkouts: socialWorkouts.length
         })
-        
+
         if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
           console.log('🔄 Activando carga de más entrenamientos por IntersectionObserver')
           loadMoreWorkouts()
@@ -342,10 +348,10 @@ export default function SocialList() {
         threshold: 0
       }
     )
-    
+
     // Observar el sentinel
     observer.observe(sentinel)
-    
+
     // Cleanup
     return () => {
       observer.disconnect()
@@ -357,17 +363,17 @@ export default function SocialList() {
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         minHeight: 'calc(100vh - 200px)',
         flexDirection: 'column',
         gap: 2
       }}>
         <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
         <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-          Cargando feed social...
+          {translations[language].common.loading}
         </Typography>
       </Box>
     )
@@ -382,28 +388,28 @@ export default function SocialList() {
   }
 
   return (
-          <Box sx={{ p: 1 }} data-testid="social-feed-container">
-      
+    <Box sx={{ p: 1 }} data-testid="social-feed-container">
+
       <Stack spacing={3}>
         {groupedWorkouts.length > 0 ? (
           groupedWorkouts.map(({ date, workouts }) => (
             <Box key={date}>
               {/* Header del día */}
-              <Typography variant="h6" sx={{ 
-                fontWeight: 600, 
-                color: 'text.primary', 
-                mb: 2, 
+              <Typography variant="h6" sx={{
+                fontWeight: 600,
+                color: 'text.primary',
+                mb: 2,
                 px: 1,
                 textAlign: 'center'
               }}>
                 {formatDate(date)}
               </Typography>
-              
+
               {/* Workouts del día */}
               <Stack spacing={2}>
                 {workouts.map((workout) => (
-                  <Card key={workout.session_id} sx={{ 
-                    boxShadow: 2, 
+                  <Card key={workout.session_id} sx={{
+                    boxShadow: 2,
                     borderRadius: 2,
                     border: '1px solid',
                     borderColor: 'divider',
@@ -417,9 +423,9 @@ export default function SocialList() {
                       {/* Header del workout */}
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Avatar
-                          sx={{ 
-                            width: 40, 
-                            height: 40, 
+                          sx={{
+                            width: 40,
+                            height: 40,
                             mr: 2,
                             bgcolor: 'primary.main'
                           }}
@@ -439,20 +445,20 @@ export default function SocialList() {
                             {workout.total_exercises}
                           </Typography>
                           <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                            {workout.total_exercises === 1 ? 'ejercicio' : 'ejercicios'}
+                            {workout.total_exercises === 1 ? (language === 'es' ? 'ejercicio' : 'exercise') : (language === 'es' ? 'ejercicios' : 'exercises')}
                           </Typography>
                         </Box>
                       </Box>
-                      
+
                       {/* Acciones */}
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                  <Typography variant="body2" color="text.secondary">
-                            {workout.kudos_count === 0 
-                              ? 'Dar el primer kudos' 
-                              : `${workout.kudos_count} kudos`
-                            }
-                          </Typography>
-                        
+                        <Typography variant="body2" color="text.secondary">
+                          {workout.kudos_count === 0
+                            ? t.firstKudos
+                            : `${workout.kudos_count} ${t.kudos}`
+                          }
+                        </Typography>
+
                         <IconButton
                           onClick={() => handleKudos(workout.session_id)}
                           disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
@@ -482,24 +488,24 @@ export default function SocialList() {
         ) : (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              No hay entrenamientos registrados
+              {t.noWorkouts}
             </Typography>
           </Box>
         )}
 
         {/* Indicador de carga para más entrenamientos */}
         {loadingMore && (
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             py: 3,
             flexDirection: 'column',
             gap: 2
           }}>
             <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-              Cargando más entrenamientos...
+              {translations[language].common.loading}
             </Typography>
           </Box>
         )}
@@ -520,7 +526,7 @@ export default function SocialList() {
                 fontWeight: '500'
               }}
             >
-              Cargar más entrenamientos
+              {t.loadMore}
             </button>
           </Box>
         )}
@@ -529,7 +535,7 @@ export default function SocialList() {
         {!hasMore && socialWorkouts.length > 0 && (
           <Box sx={{ textAlign: 'center', py: 3 }}>
             <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-              No hay más entrenamientos para mostrar
+              {t.noMore}
             </Typography>
           </Box>
         )}

@@ -125,13 +125,13 @@ export default function LoginComponent() {
               borderColor: '#357ae8',
               backgroundColor: 'rgba(66, 133, 244, 0.04)'
             },
-            // En pantallas grandes, usar color púrpura
+            // En pantallas grandes, usar color azul
             '@media (min-width: 768px)': {
-              borderColor: '#6866D6',
-              color: '#6866D6',
+              borderColor: '#1976d2',
+              color: '#1976d2',
               '&:hover': {
-                borderColor: '#5854c7',
-                backgroundColor: 'rgba(104, 102, 214, 0.04)'
+                borderColor: '#1565c0',
+                backgroundColor: 'rgba(25, 118, 210, 0.04)'
               }
             }
           }}

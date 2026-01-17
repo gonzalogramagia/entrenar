@@ -1,15 +1,13 @@
 import React from 'react'
 import { Box, IconButton } from '@mui/material'
-import { ClipboardClock, Smile, Music, BicepsFlexed } from 'lucide-react'
+import { ToggleLeft, ToggleRight } from 'lucide-react'
 import { GitHub as GithubIcon } from '@mui/icons-material'
 import { useLanguage } from '../../contexts/LanguageContext'
 
 const FloatingLinks: React.FC = () => {
     const { language } = useLanguage()
-    const langPrefix = language === 'en' ? '/en' : ''
 
-    // URLs para emojis según idioma
-    const emojisUrl = `https://emojis.gonzalogramagia.com${langPrefix}`
+
 
     const buttonStyles = {
         p: 1.5,
@@ -26,16 +24,7 @@ const FloatingLinks: React.FC = () => {
         },
     }
 
-    const disabledButtonStyles = {
-        ...buttonStyles,
-        opacity: 0.5,
-        cursor: 'not-allowed',
-        '&:hover': {
-            bgcolor: 'white',
-            boxShadow: buttonStyles.boxShadow,
-            transform: 'none',
-        },
-    }
+
 
     const iconStyles = {
         width: 24,
@@ -64,61 +53,22 @@ const FloatingLinks: React.FC = () => {
             >
                 <IconButton
                     component="a"
-                    href={`https://today.gonzalogramagia.com${langPrefix}`}
+                    href={language === 'es' ? '/en' : '/'}
                     sx={{
                         ...buttonStyles,
                         '&:hover .icon': {
                             color: '#eab308',
                         },
                     }}
-                    aria-label="Ir a Today"
-                    title="Go to Today"
+                    aria-label={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+                    title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
                 >
-                    <ClipboardClock className="icon" style={iconStyles} />
+                    {language === 'es' ? (
+                        <ToggleLeft className="icon" style={iconStyles} />
+                    ) : (
+                        <ToggleRight className="icon" style={iconStyles} />
+                    )}
                 </IconButton>
-
-                {/* Emojis */}
-                <IconButton
-                    component="a"
-                    href={emojisUrl}
-                    sx={{
-                        ...buttonStyles,
-                        '&:hover .icon': {
-                            color: '#eab308',
-                        },
-                    }}
-                    aria-label="Ir a Emojis"
-                    title="Go to Emojis"
-                >
-                    <Smile className="icon" style={iconStyles} />
-                </IconButton>
-
-                {/* Music */}
-                <IconButton
-                    component="a"
-                    href={`https://music.gonzalogramagia.com${langPrefix}`}
-                    sx={{
-                        ...buttonStyles,
-                        '&:hover .icon': {
-                            color: '#eab308',
-                        },
-                    }}
-                    aria-label="Ir a Música"
-                    title="Go to Music"
-                >
-                    <Music className="icon" style={iconStyles} />
-                </IconButton>
-
-                {/* Entrenar (deshabilitado) */}
-                <span title="You are here!" style={{ display: 'inline-block' }}>
-                    <IconButton
-                        disabled
-                        sx={disabledButtonStyles}
-                        aria-label="Ya estás acá!"
-                    >
-                        <BicepsFlexed style={iconStyles} />
-                    </IconButton>
-                </span>
             </Box>
 
             <Box

@@ -9,22 +9,24 @@ type Exercise = {
   bodyweight?: boolean
   is_sport?: boolean
 }
-import { 
-  Box, 
-  Button, 
-  FormControl, 
-  InputLabel, 
-  MenuItem, 
-  Select, 
-  Stack, 
-  TextField, 
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
   Typography,
   IconButton,
   Dialog,
   DialogContent,
   Autocomplete
 } from '@mui/material'
-import { 
+import {
   FitnessCenter as FitnessCenterIcon,
   KeyboardArrowDown,
   KeyboardArrowUp,
@@ -64,9 +66,9 @@ type WorkoutFormProps = {
   isAdmin?: boolean
 }
 
-export default function WorkoutForm({ 
-  exercises, 
-  onSubmit, 
+export default function WorkoutForm({
+  exercises,
+  onSubmit,
   isLoading = false,
   activeRoutine,
   isRoutinePaused = false,
@@ -76,45 +78,47 @@ export default function WorkoutForm({
   userRole,
   isAdmin
 }: WorkoutFormProps) {
-  const { 
-    settings, 
-    toggleExerciseCompleted, 
-    getCompletedExercisesForRoutine, 
-    getRoutineProgress 
+  const { language } = useLanguage()
+  const t = translations[language].workout
+  const {
+    settings,
+    toggleExerciseCompleted,
+    getCompletedExercisesForRoutine,
+    getRoutineProgress
   } = useUserSettings()
-  
+
   // Estado para forzar re-render cuando cambien las configuraciones
   const [refreshTrigger, setRefreshTrigger] = useState(0)
-  
+
   // Escuchar cambios en localStorage para actualizar ejercicios instantáneamente
   useEffect(() => {
     const handleStorageChange = () => {
       setRefreshTrigger(prev => prev + 1)
     }
-    
+
     // Escuchar cambios desde otras pestañas
     window.addEventListener('storage', handleStorageChange)
-    
+
     // Escuchar cambios desde la misma pestaña
     const originalSetItem = localStorage.setItem
-    localStorage.setItem = function(key, value) {
+    localStorage.setItem = function (key, value) {
       originalSetItem.apply(this, [key, value])
       if (key === 'admin-exercise-settings') {
         // Pequeño delay para asegurar que el localStorage se actualizó
         setTimeout(handleStorageChange, 10)
       }
     }
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       localStorage.setItem = originalSetItem
     }
   }, [])
-  
+
   // Filtrar ejercicios favoritos según configuraciones
   const filteredExercises = useMemo(() => {
     let filtered = exercises // Incluir todos los ejercicios inicialmente
-    
+
     // Para usuarios Admin, Staff o Profe, usar configuraciones de localStorage
     if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
       try {
@@ -140,7 +144,7 @@ export default function WorkoutForm({
         filtered = exercises.filter(exercise => !exercise.is_sport)
       }
     }
-    
+
     return filtered
   }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin, refreshTrigger])
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
@@ -155,48 +159,48 @@ export default function WorkoutForm({
       observations: ''
     }
   })
-  
+
   const [messageInObservations, setMessageInObservations] = useState('')
-  
+
   // Estado para el modal de descanso
   const [showRestModal, setShowRestModal] = useState(false)
   const [restTime, setRestTime] = useState(0)
   const [isRestRunning, setIsRestRunning] = useState(false)
   const [lastRegisteredExercise, setLastRegisteredExercise] = useState('')
-  
+
   // Estado para controlar la expansión de la box de rutina
   const [showRoutineExercises, setShowRoutineExercises] = useState(false)
-  
+
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
-  
+
   // Obtener fecha actual y ejercicios completados
   const today = new Date().toISOString().split('T')[0]
-  const completedExercises = activeRoutine 
+  const completedExercises = activeRoutine
     ? getCompletedExercisesForRoutine(today, activeRoutine.id)
     : {}
-  
+
   // Calcular progreso real de la rutina
-  const realRoutineProgress = activeRoutine 
+  const realRoutineProgress = activeRoutine
     ? getRoutineProgress(today, activeRoutine.id, activeRoutine)
     : 0
-  
+
   // Detectar si la rutina está completa
   const isRoutineComplete = realRoutineProgress === 100
 
   // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici
   const selectedExerciseId = watch('exercise_id')
   const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
-  
+
   const isRunningExercise = selectedExerciseId === 18
   const isBiciExercise = selectedExercise?.name?.toLowerCase().includes('bici') || selectedExercise?.id === 30 || false
   const isRunningOrBiciExercise = isRunningExercise || isBiciExercise
-  
+
   const isBodyweightExercise = selectedExercise?.bodyweight || false
-  
+
   // Detectar si el ejercicio seleccionado es un deporte
   const isSportExercise = selectedExercise?.is_sport || false
-  
+
   // Establecer reps = 1 automáticamente cuando se selecciona Running, Bici o un deporte
   useEffect(() => {
     if (isRunningOrBiciExercise || isSportExercise) {
@@ -218,7 +222,7 @@ export default function WorkoutForm({
       console.log('Pre-cargando ejercicio:', preloadedExercise)
       console.log('exercise_id a establecer:', preloadedExercise.exercise_id)
       setValue('exercise_id', preloadedExercise.exercise_id)
-      
+
       // Para deportes, establecer valores específicos
       if (preloadedExercise.is_sport) {
         setValue('weight', '')
@@ -235,7 +239,7 @@ export default function WorkoutForm({
         setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
         setValue('observations', preloadedExercise.notes || '')
       }
-      
+
       // Debug adicional después de establecer valores
       setTimeout(() => {
         console.log('Valor actual de exercise_id después de setValue:', watch('exercise_id'))
@@ -246,7 +250,7 @@ export default function WorkoutForm({
   // Timer para el modal de descanso
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null
-    
+
     if (showRestModal && isRestRunning) {
       interval = setInterval(() => {
         setRestTime(prev => {
@@ -260,7 +264,7 @@ export default function WorkoutForm({
         })
       }, 1000)
     }
-    
+
     return () => {
       if (interval) {
         clearInterval(interval)
@@ -279,7 +283,7 @@ export default function WorkoutForm({
     // Normalizar el valor: convertir coma a punto para parseFloat
     const normalizedValue = value.replace(',', '.')
     const numValue = parseFloat(normalizedValue)
-    
+
     if (isNaN(numValue)) {
       setValue(field, '')
       return
@@ -340,7 +344,7 @@ export default function WorkoutForm({
         // Para ejercicios normales, usar la lógica del cronómetro
         // Removed timer-related logic as TimerComponent is removed
       }
-      
+
       // Crear objeto de datos sin el campo weight si está vacío
       const workoutData: any = {
         exercise_id: data.exercise_id,
@@ -348,7 +352,7 @@ export default function WorkoutForm({
         seconds: data.seconds,
         observations: data.observations
       }
-      
+
       // Solo incluir reps si tiene un valor válido mayor a 0
       if (data.reps !== undefined && data.reps !== null && data.reps > 0) {
         workoutData.reps = data.reps
@@ -356,26 +360,26 @@ export default function WorkoutForm({
         // Para Running y Bici, enviar 1 como valor mínimo
         workoutData.reps = 1
       }
-      
+
       // Solo incluir weight si tiene un valor válido mayor a 0
       if (data.weight !== undefined && data.weight !== null && data.weight > 0) {
         workoutData.weight = data.weight
       }
-      
+
       // Obtener el nombre del ejercicio seleccionado
       const selectedExercise = exercises.find(ex => ex.id === data.exercise_id)
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
-      
+
       await onSubmit(workoutData)
-      
+
       // Mostrar mensaje de éxito
       setMessageInObservations(`✅ '${exerciseName}' registrado exitosamente`)
       setValue('observations', `✅ '${exerciseName}' registrado exitosamente`)
-      
+
       // Disparar evento para actualizar el feed social
       console.log('🔄 Disparando evento de actualización del feed social')
       window.dispatchEvent(new CustomEvent('socialFeedRefresh'))
-      
+
       // Solo abrir el modal de descanso si hay un tiempo de descanso configurado
       if (data.restSeconds && data.restSeconds > 0) {
         setLastRegisteredExercise(exerciseName)
@@ -383,7 +387,7 @@ export default function WorkoutForm({
         setIsRestRunning(true)
         setShowRestModal(true)
       }
-      
+
       reset({
         exercise_id: '',
         weight: '',
@@ -393,10 +397,10 @@ export default function WorkoutForm({
         restSeconds: '',
         observations: ''
       })
-      
+
       // Resetear el cronómetro
       // Removed timer-related reset
-      
+
       // Limpiar el mensaje de éxito después de 3 segundos
       setTimeout(() => {
         setMessageInObservations('')
@@ -413,25 +417,25 @@ export default function WorkoutForm({
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
-      
+
       {/* Box de rutina activa o mensaje de no rutina */}
       {activeRoutine ? (
-        <Box sx={{ 
-          mb: 3, 
-          p: 2, 
-          backgroundColor: isRoutineComplete ? 'success.main' : (isRoutinePaused ? 'primary.main' : '#FFB732'), 
+        <Box sx={{
+          mb: 3,
+          p: 2,
+          backgroundColor: isRoutineComplete ? 'success.main' : (isRoutinePaused ? 'primary.main' : '#FFB732'),
           borderRadius: 2,
           color: 'white',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           position: 'relative'
         }}>
 
-          
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 600, 
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
                 textAlign: 'left',
                 cursor: 'pointer',
                 '&:hover': {
@@ -440,13 +444,13 @@ export default function WorkoutForm({
               }}
               onClick={onNavigateToRoutines}
             >
-              🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
+              🏋️ {isRoutinePaused ? t.restTime : activeRoutine.name}
             </Typography>
-            
+
             <IconButton
               size="small"
               onClick={onStopRoutine}
-              sx={{ 
+              sx={{
                 color: 'white',
                 '&:hover': {
                   backgroundColor: 'rgba(255,255,255,0.1)'
@@ -456,37 +460,37 @@ export default function WorkoutForm({
               {isRoutineComplete ? <CloseIcon /> : <StopIcon />}
             </IconButton>
           </Box>
-          
-          <Box sx={{ 
-            width: '100%', 
-            backgroundColor: 'rgba(255,255,255,0.2)', 
+
+          <Box sx={{
+            width: '100%',
+            backgroundColor: 'rgba(255,255,255,0.2)',
             borderRadius: 1,
             height: 8,
             mb: 1
           }}>
-            <Box sx={{ 
-              width: `${realRoutineProgress}%`, 
-              backgroundColor: 'white', 
+            <Box sx={{
+              width: `${realRoutineProgress}%`,
+              backgroundColor: 'white',
               borderRadius: 1,
               height: '100%',
               transition: 'width 0.3s ease'
             }} />
           </Box>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center'
           }}>
             <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
-              {realRoutineProgress}% completa
+              {realRoutineProgress}% {language === 'es' ? 'completa' : 'complete'}
             </Typography>
-            
+
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {!showRoutineExercises && (
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     fontWeight: 'bold',
                     cursor: 'pointer',
                     '&:hover': {
@@ -498,14 +502,14 @@ export default function WorkoutForm({
                     setShowRoutineExercises(!showRoutineExercises)
                   }}
                 >
-                  {isRoutineComplete ? '¡Felicitaciones!' : (isRoutinePaused ? 'Elegir rutina' : 'Ver rutina')}
+                  {isRoutineComplete ? (language === 'es' ? '¡Felicitaciones!' : 'Congratulations!') : (isRoutinePaused ? t.chooseRoutine : t.viewRoutine)}
                 </Typography>
               )}
-              
+
               <IconButton
                 size="small"
                 onClick={() => setShowRoutineExercises(!showRoutineExercises)}
-                sx={{ 
+                sx={{
                   color: 'white',
                   backgroundColor: 'rgba(255,255,255,0.1)',
                   '&:hover': {
@@ -517,24 +521,24 @@ export default function WorkoutForm({
               </IconButton>
             </Box>
           </Box>
-          
+
           {/* Lista expandible de ejercicios de la rutina */}
           {showRoutineExercises && activeRoutine?.exercises && (
-            <Box sx={{ 
-              mt: 2, 
-              p: 2, 
-              backgroundColor: 'rgba(255,255,255,0.1)', 
+            <Box sx={{
+              mt: 2,
+              p: 2,
+              backgroundColor: 'rgba(255,255,255,0.1)',
               borderRadius: 2,
               overflow: 'visible'
             }}>
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: 'white' }}>
-                Ejercicios restantes:
+                {t.remainingExercises}
               </Typography>
-              
+
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {activeRoutine.exercises.map((exercise: any, index: number) => {
                   const completedSets = completedExercises[exercise.exercise_id] || []
-                  
+
                   return (
                     <Box
                       key={`${exercise.exercise_id}-${index}`}
@@ -553,7 +557,7 @@ export default function WorkoutForm({
                           {Array.from({ length: exercise.sets }, (_, setIndex) => {
                             const setNumber = setIndex + 1
                             const isCompleted = completedSets.includes(setNumber)
-                            
+
                             return (
                               <Box
                                 key={setNumber}
@@ -589,14 +593,14 @@ export default function WorkoutForm({
                           })}
                         </Box>
                       </Box>
-                      
+
                       <Box sx={{ display: 'flex', gap: 1, mb: 1, justifyContent: 'center' }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
                             {exercise.sets}
                           </Typography>
                           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                            {exercise.sets === 1 ? 'serie' : 'series'}
+                            {exercise.sets === 1 ? (language === 'es' ? 'serie' : 'set') : (language === 'es' ? 'series' : 'sets')}
                           </Typography>
                         </Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
@@ -607,7 +611,7 @@ export default function WorkoutForm({
                             {exercise.reps}
                           </Typography>
                           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                            {exercise.reps === 1 ? 'rep' : 'reps'}
+                            {exercise.reps === 1 ? (language === 'es' ? 'rep' : 'rep') : (language === 'es' ? 'reps' : 'reps')}
                           </Typography>
                         </Box>
                         {exercise.weight && (
@@ -633,37 +637,37 @@ export default function WorkoutForm({
                             {Math.floor(exercise.rest_time_seconds / 60)}:{(exercise.rest_time_seconds % 60).toString().padStart(2, '0')}
                           </Typography>
                           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                            descanso
+                            {language === 'es' ? 'descanso' : 'rest'}
                           </Typography>
                         </Box>
                       </Box>
-                      
-                                              <Button
-                          variant="outlined"
-                          size="small"
-                          sx={{
-                            color: 'white',
-                            borderColor: 'rgba(255,255,255,0.5)',
-                            '&:hover': {
-                              borderColor: '#FFB732',
-                              backgroundColor: 'rgba(255,183,50,0.1)'
-                            }
-                          }}
-                          onClick={() => {
-                            // Pre-cargar el ejercicio en el formulario
-                            setValue('exercise_id', exercise.exercise_id)
-                            setValue('weight', exercise.weight?.toString() || '')
-                            setValue('reps', exercise.reps || '')
-                            setValue('set', 1)
-                            setValue('seconds', exercise.rest_time_seconds?.toString() || '')
-                            setValue('observations', exercise.notes || '')
-                            
-                            // Cerrar la lista expandible
-                            setShowRoutineExercises(false)
-                          }}
-                        >
-                          Cargar en el registro
-                        </Button>
+
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={{
+                          color: 'white',
+                          borderColor: 'rgba(255,255,255,0.5)',
+                          '&:hover': {
+                            borderColor: '#FFB732',
+                            backgroundColor: 'rgba(255,183,50,0.1)'
+                          }
+                        }}
+                        onClick={() => {
+                          // Pre-cargar el ejercicio en el formulario
+                          setValue('exercise_id', exercise.exercise_id)
+                          setValue('weight', exercise.weight?.toString() || '')
+                          setValue('reps', exercise.reps || '')
+                          setValue('set', 1)
+                          setValue('seconds', exercise.rest_time_seconds?.toString() || '')
+                          setValue('observations', exercise.notes || '')
+
+                          // Cerrar la lista expandible
+                          setShowRoutineExercises(false)
+                        }}
+                      >
+                        {t.loadInForm}
+                      </Button>
                     </Box>
                   )
                 })}
@@ -673,10 +677,10 @@ export default function WorkoutForm({
         </Box>
       ) : (
         // Box cuando no hay rutina activa
-        <Box sx={{ 
-          mb: 3, 
-          p: 2, 
-          backgroundColor: 'grey.100', 
+        <Box sx={{
+          mb: 3,
+          p: 2,
+          backgroundColor: 'grey.100',
           borderRadius: 2,
           color: 'text.secondary',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -688,147 +692,117 @@ export default function WorkoutForm({
             transform: 'translateY(-1px)'
           }
         }}
-        onClick={onNavigateToRoutines}
+          onClick={onNavigateToRoutines}
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'left' }}>
-              🏋️ Ninguna rutina activa
+              🏋️ {t.noActiveRoutine}
             </Typography>
           </Box>
-          
-          <Box sx={{ 
-            width: '100%', 
-            backgroundColor: 'rgba(0,0,0,0.1)', 
+
+          <Box sx={{
+            width: '100%',
+            backgroundColor: 'rgba(0,0,0,0.1)',
             borderRadius: 1,
             height: 8,
             mb: 1
           }}>
-            <Box sx={{ 
-              width: '0%', 
-              backgroundColor: 'grey.500', 
+            <Box sx={{
+              width: '0%',
+              backgroundColor: 'grey.500',
               borderRadius: 1,
               height: '100%',
               transition: 'width 0.3s ease'
             }} />
           </Box>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center'
           }}>
             <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
               0% completa
             </Typography>
-            
-            <Typography variant="body2" sx={{ 
+
+            <Typography variant="body2" sx={{
               fontWeight: 'bold',
               cursor: 'pointer',
               '&:hover': {
                 opacity: 0.8
               }
             }}>
-              Ir a Mis Rutinas
+              {t.goToRoutines}
             </Typography>
           </Box>
         </Box>
       )}
-      
+
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <Autocomplete
-          options={filteredExercises}
-          getOptionLabel={(option) => {
-            let label = option.name
+          <Autocomplete
+            options={filteredExercises}
+            getOptionLabel={(option) => {
+              let label = option.name
 
-            // Agregar emojis a la derecha
-            if (option.name.toLowerCase().includes('running')) label += ' 🏃‍♂️'
-            if (option.name.toLowerCase().includes('bici')) label += ' 🚴'
-            if (option.name.toLowerCase().includes('fútbol')) label += ' ⚽'
-            if (option.name.toLowerCase().includes('básquet')) label += ' 🏀'
-            if (option.name.toLowerCase().includes('pádel')) label += ' 🎾'
-            if (option.name.toLowerCase().includes('voley')) label += ' 🏐'
-            if (option.name.toLowerCase().includes('handball')) label += ' ⚾'
-            if (option.name.toLowerCase().includes('hockey')) label += ' 🏑'
-            if (option.name.toLowerCase().includes('natación')) label += ' 🏊‍♂️'
-            return label
-          }}
-          value={filteredExercises.find(ex => ex.id === watch('exercise_id')) || null}
-          onChange={(_, newValue) => {
-            setValue('exercise_id', newValue ? newValue.id : undefined)
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Buscar y seleccionar ejercicio"
-              error={Boolean(errors.exercise_id)}
-              disabled={isLoading || filteredExercises.length === 0}
-              placeholder={filteredExercises.length === 0 ? 'Cargando ejercicios...' : 'Escribe para buscar ejercicios...'}
-            />
-          )}
-          filterOptions={(options, { inputValue }) => {
-            const searchTerm = inputValue.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-            return options.filter(option => {
-              const optionName = option.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-              return optionName.includes(searchTerm)
-            })
-          }}
-          noOptionsText="No se encontraron ejercicios"
-          loading={isLoading}
-          loadingText="Cargando ejercicios..."
-          clearOnBlur={false}
-          blurOnSelect={true}
-        />
-
-        {/* Interfaz para deportes */}
-        {isSportExercise ? (
-          <TextField
-            label="Tiempo en cancha (minutos)"
-            type="number"
-            disabled={isLoading}
-            error={Boolean(errors.seconds)}
-            value={watch('seconds') ? Math.floor((watch('seconds') as number) / 60) : ''}
-            onChange={(e) => {
-              const minutes = parseInt(e.target.value) || 0
-              setValue('seconds', minutes * 60) // Convertir minutos a segundos
+              // Agregar emojis a la derecha
+              if (option.name.toLowerCase().includes('running')) label += ' 🏃‍♂️'
+              if (option.name.toLowerCase().includes('bici')) label += ' 🚴'
+              if (option.name.toLowerCase().includes('fútbol')) label += ' ⚽'
+              if (option.name.toLowerCase().includes('básquet')) label += ' 🏀'
+              if (option.name.toLowerCase().includes('pádel')) label += ' 🎾'
+              if (option.name.toLowerCase().includes('voley')) label += ' 🏐'
+              if (option.name.toLowerCase().includes('handball')) label += ' ⚾'
+              if (option.name.toLowerCase().includes('hockey')) label += ' 🏑'
+              if (option.name.toLowerCase().includes('natación')) label += ' 🏊‍♂️'
+              return label
             }}
-            inputProps={{ 
-              inputMode: 'numeric',
-              min: 1,
-              max: 480 // 8 horas máximo (480 minutos)
+            value={filteredExercises.find(ex => ex.id === watch('exercise_id')) || null}
+            onChange={(_, newValue) => {
+              setValue('exercise_id', newValue ? newValue.id : undefined)
             }}
-            required
-            sx={{
-              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                display: 'none'
-              },
-              '& input[type=number]': {
-                MozAppearance: 'textfield'
-              }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t.searchExercise}
+                error={Boolean(errors.exercise_id)}
+                disabled={isLoading || filteredExercises.length === 0}
+                placeholder={filteredExercises.length === 0 ? (translations[language].common.loading) : (language === 'es' ? 'Escribe para buscar ejercicios...' : 'Type to search exercises...')}
+              />
+            )}
+            filterOptions={(options, { inputValue }) => {
+              const searchTerm = inputValue.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+              return options.filter(option => {
+                const optionName = option.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                return optionName.includes(searchTerm)
+              })
             }}
+            noOptionsText="No se encontraron ejercicios"
+            loading={isLoading}
+            loadingText="Cargando ejercicios..."
+            clearOnBlur={false}
+            blurOnSelect={true}
           />
-        ) : (
-          /* Interfaz normal para ejercicios no deportivos */
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            flexDirection: { xs: 'row' }
-          }}>
+
+          {/* Interfaz para deportes */}
+          {isSportExercise ? (
             <TextField
-              label={isRunningOrBiciExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
+              label="Tiempo en cancha (minutos)"
               type="number"
               disabled={isLoading}
-              error={Boolean(errors.weight)}
-              value={watch('weight') === undefined || watch('weight') === null ? '' : watch('weight')}
-              onChange={(e) => handleNumberInput('weight', e.target.value)}
-              inputProps={{ 
-                step: 'any',
-                inputMode: 'decimal',
-                min: isRunningOrBiciExercise ? 0.1 : 0.1,
-                max: isRunningOrBiciExercise ? 100 : 1000
+              error={Boolean(errors.seconds)}
+              value={watch('seconds') ? Math.floor((watch('seconds') as number) / 60) : ''}
+              onChange={(e) => {
+                const minutes = parseInt(e.target.value) || 0
+                setValue('seconds', minutes * 60) // Convertir minutos a segundos
               }}
+              inputProps={{
+                inputMode: 'numeric',
+                min: 1,
+                max: 480 // 8 horas máximo (480 minutos)
+              }}
+              required
               sx={{
-                flex: isRunningOrBiciExercise ? 2 : 1, // 2/3 del espacio para Running y Bici
                 '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
                   display: 'none'
                 },
@@ -837,23 +811,28 @@ export default function WorkoutForm({
                 }
               }}
             />
-
-            {/* Ocultar campo Reps para Running y Bici */}
-            {!isRunningOrBiciExercise && (
+          ) : (
+            /* Interfaz normal para ejercicios no deportivos */
+            <Box sx={{
+              display: 'flex',
+              gap: 2,
+              flexDirection: { xs: 'row' }
+            }}>
               <TextField
-                label="Reps"
+                label={isRunningOrBiciExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
                 type="number"
                 disabled={isLoading}
-                error={Boolean(errors.reps)}
-                value={watch('reps') || ''}
-                onChange={(e) => handleNumberInput('reps', e.target.value)}
-                inputProps={{ 
-                  inputMode: 'numeric',
-                  min: 1,
-                  max: 100
+                error={Boolean(errors.weight)}
+                value={watch('weight') === undefined || watch('weight') === null ? '' : watch('weight')}
+                onChange={(e) => handleNumberInput('weight', e.target.value)}
+                inputProps={{
+                  step: 'any',
+                  inputMode: 'decimal',
+                  min: isRunningOrBiciExercise ? 0.1 : 0.1,
+                  max: isRunningOrBiciExercise ? 100 : 1000
                 }}
                 sx={{
-                  flex: 1,
+                  flex: isRunningOrBiciExercise ? 2 : 1, // 2/3 del espacio para Running y Bici
                   '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
                     display: 'none'
                   },
@@ -862,114 +841,139 @@ export default function WorkoutForm({
                   }
                 }}
               />
-            )}
 
-            <FormControl 
-              fullWidth 
-              error={Boolean(errors.set)}
-              disabled={isLoading || isSportExercise} // Bloquear solo para deportes
-              sx={{ flex: 1 }}
-            >
-              <InputLabel id="serie-select-label">
-                {isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
-              </InputLabel>
-              <Select
-                labelId="serie-select-label"
-                label={isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
-                value={watch('set')}
-                {...register('set', { valueAsNumber: true })}
+              {/* Ocultar campo Reps para Running y Bici */}
+              {!isRunningOrBiciExercise && (
+                <TextField
+                  label="Reps"
+                  type="number"
+                  disabled={isLoading}
+                  error={Boolean(errors.reps)}
+                  value={watch('reps') || ''}
+                  onChange={(e) => handleNumberInput('reps', e.target.value)}
+                  inputProps={{
+                    inputMode: 'numeric',
+                    min: 1,
+                    max: 100
+                  }}
+                  sx={{
+                    flex: 1,
+                    '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                      display: 'none'
+                    },
+                    '& input[type=number]': {
+                      MozAppearance: 'textfield'
+                    }
+                  }}
+                />
+              )}
+
+              <FormControl
+                fullWidth
+                error={Boolean(errors.set)}
+                disabled={isLoading || isSportExercise} // Bloquear solo para deportes
+                sx={{ flex: 1 }}
               >
-                {(isRunningOrBiciExercise ? [1, 2, 3, 4, 5, 6, 7, 8] : [1, 2, 3, 4, 5]).map((serie) => (
-                  <MenuItem key={serie} value={serie}>
-                    {serie}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        )}
+                <InputLabel id="serie-select-label">
+                  {isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
+                </InputLabel>
+                <Select
+                  labelId="serie-select-label"
+                  label={isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
+                  value={watch('set')}
+                  {...register('set', { valueAsNumber: true })}
+                >
+                  {(isRunningOrBiciExercise ? [1, 2, 3, 4, 5, 6, 7, 8] : [1, 2, 3, 4, 5]).map((serie) => (
+                    <MenuItem key={serie} value={serie}>
+                      {serie}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          )}
 
-        {/* Campo de descanso en segundos - Oculto para deportes */}
-        {!isSportExercise && (
-          <TextField
-            label="Pausa luego de la serie (segs)"
-            type="number"
-            disabled={isLoading}
-            error={Boolean(errors.restSeconds)}
-            {...register('restSeconds')}
-            inputProps={{ 
-              inputMode: 'numeric',
-              min: 0,
-              max: 3600 // 1 hora máximo
-            }}
-            sx={{ 
-              '& .MuiInputLabel-root': { 
-                color: 'text.primary' 
-              } 
-            }}
-          />
-        )}
+          {/* Campo de descanso en segundos - Oculto para deportes */}
+          {!isSportExercise && (
+            <TextField
+              label="Pausa luego de la serie (segs)"
+              type="number"
+              disabled={isLoading}
+              error={Boolean(errors.restSeconds)}
+              {...register('restSeconds')}
+              inputProps={{
+                inputMode: 'numeric',
+                min: 0,
+                max: 3600 // 1 hora máximo
+              }}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  color: 'text.primary'
+                }
+              }}
+            />
+          )}
 
-        {/* Mensaje de éxito/error o campo de observaciones */}
-        {messageInObservations ? (
-          <Box
+          {/* Mensaje de éxito/error o campo de observaciones */}
+          {messageInObservations ? (
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                backgroundColor: messageInObservations.includes('✅') ? '#e8f5e8' : '#ffebee',
+                color: messageInObservations.includes('✅') ? '#2e7d32' : '#c62828',
+                border: '1px solid',
+                borderColor: messageInObservations.includes('✅') ? '#4caf50' : '#f44336',
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                textAlign: 'center'
+              }}
+            >
+              {messageInObservations}
+            </Box>
+          ) : (
+            <TextField
+              label="Observaciones (opcional)"
+              multiline
+              rows={activeRoutine ? 1 : 2}
+              disabled={isLoading}
+              error={Boolean(errors.observations)}
+              {...register('observations')}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  color: 'text.primary'
+                }
+              }}
+            />
+          )}
+
+          {/* Botón de envío */}
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={isLoading || isLoadingExercises}
+            startIcon={<FitnessCenterIcon />}
             sx={{
-              p: 2,
+              py: 1.5,
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              textTransform: 'none',
               borderRadius: 2,
-              backgroundColor: messageInObservations.includes('✅') ? '#e8f5e8' : '#ffebee',
-              color: messageInObservations.includes('✅') ? '#2e7d32' : '#c62828',
-              border: '1px solid',
-              borderColor: messageInObservations.includes('✅') ? '#4caf50' : '#f44336',
-              fontSize: '0.95rem',
-              fontWeight: 500,
-              textAlign: 'center'
-            }}
-          >
-            {messageInObservations}
-          </Box>
-        ) : (
-          <TextField
-            label="Observaciones (opcional)"
-            multiline
-            rows={activeRoutine ? 1 : 2}
-            disabled={isLoading}
-            error={Boolean(errors.observations)}
-            {...register('observations')}
-            sx={{
-              '& .MuiInputLabel-root': {
-                color: 'text.primary'
+              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+              '&:hover': {
+                boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)'
               }
             }}
-          />
-        )}
-
-        {/* Botón de envío */}
-        <Button
-          type="submit"
-          variant="contained"
-          size="large"
-          disabled={isLoading || isLoadingExercises}
-          startIcon={<FitnessCenterIcon />}
-          sx={{
-            py: 1.5,
-            fontWeight: 600,
-            fontSize: '1.1rem',
-            textTransform: 'none',
-            borderRadius: 2,
-            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-            '&:hover': {
-              boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)'
-            }
-          }}
-        >
-          {isLoading ? 'Registrando...' : 'Registrar Entrenamiento'}
-        </Button>
-      </Stack>
+          >
+            {isLoading ? 'Registrando...' : 'Registrar Entrenamiento'}
+          </Button>
+        </Stack>
       </form>
 
       {/* Modal de descanso */}
-      <Dialog 
-        open={showRestModal} 
+      <Dialog
+        open={showRestModal}
         onClose={() => setShowRestModal(false)}
         maxWidth="sm"
         fullWidth
@@ -985,24 +989,24 @@ export default function WorkoutForm({
           <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
             Descansando luego de hacer
           </Typography>
-          
+
           <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
             {lastRegisteredExercise}
           </Typography>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
+
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             gap: 3
           }}>
             <Typography variant="h2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>
               {Math.floor(restTime / 60)}:{(restTime % 60).toString().padStart(2, '0')}
             </Typography>
-            
+
             <IconButton
               onClick={() => setShowRestModal(false)}
-              sx={{ 
+              sx={{
                 color: 'white',
                 backgroundColor: 'rgba(255,255,255,0.1)',
                 '&:hover': {

@@ -26,10 +26,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export const auth = {
   // Sign in with Google
   async signInWithGoogle() {
+    const redirectTo = window.location.href
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin
+        redirectTo: redirectTo
       }
     })
     return { data, error }

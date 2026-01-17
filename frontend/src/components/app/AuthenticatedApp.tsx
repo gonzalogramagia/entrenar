@@ -10,6 +10,8 @@ import AdminPanel from '../admin/AdminPanel'
 import Navigation from '../navigation/Navigation'
 import SettingsModal from '../settings/SettingsModal'
 import NotificationsModal from '../notifications/NotificationsModal'
+import { useLanguage } from '../../contexts/LanguageContext'
+import { translations } from '../../i18n/translations'
 import { TABS, type TabType } from '../../constants/tabs'
 import { UserSettingsProvider, useUserSettings } from '../../contexts/UserSettingsContext'
 import { AuthProvider, useAuth } from '../../contexts/AuthContext'
@@ -27,6 +29,8 @@ type Exercise = {
 }
 
 function AuthenticatedAppContent() {
+  const { language } = useLanguage()
+  const t = translations[language]
   const { activeTab, setActiveTab } = useTab()
   const { userRole, isAdmin } = useAuth()
   const { isLoggingOut, isSigningIn } = useAuth()
@@ -781,7 +785,7 @@ function AuthenticatedAppContent() {
             }}
           />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-            {isLoggingOut ? 'Cerrando sesión...' : isSigningIn ? 'Iniciando sesión...' : 'Cargando...'}
+            {isLoggingOut ? (language === 'es' ? 'Cerrando sesión...' : 'Logging out...') : isSigningIn ? t.login.signingInProgress : (language === 'es' ? 'Cargando...' : 'Loading...')}
           </Typography>
         </Box>
       </Backdrop>
