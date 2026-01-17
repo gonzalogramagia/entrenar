@@ -79,17 +79,31 @@ export default function LoginComponent() {
           height: '144px',
           overflow: 'hidden'
         }}>
-          <img
-            src="/entrenar-emoji.png"
-            alt="Entrenar.app"
-            style={{
-              height: '240px',
-              width: 'auto',
-              maxWidth: '100%',
-              objectFit: 'contain',
-              marginTop: '-48px'
+          <Box
+            component="a"
+            href={`https://mas.moovimiento.com${language === 'en' ? '/en' : ''}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              display: 'block',
+              transition: 'transform 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+              }
             }}
-          />
+          >
+            <img
+              src="/entrenar-emoji.png"
+              alt="Entrenar.app"
+              style={{
+                height: '240px',
+                width: 'auto',
+                maxWidth: '100%',
+                objectFit: 'contain',
+                marginTop: '-48px'
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Google OAuth Login */}
