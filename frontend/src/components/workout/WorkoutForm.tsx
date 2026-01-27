@@ -346,6 +346,7 @@ export default function WorkoutForm({
   }
 
   const submit = handleSubmit(async (data: WorkoutFormData) => {
+    const originalObservations = data.observations
     try {
       // Para deportes, validar que el tiempo sea requerido
       if (isSportExercise) {
@@ -417,7 +418,7 @@ export default function WorkoutForm({
         set: isSportExercise ? 1 : (currentSet < (isRunningOrBiciExercise ? 8 : 5) ? currentSet + 1 : currentSet),
         seconds: '',
         restSeconds: currentRestSeconds || '',
-        observations: ''
+        observations: originalObservations || ''
       })
 
       // Resetear el cronómetro
@@ -426,7 +427,6 @@ export default function WorkoutForm({
       // Limpiar el mensaje de éxito después de 3 segundos
       setTimeout(() => {
         setMessageInObservations('')
-        setValue('observations', '')
       }, 3000)
     } catch (error) {
       console.error('Error al guardar el workout:', error)
@@ -860,7 +860,7 @@ export default function WorkoutForm({
                   min: isRunningOrBiciExercise ? 0.1 : 0.1,
                   max: isRunningOrBiciExercise ? 100 : 1000
                 }}
-                onFocus={(e) => e.target.select()}
+                onFocus={() => setValue('weight', '')}
                 sx={{
                   flex: isRunningOrBiciExercise ? 2 : 1, // 2/3 del espacio para Running y Bici
                   '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -970,6 +970,7 @@ export default function WorkoutForm({
               disabled={isLoading}
               error={Boolean(errors.observations)}
               {...register('observations')}
+              onFocus={() => setValue('observations', '')}
               sx={{
                 '& .MuiInputLabel-root': {
                   color: 'text.primary'
