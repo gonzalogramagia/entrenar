@@ -60,12 +60,6 @@ GET    /api/exercises                # Listar ejercicios
 GET    /api/exercises/{id}           # Obtener ejercicio
 ```
 
-### Equipment
-```
-GET    /api/equipment                # Listar equipos
-GET    /api/equipment/{id}           # Obtener equipo
-```
-
 ### Users (Supabase Auth)
 ```
 GET    /api/me                       # Usuario actual
@@ -171,7 +165,6 @@ backend/
 │   ├── health.go                        # Health check
 │   ├── workouts.go                      # CRUD workouts + sessions
 │   ├── exercises.go                     # Endpoints ejercicios
-│   ├── equipment.go                     # Endpoints equipos
 │   └── users.go                         # Usuario actual (desde JWT)
 ├── middleware/
 │   ├── logging.go                       # Logging de requests
@@ -191,12 +184,7 @@ backend/
 
 ### Exercises
 - `?muscle_group=pecho` - Filtrar por grupo muscular
-- `?equipment=mancuernas` - Filtrar por equipo
 - `?search=press` - Búsqueda por nombre
-
-### Equipment
-- `?category=pesas_libres` - Filtrar por categoría
-- `?search=mancuerna` - Búsqueda por nombre
 
 ## 🚦 Códigos de Estado HTTP
 

@@ -75,7 +75,6 @@ export const translations = {
         exercises: {
             searchPlaceholder: 'Buscar ejercicios...',
             muscleGroup: 'Grupo muscular',
-            equipment: 'Equipamiento',
             noResults: 'Sin resultados',
             noExercises: 'No hay ejercicios disponibles',
             choose: 'Elegir',
@@ -167,7 +166,6 @@ export const translations = {
         exercises: {
             searchPlaceholder: 'Search exercises...',
             muscleGroup: 'Muscle group',
-            equipment: 'Equipment',
             noResults: 'No results',
             noExercises: 'No exercises available',
             choose: 'Choose',

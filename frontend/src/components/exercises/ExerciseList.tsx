@@ -33,7 +33,6 @@ type Exercise = {
   muscle_group: string
   primary_muscles: string[]
   secondary_muscles: string[]
-  equipment: string
   video_url?: string
 }
 
@@ -47,7 +46,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
   const t = translations[language].exercises
   const [searchTerm, setSearchTerm] = useState('')
   const [muscleGroupFilter, setMuscleGroupFilter] = useState('')
-  const [equipmentFilter, setEquipmentFilter] = useState('')
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
   const [openDialog, setOpenDialog] = useState(false)
   const [showTestAlert, setShowTestAlert] = useState(true)
@@ -67,21 +65,15 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
     return [...new Set(groups)].sort()
   }, [exercises])
 
-  const equipmentTypes = useMemo(() => {
-    const types = exercises.map(ex => ex.equipment)
-    return [...new Set(types)].sort()
-  }, [exercises])
-
   // Filtrar ejercicios
   const filteredExercises = useMemo(() => {
     return exercises.filter(exercise => {
       const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesMuscleGroup = !muscleGroupFilter || exercise.muscle_group === muscleGroupFilter
-      const matchesEquipment = !equipmentFilter || exercise.equipment === equipmentFilter
 
-      return matchesSearch && matchesMuscleGroup && matchesEquipment
+      return matchesSearch && matchesMuscleGroup
     })
-  }, [exercises, searchTerm, muscleGroupFilter, equipmentFilter])
+  }, [exercises, searchTerm, muscleGroupFilter])
 
   const handleExerciseClick = (exercise: Exercise) => {
     setSelectedExercise(exercise)
@@ -98,7 +90,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
   }
 
   const getYouTubeEmbedUrl = (url: string): string => {
-    // Extraer el ID del video de YouTube
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
     const match = url.match(regExp)
     if (match && match[2].length === 11) {
@@ -107,7 +98,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
     return url
   }
 
-  // Función para renderizar el estado vacío con mejor estilo
   const renderEmptyState = (isInitialEmpty: boolean = false) => (
     <Box
       sx={{
@@ -147,7 +137,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-
       <Stack spacing={3}>
         {/* Filtros */}
         <Box sx={{
@@ -229,44 +218,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl sx={{ flex: 1 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'white',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    mb: 1
-                  }}
-                >
-                  {t.equipment}
-                </Typography>
-                <Select
-                  value={equipmentFilter}
-                  onChange={(e) => setEquipmentFilter(e.target.value)}
-                  displayEmpty
-                  sx={{
-                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 1)'
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'white'
-                    },
-                    '& .MuiSelect-select': {
-                      color: '#333',
-                      fontSize: '1rem'
-                    }
-                  }}
-                >
-                  <MenuItem value="">{t.choose}</MenuItem>
-                  {equipmentTypes.map(equipment => (
-                    <MenuItem key={equipment} value={equipment}>
-                      {capitalizeFirstLetter(equipment)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
             </Box>
           </Stack>
         </Box>
@@ -334,12 +285,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                         color="primary"
                         sx={{ fontWeight: 'bold' }}
                       />
-                      <Chip
-                        label={capitalizeFirstLetter(exercise.equipment)}
-                        size="small"
-                        variant="outlined"
-                        sx={{ borderColor: 'primary.main' }}
-                      />
                     </Stack>
                   </Box>
                 </CardContent>
@@ -388,7 +333,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
             px: { xs: 2, sm: 3 },
             position: 'relative'
           }}>
-            {/* Handle para móviles */}
             <Box sx={{
               position: 'absolute',
               top: { xs: 8, sm: 12 },
@@ -420,7 +364,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
 
           <DialogContent sx={{ p: { xs: 2 }, maxHeight: { xs: '60vh', sm: '70vh' }, overflow: 'auto' }}>
             <Stack spacing={1}>
-              {/* Video del ejercicio */}
               {selectedExercise.video_url && (
                 <Box sx={{ pt: 1 }}>
                   <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' }, mb: 1 }}>
@@ -430,7 +373,7 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                     position: 'relative',
                     width: '100%',
                     height: 0,
-                    paddingBottom: '56.25%', // Aspect ratio 16:9
+                    paddingBottom: '56.25%',
                     borderRadius: 2,
                     overflow: 'hidden'
                   }}>
@@ -507,17 +450,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
                       </Stack>
                     </Box>
                   )}
-
-                  <Box>
-                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                      {language === 'es' ? 'Equipamiento:' : 'Equipment:'}
-                    </Typography>
-                    <Chip
-                      label={capitalizeFirstLetter(selectedExercise.equipment)}
-                      variant="outlined"
-                      sx={{ borderColor: 'primary.main' }}
-                    />
-                  </Box>
                 </Stack>
               </Box>
             </Stack>
@@ -545,7 +477,6 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
         </Dialog>
       )}
 
-      {/* Alerta de información de prueba */}
       <Snackbar
         open={showTestAlert}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}

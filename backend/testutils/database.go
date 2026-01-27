@@ -80,8 +80,8 @@ func VerifyDatabaseSchema(t *testing.T) {
 	}
 
 	// Verificar tablas principales en public schema
-	publicTables := []string{"workouts", "workout_sessions", "exercises", "equipment"}
-	
+	publicTables := []string{"workouts", "workout_sessions", "exercises"}
+
 	for _, table := range publicTables {
 		var exists bool
 		query := `
@@ -91,12 +91,12 @@ func VerifyDatabaseSchema(t *testing.T) {
 				AND table_name = $1
 			)
 		`
-		
+
 		err := database.DB.QueryRow(query, table).Scan(&exists)
 		if err != nil {
 			t.Fatalf("Error verificando tabla public.%s: %v", table, err)
 		}
-		
+
 		if !exists {
 			t.Fatalf("Tabla requerida 'public.%s' no existe en la base de datos", table)
 		}
@@ -111,12 +111,12 @@ func VerifyDatabaseSchema(t *testing.T) {
 			AND table_name = 'users'
 		)
 	`
-	
+
 	err := database.DB.QueryRow(authQuery).Scan(&authUsersExists)
 	if err != nil {
 		t.Fatalf("Error verificando auth.users: %v", err)
 	}
-	
+
 	if !authUsersExists {
 		t.Fatalf("Tabla 'auth.users' no existe - verificar configuración de Supabase Auth")
 	}
@@ -161,7 +161,7 @@ func CreateTestUserInDB(t *testing.T, userID string) {
 		)
 		ON CONFLICT (id) DO NOTHING
 	`
-	
+
 	email := "test_" + userID + "@gym.test"
 	metadata := `{"full_name": "Test User", "provider": "test"}`
 

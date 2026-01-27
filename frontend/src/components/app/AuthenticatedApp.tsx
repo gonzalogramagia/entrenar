@@ -624,7 +624,6 @@ function AuthenticatedAppContent() {
                   muscle_group: 'Pecho',
                   primary_muscles: ['Pectoral Mayor', 'Tríceps'],
                   secondary_muscles: ['Deltoides Anterior', 'Serrato Anterior'],
-                  equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=rT7DgCr-3pg'
                 },
                 {
@@ -633,7 +632,6 @@ function AuthenticatedAppContent() {
                   muscle_group: 'Piernas',
                   primary_muscles: ['Cuádriceps', 'Glúteos'],
                   secondary_muscles: ['Isquiotibiales', 'Gastrocnemio', 'Core'],
-                  equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=aclHkVaku9U'
                 },
                 {
@@ -642,7 +640,6 @@ function AuthenticatedAppContent() {
                   muscle_group: 'Espalda',
                   primary_muscles: ['Erector Espinal', 'Glúteos', 'Isquiotibiales'],
                   secondary_muscles: ['Trapecio', 'Romboides', 'Core'],
-                  equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=op9kVnSso6Q'
                 },
                 {
@@ -651,7 +648,6 @@ function AuthenticatedAppContent() {
                   muscle_group: 'Hombros',
                   primary_muscles: ['Deltoides Anterior', 'Deltoides Medio'],
                   secondary_muscles: ['Tríceps', 'Trapecio Superior'],
-                  equipment: 'Barra',
                   video_url: 'https://www.youtube.com/watch?v=2yjwXTZQDDI'
                 },
                 {
@@ -660,7 +656,6 @@ function AuthenticatedAppContent() {
                   muscle_group: 'Brazos',
                   primary_muscles: ['Bíceps Braquial'],
                   secondary_muscles: ['Braquiorradial', 'Braquial'],
-                  equipment: 'Mancuernas',
                   video_url: 'https://www.youtube.com/watch?v=ykJmrZ5v0Oa'
                 },
               ]}

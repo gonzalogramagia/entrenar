@@ -2,7 +2,7 @@
 
 **A comprehensive workout logging and tracking application designed for serious training.**
 
-"Entrenar App" is your digital partner for tracking progress, managing routines, and visualizing gym equipment. Built with performance and usability in mind, it helps you focus on what matters: your training.
+"Entrenar App" is your digital partner for tracking progress and managing routines. Built with performance and usability in mind, it helps you focus on what matters: your training.
 
 ---
 
@@ -10,7 +10,7 @@
 
 - **✅ Workout Logging**: Detailed tracking for weight, reps, sets, and time with a complete form.
 - **⏱️ Smart Stopwatch**: Integrated timer to manage rest periods efficiently between sets.
-- **🏋️ Exercise Library**: Browse exercises and equipment with advanced filtering capabilities.
+- **🏋️ Exercise Library**: Browse exercises with advanced filtering capabilities.
 - **🔔 Notification System**: Stay on track with manual and automatic notifications.
 - **📊 Progress Tracking**: Visual insights into your training history and improvements.
 - **🔄 Custom Routines**: Create and manage personalized workout routines.
