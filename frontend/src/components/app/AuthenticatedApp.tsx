@@ -599,6 +599,20 @@ function AuthenticatedAppContent() {
           </Box>
         )}
 
+        {/* Pestaña Historial */}
+        {activeTab === TABS.HISTORY && (
+          <Box sx={{ height: '100%' }}>
+            <WorkoutHistory />
+          </Box>
+        )}
+
+        {/* Pestaña Mis Rutinas */}
+        {activeTab === TABS.ROUTINES && (
+          <Box sx={{ height: '100%' }}>
+            <RoutineList activeRoutine={activeRoutine} routineProgress={routineProgress} />
+          </Box>
+        )}
+
         {/* Pestaña Ejercicios */}
         {activeTab === TABS.EXERCISES && (
           <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
@@ -655,26 +669,10 @@ function AuthenticatedAppContent() {
           </Box>
         )}
 
-
-
-        {/* Pestaña Historial */}
-        {activeTab === TABS.HISTORY && (
-          <Box sx={{ height: '100%' }}>
-            <WorkoutHistory />
-          </Box>
-        )}
-
         {/* Pestaña Social */}
         {activeTab === TABS.SOCIAL && (
           <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
             <SocialList />
-          </Box>
-        )}
-
-        {/* Pestaña Mis Rutinas */}
-        {activeTab === TABS.ROUTINES && (
-          <Box sx={{ height: '100%' }}>
-            <RoutineList activeRoutine={activeRoutine} routineProgress={routineProgress} />
           </Box>
         )}
 

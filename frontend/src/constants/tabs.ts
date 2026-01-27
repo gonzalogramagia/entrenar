@@ -1,11 +1,10 @@
 // Constantes para las pestañas de navegación
 export const TABS = {
   WORKOUT: 0,
-  EXERCISES: 1,
-  // EQUIPMENT: 2 removed
-  HISTORY: 2,
-  SOCIAL: 3,
-  ROUTINES: 4,
+  HISTORY: 1,
+  ROUTINES: 2,
+  EXERCISES: 3,
+  SOCIAL: 4,
   NOTIFICATIONS: 5,
   ADMIN: 6
 } as const

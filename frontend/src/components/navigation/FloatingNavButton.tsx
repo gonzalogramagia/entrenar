@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Fab, Zoom } from '@mui/material'
-import { AllInclusive, People, FitnessCenter } from '@mui/icons-material'
+import { AllInclusive, People, FitnessCenter, History } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 import { TABS, type TabType } from '../../constants/tabs'
@@ -67,6 +67,8 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
     } else if (currentTab === TABS.WORKOUT) {
       onTabChange(TABS.HISTORY)
     } else if (currentTab === TABS.HISTORY) {
+      onTabChange(TABS.ROUTINES)
+    } else if (currentTab === TABS.ROUTINES) {
       onTabChange(TABS.SOCIAL)
     } else if (currentTab === TABS.SOCIAL) {
       onTabChange(TABS.WORKOUT)
@@ -75,10 +77,12 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
 
   const getIcon = () => {
     if (currentTab === TABS.ROUTINES && activeRoutine) {
-      return isRoutineComplete ? <FitnessCenter /> : <AllInclusive />
+      return isRoutineComplete ? <History /> : <AllInclusive />
     } else if (currentTab === TABS.WORKOUT) {
-      return <FitnessCenter />
+      return <History />
     } else if (currentTab === TABS.HISTORY) {
+      return <FitnessCenter />
+    } else if (currentTab === TABS.ROUTINES) {
       return <People />
     } else if (currentTab === TABS.SOCIAL) {
       return <AllInclusive />
@@ -88,10 +92,12 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
 
   const getTooltip = () => {
     if (currentTab === TABS.ROUTINES && activeRoutine) {
-      return isRoutineComplete ? t.viewWorkouts : t.logWorkout
+      return isRoutineComplete ? t.viewHistory : t.logWorkout
     } else if (currentTab === TABS.WORKOUT) {
       return t.viewHistory
     } else if (currentTab === TABS.HISTORY) {
+      return t.routines
+    } else if (currentTab === TABS.ROUTINES) {
       return t.viewSocial
     } else if (currentTab === TABS.SOCIAL) {
       return t.logWorkout

@@ -149,8 +149,8 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
 
   const menuItems = [
     { label: t.workout, icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
-    { label: t.routines, icon: <HistoryIcon />, value: TABS.ROUTINES },
-    { label: t.history, icon: <FitnessCenterIcon />, value: TABS.HISTORY },
+    { label: t.history, icon: <HistoryIcon />, value: TABS.HISTORY },
+    { label: t.routines, icon: <FitnessCenterIcon />, value: TABS.ROUTINES },
     { label: t.social, icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
 
