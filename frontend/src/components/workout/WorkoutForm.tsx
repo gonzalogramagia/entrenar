@@ -1014,7 +1014,9 @@ export default function WorkoutForm({
       {/* Modal de descanso */}
       <Dialog
         open={showRestModal}
-        onClose={() => setShowRestModal(false)}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') setShowRestModal(false)
+        }}
         maxWidth="sm"
         fullWidth
         PaperProps={{

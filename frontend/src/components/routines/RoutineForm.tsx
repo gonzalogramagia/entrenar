@@ -15,7 +15,8 @@ import {
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
-  DragIndicator as DragIcon
+  DragIndicator as DragIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -60,20 +61,21 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchTerms, setSearchTerms] = useState<string[]>([]) // Términos de búsqueda para cada ejercicio
+  const [confirmDeleteIndex, setConfirmDeleteIndex] = useState<number | null>(null) // Índice del ejercicio en espera de confirmación de borrado
 
   const loadExercises = useCallback(async () => {
     try {
       setLoading(true)
       const data = await apiClient.getExercises() as Exercise[]
-      
+
       // Filtrar ejercicios: excluir deportes y aplicar filtros de favoritos
       let filteredExercises = data.filter(exercise => !exercise.is_sport) // Excluir deportes
-      
+
       // Filtrar solo los ejercicios favoritos si el usuario ha configurado manualmente sus favoritos
       if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
         filteredExercises = filteredExercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
       }
-      
+
       setAvailableExercises(filteredExercises)
     } catch (err) {
       console.error('Error cargando ejercicios:', err)
@@ -107,9 +109,9 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     if (!searchTerm.trim()) {
       return availableExercises
     }
-    
+
     const normalizedSearchTerm = normalizeText(searchTerm)
-    return availableExercises.filter(exercise => 
+    return availableExercises.filter(exercise =>
       normalizeText(exercise.name).includes(normalizedSearchTerm)
     )
   }
@@ -136,17 +138,25 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
   }
 
   const handleRemoveExercise = (index: number) => {
-    const newExercises = exercises.filter((_, i) => i !== index)
-    // Reordenar los índices
-    const reorderedExercises = newExercises.map((ex, i) => ({
-      ...ex,
-      order_index: i
-    }))
-    setExercises(reorderedExercises)
-    
-    // También remover el término de búsqueda correspondiente
-    const newSearchTerms = searchTerms.filter((_, i) => i !== index)
-    setSearchTerms(newSearchTerms)
+    if (confirmDeleteIndex === index) {
+      const newExercises = exercises.filter((_, i) => i !== index)
+      // Reordenar los índices
+      const reorderedExercises = newExercises.map((ex, i) => ({
+        ...ex,
+        order_index: i
+      }))
+      setExercises(reorderedExercises)
+
+      // También remover el término de búsqueda correspondiente
+      const newSearchTerms = searchTerms.filter((_, i) => i !== index)
+      setSearchTerms(newSearchTerms)
+      setConfirmDeleteIndex(null)
+    } else {
+      setConfirmDeleteIndex(index)
+      setTimeout(() => {
+        setConfirmDeleteIndex(current => current === index ? null : current)
+      }, 1500)
+    }
   }
 
   const handleExerciseChange = (index: number, field: keyof CreateRoutineExerciseRequest, value: any) => {
@@ -155,19 +165,19 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       ...newExercises[index],
       [field]: value
     }
-    
+
     // Si se cambia el ejercicio a Running o Bici, establecer reps = 1 y sets = 1 automáticamente
     if (field === 'exercise_id' && (value === 18 || isBiciExercise(value))) {
       newExercises[index].reps = 1
       newExercises[index].sets = 1
     }
-    
+
     setExercises(newExercises)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!name.trim()) {
       setError('El nombre de la rutina es obligatorio')
       return
@@ -222,7 +232,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
           sx={{ mb: 2 }}
         />
       </Box>
-      
+
       <Box sx={{ mb: 3 }}>
         <TextField
           fullWidth
@@ -251,9 +261,12 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
               <IconButton
                 size="small"
                 onClick={() => handleRemoveExercise(index)}
-                sx={{ color: 'error.main' }}
+                sx={{
+                  color: confirmDeleteIndex === index ? 'error.main' : 'error.main',
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <DeleteIcon />
+                {confirmDeleteIndex === index ? <CheckCircleIcon /> : <DeleteIcon />}
               </IconButton>
             </Box>
 
@@ -321,8 +334,8 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
                 type="number"
                 value={exercise.weight || ''}
                 onChange={(e) => handleExerciseChange(index, 'weight', e.target.value ? parseFloat(e.target.value) : undefined)}
-                inputProps={{ 
-                  min: 0, 
+                inputProps={{
+                  min: 0,
                   step: isRunningOrBiciExercise(exercise.exercise_id) ? 0.1 : 0.5,
                   max: isRunningOrBiciExercise(exercise.exercise_id) ? 100 : 1000
                 }}

@@ -175,14 +175,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
 
 
-  const handleEditNameClick = (routine: RoutineWithExercises) => {
-    setEditNameModal({
-      show: true,
-      routineId: routine.id,
-      currentName: routine.name,
-      newName: routine.name
-    })
-  }
+
 
 
   const handleSaveRoutineName = async () => {
@@ -405,18 +398,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                         fontWeight: 700,
                         color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                         textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                        cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
+                        cursor: 'default',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
-                        textAlign: 'left',
-                        '&:hover': {
-                          textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                        textAlign: 'left'
                       }}
                     >
                       🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
@@ -438,15 +424,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                         fontWeight: 700,
                         color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                         textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                        cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
-                        textAlign: 'left',
-                        '&:hover': {
-                          textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        activeRoutine?.id !== routine.id && handleEditNameClick(routine)
+                        cursor: 'default',
+                        textAlign: 'left'
                       }}
                     >
                       🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
@@ -640,7 +619,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       {/* Dialog para crear rutina */}
       <Dialog
         open={openCreateDialog}
-        onClose={() => setOpenCreateDialog(false)}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') setOpenCreateDialog(false)
+        }}
         maxWidth="md"
         fullWidth
       >
@@ -656,7 +637,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       {/* Dialog para editar rutina */}
       <Dialog
         open={openEditDialog}
-        onClose={() => setOpenEditDialog(false)}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') setOpenEditDialog(false)
+        }}
         maxWidth="md"
         fullWidth
       >
@@ -675,14 +658,16 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       {/* Dialog para ver detalles de rutina */}
       <Dialog
         open={openDetailDialog}
-        onClose={() => setOpenDetailDialog(false)}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') setOpenDetailDialog(false)
+        }}
         maxWidth="md"
         fullWidth
         PaperProps={{
           sx: {
-            width: { xs: '95%', sm: '100%' },
-            maxWidth: { xs: '95%', sm: '900px' },
-            margin: { xs: '16px', sm: 'auto' }
+            width: { xs: '98%', sm: '100%' },
+            maxWidth: { xs: '98%', sm: '900px' },
+            margin: { xs: '8px', sm: 'auto' }
           }
         }}
       >
@@ -790,7 +775,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       {/* Modal de edición de nombre */}
       <Dialog
         open={editNameModal.show}
-        onClose={() => setEditNameModal({ show: false, routineId: null, currentName: '', newName: '' })}
+        onClose={(_, reason) => {
+          if (reason !== 'backdropClick') setEditNameModal({ show: false, routineId: null, currentName: '', newName: '' })
+        }}
         maxWidth="sm"
         fullWidth
         PaperProps={{

@@ -651,7 +651,9 @@ export default function WorkoutHistory() {
         {/* Modal de edición de nombre */}
         <Dialog
           open={editNameModal.show}
-          onClose={() => setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' })}
+          onClose={(_, reason) => {
+            if (reason !== 'backdropClick') setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' })
+          }}
           maxWidth="sm"
           fullWidth
           PaperProps={{
@@ -739,10 +741,12 @@ export default function WorkoutHistory() {
         {/* Modal de confirmación de eliminación */}
         <Dialog
           open={deleteConfirmation.show}
-          onClose={() => {
-            setDeleteConfirmation({ show: false, workoutId: null });
-            // Mantener cerrada la sección expandida
-            setExpandedDays(new Set());
+          onClose={(_, reason) => {
+            if (reason !== 'backdropClick') {
+              setDeleteConfirmation({ show: false, workoutId: null });
+              // Mantener cerrada la sección expandida
+              setExpandedDays(new Set());
+            }
           }}
           maxWidth="sm"
           fullWidth
@@ -832,7 +836,9 @@ export default function WorkoutHistory() {
         {/* Modal de ejercicio individual */}
         <Dialog
           open={exerciseModal.show}
-          onClose={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+          onClose={(_, reason) => {
+            if (reason !== 'backdropClick') setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })
+          }}
           maxWidth="md"
           fullWidth
           BackdropProps={{
@@ -848,7 +854,10 @@ export default function WorkoutHistory() {
               backgroundColor: 'background.paper',
               boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
               border: '1px solid',
-              borderColor: 'divider'
+              borderColor: 'divider',
+              width: { xs: '98%', sm: '100%' },
+              maxWidth: { xs: '98%', sm: '900px' },
+              margin: { xs: '8px', sm: 'auto' }
             }
           }}
         >
