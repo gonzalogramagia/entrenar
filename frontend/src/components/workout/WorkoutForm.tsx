@@ -783,8 +783,8 @@ export default function WorkoutForm({
             onChange={(_, newValue) => {
               setValue('exercise_id', newValue ? newValue.id : undefined)
             }}
-            onFocus={() => {
-              // Limpiar el selector al hacerle foco para facilitar una nueva búsqueda
+            onOpen={() => {
+              // Limpiar el selector al abrir (click o foco) para facilitar una nueva búsqueda
               if (watch('exercise_id')) {
                 setValue('exercise_id', undefined)
               }
@@ -796,6 +796,11 @@ export default function WorkoutForm({
                 error={Boolean(errors.exercise_id)}
                 disabled={isLoading || filteredExercises.length === 0}
                 placeholder={filteredExercises.length === 0 ? (translations[language].common.loading) : (language === 'es' ? 'Escribe para buscar ejercicios...' : 'Type to search exercises...')}
+                onClick={() => {
+                  if (watch('exercise_id')) {
+                    setValue('exercise_id', undefined)
+                  }
+                }}
               />
             )}
             filterOptions={(options, { inputValue }) => {
@@ -861,6 +866,7 @@ export default function WorkoutForm({
                   max: isRunningOrBiciExercise ? 100 : 1000
                 }}
                 onFocus={() => setValue('weight', '')}
+                onClick={() => setValue('weight', '')}
                 sx={{
                   flex: isRunningOrBiciExercise ? 2 : 1, // 2/3 del espacio para Running y Bici
                   '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -887,6 +893,7 @@ export default function WorkoutForm({
                     max: 100
                   }}
                   onFocus={(e) => e.target.select()}
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
                   sx={{
                     flex: 1,
                     '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -971,6 +978,7 @@ export default function WorkoutForm({
               error={Boolean(errors.observations)}
               {...register('observations')}
               onFocus={() => setValue('observations', '')}
+              onClick={() => setValue('observations', '')}
               sx={{
                 '& .MuiInputLabel-root': {
                   color: 'text.primary'
