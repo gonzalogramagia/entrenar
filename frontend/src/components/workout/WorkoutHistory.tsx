@@ -537,7 +537,10 @@ export default function WorkoutHistory() {
                       {day.exerciseGroups.map((group, index) => (
                         <Card
                           key={index}
-                          onClick={() => setExerciseModal({ show: true, exerciseGroup: group, workoutDay: day.workoutDay })}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setExerciseModal({ show: true, exerciseGroup: group, workoutDay: day.workoutDay })
+                          }}
                           sx={{
                             boxShadow: 1,
                             border: '1px solid',
@@ -580,302 +583,7 @@ export default function WorkoutHistory() {
                 </CardContent>
               </Card>
 
-              {/* Modal de confirmación de eliminación */}
-              <Dialog
-                open={deleteConfirmation.show}
-                onClose={() => {
-                  setDeleteConfirmation({ show: false, workoutId: null });
-                  // Mantener cerrada la sección expandida
-                  setExpandedDays(new Set());
-                }}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                  sx: {
-                    borderRadius: 3,
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                    border: '1px solid',
-                    borderColor: 'divider'
-                  }
-                }}
-              >
-                <DialogTitle sx={{
-                  pb: 2,
-                  textAlign: 'center',
-                  fontWeight: 600,
-                  color: 'error.main'
-                }}>
-                  ⚠️ {language === 'es' ? 'Confirmar eliminación' : 'Confirm deletion'}
-                </DialogTitle>
-                <DialogContent sx={{ py: 2, px: 3 }}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ pb: 1 }}>
-                      {language === 'es' ? 'Esta acción no se puede deshacer. El ejercicio será eliminado permanentemente.' : 'This action cannot be undone. The exercise will be permanently deleted.'}
-                    </Typography>
-                  </Box>
-                </DialogContent>
-                <DialogActions sx={{ p: 3, pt: 1, gap: 2, justifyContent: 'center' }}>
-                  <Button
-                    onClick={() => {
-                      setDeleteConfirmation({ show: false, workoutId: null });
-                      // Mantener cerrada la sección expandida
-                      setExpandedDays(new Set());
-                    }}
-                    variant="outlined"
-                    sx={{
-                      px: 4,
-                      py: 1.5,
-                      borderRadius: 2,
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      fontSize: '0.95rem',
-                      borderColor: 'grey.400',
-                      color: 'text.primary',
-                      '&:hover': {
-                        borderColor: 'grey.600',
-                        backgroundColor: 'grey.50'
-                      }
-                    }}
-                  >
-                    {translations[language].common.cancel}
-                  </Button>
-                  <Button
-                    onClick={handleConfirmDelete}
-                    color="error"
-                    variant="contained"
-                    disabled={loadingWorkoutId !== null}
-                    sx={{
-                      px: 4,
-                      py: 1.5,
-                      borderRadius: 2,
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      fontSize: '0.95rem',
-                      backgroundColor: '#d32f2f',
-                      '&:hover': {
-                        backgroundColor: '#c62828'
-                      },
-                      '&:disabled': {
-                        backgroundColor: '#ffcdd2',
-                        color: '#c62828'
-                      }
-                    }}
-                  >
-                    {loadingWorkoutId !== null ? (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CircularProgress size={16} color="inherit" />
-                        {language === 'es' ? 'Eliminando...' : 'Deleting...'}
-                      </Box>
-                    ) : (
-                      translations[language].common.delete
-                    )}
-                  </Button>
-                </DialogActions>
-              </Dialog>
 
-              {/* Modal de ejercicio individual */}
-              <Dialog
-                open={exerciseModal.show}
-                onClose={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
-                maxWidth="md"
-                fullWidth
-
-                BackdropProps={{
-                  sx: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
-                  }
-                }}
-                sx={{
-                  '& .MuiBackdrop-root': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
-                  },
-                  '& .MuiDialog-paper': {
-                    backgroundColor: 'background.paper',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                    border: '1px solid',
-                    borderColor: 'divider'
-                  }
-                }}
-              >
-                <DialogTitle sx={{
-                  pb: 1,
-                  borderBottom: 1,
-                  borderColor: 'divider',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    {exerciseModal.exerciseGroup?.exerciseName}
-                  </Typography>
-                  <IconButton
-                    onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
-                    size="small"
-                  >
-                    <ExpandLessIcon />
-                  </IconButton>
-                </DialogTitle>
-
-                <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ margin: '8px 0px -16px' }}>
-                      {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
-                    </Typography>
-                  </Box>
-
-                  <Stack spacing={2}>
-                    {exerciseModal.exerciseGroup?.workouts
-                      .sort((a, b) => a.set - b.set) // Ordenar por número de serie ascendente
-                      .map((workout, workoutIndex) => (
-                        <Card key={workoutIndex} sx={{
-                          boxShadow: 1,
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          position: 'relative',
-                          filter: loadingWorkoutId === workout.id ? 'blur(2px)' : 'none',
-                          transition: 'all 0.3s ease-in-out'
-                        }}>
-                          {/* Loader overlay cuando se está eliminando */}
-                          {loadingWorkoutId === workout.id && (
-                            <Box sx={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                              borderRadius: 1,
-                              zIndex: 10
-                            }}>
-                              <CircularProgress size={40} sx={{ color: 'primary.main' }} />
-                            </Box>
-                          )}
-                          <CardContent sx={{
-                            p: 2
-                          }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                  {workout.is_sport || workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ?
-                                    getSportEmoji(workout.exercise_name) || (language === 'es' ? `Serie nº${workout.set}` : `Set #${workout.set}`) :
-                                    (language === 'es' ? `Serie nº${workout.set}` : `Set #${workout.set}`)
-                                  }
-                                </Typography>
-
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                  {/* Para deportes, mostrar solo el tiempo formateado */}
-                                  {workout.is_sport ? (
-                                    workout.seconds && workout.seconds > 0 && (
-                                      <Chip
-                                        label={formatTimeForSport(workout.seconds)}
-                                        variant="outlined"
-                                        size="small"
-                                        sx={{
-                                          fontWeight: 'bold',
-                                          borderColor: '#ff9800',
-                                          color: '#ff9800',
-                                          minWidth: '80px',
-                                          '&:hover': {
-                                            backgroundColor: '#ff9800',
-                                            color: 'white'
-                                          }
-                                        }}
-                                      />
-                                    )
-                                  ) : (
-                                    /* Para ejercicios normales, mostrar solo peso y reps */
-                                    <>
-                                      <Chip
-                                        label={workout.weight === 0 ? (language === 'es' ? 'Peso corporal' : 'Bodyweight') : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`}
-                                        variant="outlined"
-                                        size="small"
-                                        sx={{
-                                          fontWeight: 'bold',
-                                          borderColor: '#2196f3',
-                                          color: '#2196f3',
-                                          minWidth: workout.weight === 0 ? '100px' : '60px',
-                                          '&:hover': {
-                                            backgroundColor: '#2196f3',
-                                            color: 'white'
-                                          }
-                                        }}
-                                      />
-                                      {!workout.exercise_name.toLowerCase().includes('running') && !workout.exercise_name.toLowerCase().includes('bici') && (
-                                        <Chip
-                                          label={`${workout.reps} reps`}
-                                          variant="outlined"
-                                          size="small"
-                                          sx={{
-                                            fontWeight: 'bold',
-                                            borderColor: '#4caf50',
-                                            color: '#4caf50',
-                                            minWidth: '60px',
-                                            '&:hover': {
-                                              backgroundColor: '#4caf50',
-                                              color: 'white'
-                                            }
-                                          }}
-                                        />
-                                      )}
-                                    </>
-                                  )}
-                                </Stack>
-                              </Box>
-
-                              <IconButton
-                                onClick={(e) => {
-                                  console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
-                                  e.stopPropagation();
-                                  setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null });
-                                  setDeleteConfirmation({ show: true, workoutId: workout.id });
-                                }}
-                                size="small"
-                                sx={{
-                                  color: 'error.main',
-                                  opacity: 0.7,
-                                  '&:hover': { opacity: 1 }
-                                }}
-                                disabled={loadingWorkoutId === workout.id}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Box>
-
-                            {workout.observations && (
-                              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-                                "{workout.observations}"
-                              </Typography>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                  </Stack>
-                </DialogContent>
-
-                <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
-                  <Button
-                    onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
-                    variant="contained"
-                    sx={{
-                      px: 4,
-                      py: 1,
-                      borderRadius: 2,
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      fontSize: '0.95rem',
-                      backgroundColor: '#1976d2',
-                      '&:hover': {
-                        backgroundColor: '#1565c0'
-                      }
-                    }}
-                  >
-                    Cerrar
-                  </Button>
-                </DialogActions>
-              </Dialog>
             </Box>
           ))}
         </Box>
@@ -1028,7 +736,302 @@ export default function WorkoutHistory() {
           </DialogActions>
         </Dialog>
 
-        {/* Snackbar para mensajes de error */}
+        {/* Modal de confirmación de eliminación */}
+        <Dialog
+          open={deleteConfirmation.show}
+          onClose={() => {
+            setDeleteConfirmation({ show: false, workoutId: null });
+            // Mantener cerrada la sección expandida
+            setExpandedDays(new Set());
+          }}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid',
+              borderColor: 'divider'
+            }
+          }}
+        >
+          <DialogTitle sx={{
+            pb: 2,
+            textAlign: 'center',
+            fontWeight: 600,
+            color: 'error.main'
+          }}>
+            ⚠️ {language === 'es' ? 'Confirmar eliminación' : 'Confirm deletion'}
+          </DialogTitle>
+          <DialogContent sx={{ py: 2, px: 3 }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="body1" color="text.secondary" sx={{ pb: 1 }}>
+                {language === 'es' ? 'Esta acción no se puede deshacer. El ejercicio será eliminado permanentemente.' : 'This action cannot be undone. The exercise will be permanently deleted.'}
+              </Typography>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1, gap: 2, justifyContent: 'center' }}>
+            <Button
+              onClick={() => {
+                setDeleteConfirmation({ show: false, workoutId: null });
+                // Mantener cerrada la sección expandida
+                setExpandedDays(new Set());
+              }}
+              variant="outlined"
+              sx={{
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                borderColor: 'grey.400',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: 'grey.600',
+                  backgroundColor: 'grey.50'
+                }
+              }}
+            >
+              {translations[language].common.cancel}
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              color="error"
+              variant="contained"
+              disabled={loadingWorkoutId !== null}
+              sx={{
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                backgroundColor: '#d32f2f',
+                '&:hover': {
+                  backgroundColor: '#c62828'
+                },
+                '&:disabled': {
+                  backgroundColor: '#ffcdd2',
+                  color: '#c62828'
+                }
+              }}
+            >
+              {loadingWorkoutId !== null ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CircularProgress size={16} color="inherit" />
+                  {language === 'es' ? 'Eliminando...' : 'Deleting...'}
+                </Box>
+              ) : (
+                translations[language].common.delete
+              )}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Modal de ejercicio individual */}
+        <Dialog
+          open={exerciseModal.show}
+          onClose={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+          maxWidth="md"
+          fullWidth
+          BackdropProps={{
+            sx: {
+              backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
+            }
+          }}
+          sx={{
+            '& .MuiBackdrop-root': {
+              backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
+            },
+            '& .MuiDialog-paper': {
+              backgroundColor: 'background.paper',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid',
+              borderColor: 'divider'
+            }
+          }}
+        >
+          <DialogTitle sx={{
+            pb: 1,
+            borderBottom: 1,
+            borderColor: 'divider',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+              {exerciseModal.exerciseGroup?.exerciseName}
+            </Typography>
+            <IconButton
+              onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+              size="small"
+            >
+              <ExpandLessIcon />
+            </IconButton>
+          </DialogTitle>
+
+          <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ margin: '8px 0px -16px' }}>
+                {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
+              </Typography>
+            </Box>
+
+            <Stack spacing={2}>
+              {exerciseModal.exerciseGroup?.workouts && [...exerciseModal.exerciseGroup.workouts]
+                .sort((a, b) => a.set - b.set) // Ordenar por número de serie ascendente
+                .map((workout, workoutIndex) => (
+                  <Card key={workoutIndex} sx={{
+                    boxShadow: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    position: 'relative',
+                    filter: loadingWorkoutId === workout.id ? 'blur(2px)' : 'none',
+                    transition: 'all 0.3s ease-in-out'
+                  }}>
+                    {/* Loader overlay cuando se está eliminando */}
+                    {loadingWorkoutId === workout.id && (
+                      <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: 1,
+                        zIndex: 10
+                      }}>
+                        <CircularProgress size={40} sx={{ color: 'primary.main' }} />
+                      </Box>
+                    )}
+                    <CardContent sx={{
+                      p: 2
+                    }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                            {workout.is_sport || workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ?
+                              getSportEmoji(workout.exercise_name) || (language === 'es' ? `Serie nº${workout.set}` : `Set #${workout.set}`) :
+                              (language === 'es' ? `Serie nº${workout.set}` : `Set #${workout.set}`)
+                            }
+                          </Typography>
+
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            {/* Para deportes, mostrar solo el tiempo formateado */}
+                            {workout.is_sport ? (
+                              workout.seconds && workout.seconds > 0 && (
+                                <Chip
+                                  label={formatTimeForSport(workout.seconds)}
+                                  variant="outlined"
+                                  size="small"
+                                  sx={{
+                                    fontWeight: 'bold',
+                                    borderColor: '#ff9800',
+                                    color: '#ff9800',
+                                    minWidth: '80px',
+                                    '&:hover': {
+                                      backgroundColor: '#ff9800',
+                                      color: 'white'
+                                    }
+                                  }}
+                                />
+                              )
+                            ) : (
+                              /* Para ejercicios normales, mostrar solo peso y reps */
+                              <>
+                                <Chip
+                                  label={workout.weight === 0 ? (language === 'es' ? 'Peso corporal' : 'Bodyweight') : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`}
+                                  variant="outlined"
+                                  size="small"
+                                  sx={{
+                                    fontWeight: 'bold',
+                                    borderColor: '#2196f3',
+                                    color: '#2196f3',
+                                    minWidth: workout.weight === 0 ? '100px' : '60px',
+                                    '&:hover': {
+                                      backgroundColor: '#2196f3',
+                                      color: 'white'
+                                    }
+                                  }}
+                                />
+                                {!workout.exercise_name.toLowerCase().includes('running') && !workout.exercise_name.toLowerCase().includes('bici') && (
+                                  <Chip
+                                    label={`${workout.reps} reps`}
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{
+                                      fontWeight: 'bold',
+                                      borderColor: '#4caf50',
+                                      color: '#4caf50',
+                                      minWidth: '60px',
+                                      '&:hover': {
+                                        backgroundColor: '#4caf50',
+                                        color: 'white'
+                                      }
+                                    }}
+                                  />
+                                )}
+                              </>
+                            )}
+                          </Stack>
+                        </Box>
+
+                        <IconButton
+                          onClick={(e) => {
+                            console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
+                            e.stopPropagation();
+                            setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null });
+                            setDeleteConfirmation({ show: true, workoutId: workout.id });
+                          }}
+                          size="small"
+                          sx={{
+                            color: 'error.main',
+                            opacity: 0.7,
+                            '&:hover': { opacity: 1 }
+                          }}
+                          disabled={loadingWorkoutId === workout.id}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+
+                      {workout.observations && (
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                          "{workout.observations}"
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+            </Stack>
+          </DialogContent>
+
+          <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
+            <Button
+              onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+              variant="contained"
+              sx={{
+                px: 4,
+                py: 1,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
+                }
+              }}
+            >
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Snackbar
           open={!!error}
           autoHideDuration={4000}
