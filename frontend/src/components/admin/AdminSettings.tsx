@@ -30,6 +30,8 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   const [hasChanges, setHasChanges] = useState(false)
   const [favoriteExercises, setFavoriteExercises] = useState<number[]>([])
   const [tempFavoriteExercises, setTempFavoriteExercises] = useState<number[]>([])
+  const [hideRestSeconds, setHideRestSeconds] = useState(false)
+  const [tempHideRestSeconds, setTempHideRestSeconds] = useState(false)
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -39,23 +41,25 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
     const loadData = async () => {
       try {
         setLoading(true)
-        
+
         // Cargar ejercicios
         const response = await apiClient.getExercises() as Exercise[]
         setExercises(response || [])
-        
+
         // Cargar configuraciones desde localStorage
         const savedSettings = localStorage.getItem('admin-exercise-settings')
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings)
           setFavoriteExercises(parsed.favoriteExercises || [])
           setTempFavoriteExercises(parsed.favoriteExercises || [])
+          setHideRestSeconds(parsed.hideRestSeconds || false)
+          setTempHideRestSeconds(parsed.hideRestSeconds || false)
         } else {
           // Si no hay configuraciones guardadas, inicializar solo con ejercicios no-deportes
           const nonSportExerciseIds = (response as Exercise[])?.filter((ex: Exercise) => !ex.is_sport).map((ex: Exercise) => ex.id) || []
           setFavoriteExercises(nonSportExerciseIds)
           setTempFavoriteExercises(nonSportExerciseIds)
-          
+
           // Guardar automáticamente la configuración inicial
           const settingsToSave = {
             favoriteExercises: nonSportExerciseIds,
@@ -76,13 +80,15 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
     setTempFavoriteExercises(favoriteExercises)
-  }, [favoriteExercises])
+    setTempHideRestSeconds(hideRestSeconds)
+  }, [favoriteExercises, hideRestSeconds])
 
-  // Verificar si hay cambios en ejercicios favoritos
+  // Verificar si hay cambios en ejercicios favoritos o configuraciones
   useEffect(() => {
     const hasFavoriteChanges = JSON.stringify(tempFavoriteExercises) !== JSON.stringify(favoriteExercises)
-    setHasChanges(hasFavoriteChanges)
-  }, [tempFavoriteExercises, favoriteExercises])
+    const hasSettingChanges = tempHideRestSeconds !== hideRestSeconds
+    setHasChanges(hasFavoriteChanges || hasSettingChanges)
+  }, [tempFavoriteExercises, favoriteExercises, tempHideRestSeconds, hideRestSeconds])
 
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempFavoriteExercises.includes(exerciseId)
@@ -97,20 +103,22 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   const handleSave = async () => {
     try {
       setSaving(true)
-      
+
       // Guardar en localStorage
       const settingsToSave = {
         favoriteExercises: tempFavoriteExercises,
+        hideRestSeconds: tempHideRestSeconds,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
-      
-      
+
+
       // Actualizar el estado
       setFavoriteExercises(tempFavoriteExercises)
+      setHideRestSeconds(tempHideRestSeconds)
       setHasChanges(false)
       setShowSuccessMessage(true)
-      
+
       // Cerrar el panel después de un breve delay para mostrar el mensaje
       if (onClose) {
         setTimeout(() => {
@@ -126,6 +134,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
 
   const handleCancel = () => {
     setTempFavoriteExercises(favoriteExercises)
+    setTempHideRestSeconds(hideRestSeconds)
     setHasChanges(false)
     setExerciseSearchTerm('')
   }
@@ -133,7 +142,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   const handleDownloadWorkouts = async () => {
     try {
       setDownloading(true)
-      
+
       // Intentar primero con el endpoint de exportación
       let response = await fetch('/api/workouts/export', {
         method: 'POST',
@@ -145,14 +154,14 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       // Si falla con 405, usar método alternativo
       if (!response.ok && response.status === 405) {
         console.log('Endpoint /workouts/export no disponible, usando método alternativo...')
-        
+
         // Método alternativo: obtener datos y generar CSV en el frontend
         try {
           const workouts = await apiClient.getWorkouts() as any[]
-          
+
           // Generar CSV
           const csvContent = generateCSVFromWorkouts(workouts)
-          
+
           // Descargar archivo
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
           const url = window.URL.createObjectURL(blob)
@@ -163,7 +172,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
           a.click()
           window.URL.revokeObjectURL(url)
           document.body.removeChild(a)
-          
+
           return // Salir exitosamente
         } catch (altError) {
           throw new Error('Error generando archivo CSV: ' + (altError instanceof Error ? altError.message : 'Error desconocido'))
@@ -183,7 +192,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      
+
     } catch (error) {
       console.error('Error downloading workouts:', error)
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
@@ -196,12 +205,12 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   // Función para generar CSV desde los datos de entrenamientos
   const generateCSVFromWorkouts = (workouts: any[]) => {
     const headers = ['Fecha', 'Ejercicio', 'Peso (kg)', 'Repeticiones', 'Serie', 'Tiempo (seg)', 'Observaciones', 'Día de Entrenamiento']
-    
+
     let csvContent = '\uFEFF' // BOM para UTF-8
-    
+
     // Agregar encabezados
     csvContent += headers.map(header => `"${header}"`).join(',') + '\n'
-    
+
     // Agregar datos
     workouts.forEach(workout => {
       const row = [
@@ -216,7 +225,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       ]
       csvContent += row.map(field => `"${field}"`).join(',') + '\n'
     })
-    
+
     return csvContent
   }
 
@@ -232,10 +241,10 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         minHeight: '400px',
         flexDirection: 'column',
         gap: 2
@@ -249,8 +258,8 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   }
 
   return (
-    <Box sx={{ 
-      maxWidth: '900px', 
+    <Box sx={{
+      maxWidth: '900px',
       mx: 'auto',
       px: { xs: 2, sm: 3, md: 4 },
       height: 'calc(100vh - 300px)',
@@ -258,10 +267,10 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         mb: 3,
         pt: 2 // Padding superior para bajar el contenido
       }}>
@@ -271,9 +280,9 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       </Box>
 
       {/* Contenido scrolleable */}
-      <Box sx={{ 
-        flex: 1, 
-        overflow: 'auto', 
+      <Box sx={{
+        flex: 1,
+        overflow: 'auto',
         minHeight: 0,
         maxHeight: '400px' // Limitar altura para asegurar que los botones sean visibles
       }}>
@@ -297,6 +306,29 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
           >
             {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
           </Button>
+
+          <Box sx={{ mt: 1 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={tempHideRestSeconds}
+                  onChange={(e) => setTempHideRestSeconds(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Ocultar segundos de descanso
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    No mostrar el campo de segundos de descanso en el registro
+                  </Typography>
+                </Box>
+              }
+              sx={{ m: 0 }}
+            />
+          </Box>
         </Box>
 
         {/* Sección EJERCICIOS FAVORITOS */}
@@ -407,10 +439,10 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       </Box>
 
       {/* Botones de acción - SIEMPRE VISIBLES */}
-      <Box sx={{ 
+      <Box sx={{
         flexShrink: 0,
-        display: 'flex', 
-        gap: 2, 
+        display: 'flex',
+        gap: 2,
         justifyContent: 'flex-end',
         p: 3,
         pt: 1,
@@ -446,9 +478,9 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
         onClose={() => setShowSuccessMessage(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={() => setShowSuccessMessage(false)} 
-          severity="success" 
+        <Alert
+          onClose={() => setShowSuccessMessage(false)}
+          severity="success"
           sx={{ width: '100%' }}
         >
           ✅ Configuraciones guardadas exitosamente
