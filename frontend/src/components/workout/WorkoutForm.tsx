@@ -147,6 +147,21 @@ export default function WorkoutForm({
 
     return filtered
   }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin, refreshTrigger])
+
+  // Obtener configuración de ocultar descanso
+  const hideRestSeconds = useMemo(() => {
+    try {
+      const adminSettings = localStorage.getItem('admin-exercise-settings')
+      if (adminSettings) {
+        const parsed = JSON.parse(adminSettings)
+        return parsed.hideRestSeconds || false
+      }
+    } catch (error) {
+      console.error('Error loading hideRestSeconds setting:', error)
+    }
+    return false
+  }, [refreshTrigger])
+
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -909,8 +924,8 @@ export default function WorkoutForm({
             </Box>
           )}
 
-          {/* Campo de descanso en segundos - Oculto para deportes */}
-          {!isSportExercise && (
+          {/* Campo de descanso en segundos - Oculto para deportes o por configuración */}
+          {!isSportExercise && !hideRestSeconds && (
             <TextField
               label={t.restAfterSet}
               type="number"

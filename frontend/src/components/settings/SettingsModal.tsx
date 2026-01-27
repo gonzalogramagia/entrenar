@@ -41,7 +41,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const { language } = useLanguage()
   const t = translations[language]
   const [hasChanges, setHasChanges] = useState(false)
-  const [tempSettings, setTempSettings] = useState<{ favoriteExercises: number[] }>({ favoriteExercises: [] })
+  const [tempSettings, setTempSettings] = useState<{ favoriteExercises: number[], hideRestSeconds: boolean }>({ favoriteExercises: [], hideRestSeconds: false })
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [saving, setSaving] = useState(false)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
@@ -56,7 +56,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         const parsed = JSON.parse(adminSettings)
         setTempSettings(prev => ({
           ...prev,
-          favoriteExercises: parsed.favoriteExercises || []
+          favoriteExercises: parsed.favoriteExercises || [],
+          hideRestSeconds: parsed.hideRestSeconds || false
         }))
       } else {
         // Si no hay configuraciones guardadas, inicializar con todos los ejercicios disponibles
@@ -99,7 +100,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       const adminSettings = localStorage.getItem('admin-exercise-settings')
       if (adminSettings) {
         const parsed = JSON.parse(adminSettings)
-        hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || [])
+        hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || []) ||
+          tempSettings.hideRestSeconds !== (parsed.hideRestSeconds || false)
       } else {
         // Si no hay configuraciones guardadas, cualquier cambio es válido
         hasFavoriteChanges = tempSettings.favoriteExercises.length > 0
@@ -125,6 +127,14 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
 
 
+  const handleToggleHideRestSeconds = () => {
+    setTempSettings(prev => ({
+      ...prev,
+      hideRestSeconds: !prev.hideRestSeconds
+    }))
+    setHasChanges(true)
+  }
+
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
     const newFavorites = isFavorite
@@ -145,6 +155,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       // Guardar en localStorage para todos los usuarios
       const settingsToSave = {
         favoriteExercises: tempSettings.favoriteExercises,
+        hideRestSeconds: tempSettings.hideRestSeconds,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
@@ -188,7 +199,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         const parsed = JSON.parse(adminSettings)
         setTempSettings(prev => ({
           ...prev,
-          favoriteExercises: parsed.favoriteExercises || []
+          favoriteExercises: parsed.favoriteExercises || [],
+          hideRestSeconds: parsed.hideRestSeconds || false
         }))
       }
     } catch (error) {
@@ -450,6 +462,36 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
             >
               {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
             </Button>
+
+            <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={tempSettings.hideRestSeconds}
+                  onChange={handleToggleHideRestSeconds}
+                  color="primary"
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    {language === 'es' ? 'Ocultar segundos de descanso' : 'Hide rest seconds'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {language === 'es'
+                      ? 'No mostrar el campo de segundos de descanso en el registro'
+                      : 'Do not show the rest seconds field in the log'}
+                  </Typography>
+                </Box>
+              }
+              sx={{
+                width: '100%',
+                m: 0,
+                mt: 1,
+                alignItems: 'center'
+              }}
+            />
           </Box>
 
           <Divider sx={{ my: 2 }} />
