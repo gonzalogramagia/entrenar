@@ -388,13 +388,20 @@ export default function WorkoutForm({
         setShowRestModal(true)
       }
 
+      // Persistir ejercicio, peso, reps y tiempo de descanso para facilitar la siguiente serie
+      const currentExerciseId = data.exercise_id
+      const currentWeight = watch('weight') // Usamos watch para obtener el string original
+      const currentReps = watch('reps')
+      const currentSet = data.set
+      const currentRestSeconds = watch('restSeconds')
+
       reset({
-        exercise_id: '',
-        weight: '',
-        reps: '',
-        set: 1,
+        exercise_id: currentExerciseId,
+        weight: currentWeight || '',
+        reps: currentReps || '',
+        set: isSportExercise ? 1 : (currentSet < (isRunningOrBiciExercise ? 8 : 5) ? currentSet + 1 : currentSet),
         seconds: '',
-        restSeconds: '',
+        restSeconds: currentRestSeconds || '',
         observations: ''
       })
 
@@ -768,6 +775,12 @@ export default function WorkoutForm({
                 error={Boolean(errors.exercise_id)}
                 disabled={isLoading || filteredExercises.length === 0}
                 placeholder={filteredExercises.length === 0 ? (translations[language].common.loading) : (language === 'es' ? 'Escribe para buscar ejercicios...' : 'Type to search exercises...')}
+                onFocus={() => {
+                  // Limpiar el selector al tocarlo para facilitar una nueva búsqueda
+                  if (watch('exercise_id')) {
+                    setValue('exercise_id', undefined)
+                  }
+                }}
               />
             )}
             filterOptions={(options, { inputValue }) => {
@@ -801,6 +814,7 @@ export default function WorkoutForm({
                 min: 1,
                 max: 480 // 8 horas máximo (480 minutos)
               }}
+              onFocus={(e) => e.target.select()}
               required
               sx={{
                 '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -831,6 +845,7 @@ export default function WorkoutForm({
                   min: isRunningOrBiciExercise ? 0.1 : 0.1,
                   max: isRunningOrBiciExercise ? 100 : 1000
                 }}
+                onFocus={(e) => e.target.select()}
                 sx={{
                   flex: isRunningOrBiciExercise ? 2 : 1, // 2/3 del espacio para Running y Bici
                   '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -856,6 +871,7 @@ export default function WorkoutForm({
                     min: 1,
                     max: 100
                   }}
+                  onFocus={(e) => e.target.select()}
                   sx={{
                     flex: 1,
                     '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
