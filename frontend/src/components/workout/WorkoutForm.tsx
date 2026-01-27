@@ -783,6 +783,12 @@ export default function WorkoutForm({
             onChange={(_, newValue) => {
               setValue('exercise_id', newValue ? newValue.id : undefined)
             }}
+            onFocus={() => {
+              // Limpiar el selector al hacerle foco para facilitar una nueva búsqueda
+              if (watch('exercise_id')) {
+                setValue('exercise_id', undefined)
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -790,12 +796,6 @@ export default function WorkoutForm({
                 error={Boolean(errors.exercise_id)}
                 disabled={isLoading || filteredExercises.length === 0}
                 placeholder={filteredExercises.length === 0 ? (translations[language].common.loading) : (language === 'es' ? 'Escribe para buscar ejercicios...' : 'Type to search exercises...')}
-                onFocus={() => {
-                  // Limpiar el selector al tocarlo para facilitar una nueva búsqueda
-                  if (watch('exercise_id')) {
-                    setValue('exercise_id', undefined)
-                  }
-                }}
               />
             )}
             filterOptions={(options, { inputValue }) => {
