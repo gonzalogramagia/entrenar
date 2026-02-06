@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/goalritmo/gym/backend/database"
 	"github.com/goalritmo/gym/backend/models"
+	"github.com/gorilla/mux"
 )
 
 // convertToArgentinaTime convierte una fecha UTC a la zona horaria de Argentina
@@ -38,8 +38,6 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Obtener parámetros de query
 	date := r.URL.Query().Get("date")
-
-
 
 	query := `
 		SELECT w.id, w.user_id, w.workout_day_id, w.exercise_id, e.name as exercise_name, 
@@ -116,8 +114,6 @@ func GetWorkoutDaysHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-
 	query := `
 		SELECT id, user_id, date, name, effort, mood, created_at, updated_at
 		FROM workout_days 
@@ -183,20 +179,20 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error leyendo request", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Decodificar JSON
 	if err := json.Unmarshal(bodyBytes, &req); err != nil {
 		fmt.Printf("Error decodificando JSON: %v\n", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Validaciones
 	if req.Reps != nil && *req.Reps <= 0 {
 		http.Error(w, "Repeticiones deben ser mayores a 0 si se proporcionan", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Validar peso si se proporciona
 	if req.Weight != nil {
 		if *req.Weight <= 0 {
@@ -231,13 +227,11 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	var workoutDayID int
 
-
-
 	// Verificar si ya existe un día de entrenamiento para hoy
 	sessionQuery := `SELECT id FROM workout_days WHERE user_id = $1 AND date = $2`
 	var existingID int
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&existingID)
-	
+
 	if err != nil {
 		// No existe día de entrenamiento para hoy, crear uno nuevo
 		createDayQuery := `
@@ -268,7 +262,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	if req.Weight != nil {
 		weightValue = *req.Weight
 	}
-	
+
 	// Obtener valor de reps de forma segura
 	var repsValue int = 0
 	if req.Reps != nil {
@@ -302,7 +296,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		// Si no hay series existentes, crear automáticamente las series faltantes (1 hasta setValue-1)
 		if existingSetsCount == 0 {
 			fmt.Printf("Creando automáticamente %d series faltantes para ejercicio %d\n", setValue-1, req.ExerciseID)
-			
+
 			// Crear las series faltantes en una transacción
 			tx, err := database.DB.Begin()
 			if err != nil {
@@ -318,7 +312,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 					INSERT INTO workouts (user_id, workout_day_id, exercise_id, weight, reps, set, seconds, observations)
 					VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 				`, userID, workoutDayID, req.ExerciseID, weightValue, repsValue, i, req.Seconds, req.Observations)
-				
+
 				if err != nil {
 					fmt.Printf("Error creando serie automática %d: %v\n", i, err)
 					http.Error(w, "Error creando series automáticas", http.StatusInternalServerError)
@@ -332,7 +326,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
 				return
 			}
-			
+
 			fmt.Printf("Series automáticas creadas exitosamente\n")
 		} else {
 			// Si ya existen series, verificar que no haya conflicto con la serie que se está insertando
@@ -377,7 +371,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		workout.Reps = 0 // Valor por defecto cuando no se proporcionan reps
 	}
 	workout.Observations = req.Observations
-	
+
 	fmt.Printf("Insertando workout con workoutDayID: %d, weight: %f, reps: %d, set: %d\n", workoutDayID, weightValue, repsValue, setValue)
 	err = database.DB.QueryRow(
 		query,
@@ -390,10 +384,22 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
-	
+
+	// Sincronizar observaciones para toda la serie (mismo ejercicio en el mismo día)
+	updateObsQuery := `
+		UPDATE workouts 
+		SET observations = $1 
+		WHERE user_id = $2 AND workout_day_id = $3 AND exercise_id = $4
+	`
+	_, syncErr := database.DB.Exec(updateObsQuery, req.Observations, userID, workoutDayID, req.ExerciseID)
+	if syncErr != nil {
+		fmt.Printf("Error sincronizando observaciones: %v\n", syncErr)
+	}
+
 	// Convertir fecha a zona horaria de Argentina antes de devolver
 	workout.CreatedAt = convertToArgentinaTime(workout.CreatedAt)
-	
+	workout.Observations = req.Observations // Asegurar que el objeto devuelto tiene la observación correcta
+
 	fmt.Printf("Workout creado exitosamente con ID: %d\n", workout.ID)
 
 	w.WriteHeader(http.StatusCreated)
@@ -428,7 +434,7 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Repeticiones deben ser mayores a 0 si se proporcionan", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Validar peso si se proporciona
 	if req.Weight != nil && *req.Weight <= 0 {
 		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
@@ -452,7 +458,7 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	if req.Weight != nil {
 		weightValue = *req.Weight
 	}
-	
+
 	// Obtener valor de reps de forma segura
 	var repsValue int = 0
 	if req.Reps != nil {
@@ -475,8 +481,20 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Sincronizar observaciones para toda la serie
+	updateObsQuery := `
+		UPDATE workouts 
+		SET observations = $1 
+		WHERE user_id = $2 AND workout_day_id = $3 AND exercise_id = $4
+	`
+	_, syncErr := database.DB.Exec(updateObsQuery, req.Observations, userID, workout.WorkoutDayID, workout.ExerciseID)
+	if syncErr != nil {
+		fmt.Printf("Error sincronizando observaciones en update: %v\n", syncErr)
+	}
+
 	workout.UserID = userID
 	workout.CreatedAt = convertToArgentinaTime(workout.CreatedAt)
+	workout.Observations = req.Observations
 	json.NewEncoder(w).Encode(workout)
 }
 
@@ -671,7 +689,7 @@ func ExportWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		"Observaciones",
 		"Día de Entrenamiento",
 	}
-	
+
 	// Escribir encabezados
 	for i, header := range headers {
 		if i > 0 {
@@ -703,7 +721,7 @@ func ExportWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Convertir fecha a zona horaria de Argentina
 		argentinaTime := convertToArgentinaTime(createdAt)
-		
+
 		// Escribir fila CSV
 		row := []string{
 			argentinaTime.Format("2006-01-02 15:04:05"),
@@ -732,5 +750,3 @@ func ExportWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-

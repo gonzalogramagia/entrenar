@@ -887,6 +887,36 @@ export default function WorkoutHistory() {
               </Typography>
             </Box>
 
+            {/* Observación general de la serie */}
+            {(() => {
+              // Obtener la observación más reciente de cualquiera de los workouts de este grupo
+              const latestObs = [...(exerciseModal.exerciseGroup?.workouts || [])]
+                .sort((a, b) => b.id - a.id)
+                .find(w => w.observations)?.observations;
+
+              if (latestObs) {
+                return (
+                  <Box sx={{
+                    mb: 3,
+                    p: 2,
+                    backgroundColor: 'rgba(25, 118, 210, 0.05)',
+                    borderRadius: 2,
+                    borderLeft: '4px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  }}>
+                    <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      📝 {language === 'es' ? 'Observación general' : 'General observation'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.95rem' }}>
+                      "{latestObs}"
+                    </Typography>
+                  </Box>
+                )
+              }
+              return null
+            })()}
+
             <Stack spacing={2}>
               {exerciseModal.exerciseGroup?.workouts && [...exerciseModal.exerciseGroup.workouts]
                 .sort((a, b) => a.set - b.set) // Ordenar por número de serie ascendente
@@ -1007,12 +1037,6 @@ export default function WorkoutHistory() {
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Box>
-
-                      {workout.observations && (
-                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-                          "{workout.observations}"
-                        </Typography>
-                      )}
                     </CardContent>
                   </Card>
                 ))}
