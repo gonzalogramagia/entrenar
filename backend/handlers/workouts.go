@@ -386,14 +386,17 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Sincronizar observaciones para toda la serie (mismo ejercicio en el mismo día)
-	updateObsQuery := `
-		UPDATE workouts 
-		SET observations = $1 
-		WHERE user_id = $2 AND workout_day_id = $3 AND exercise_id = $4
-	`
-	_, syncErr := database.DB.Exec(updateObsQuery, req.Observations, userID, workoutDayID, req.ExerciseID)
-	if syncErr != nil {
-		fmt.Printf("Error sincronizando observaciones: %v\n", syncErr)
+	// Solo actualizamos si la observación NO está vacía, para no sobrescribir observaciones existentes
+	if req.Observations != "" {
+		updateObsQuery := `
+			UPDATE workouts 
+			SET observations = $1 
+			WHERE user_id = $2 AND workout_day_id = $3 AND exercise_id = $4
+		`
+		_, syncErr := database.DB.Exec(updateObsQuery, req.Observations, userID, workoutDayID, req.ExerciseID)
+		if syncErr != nil {
+			fmt.Printf("Error sincronizando observaciones: %v\n", syncErr)
+		}
 	}
 
 	// Convertir fecha a zona horaria de Argentina antes de devolver

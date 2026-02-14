@@ -41,6 +41,15 @@ export default function WorkoutHistory() {
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({ show: false, workoutId: null })
   const [loadingWorkoutId, setLoadingWorkoutId] = useState<number | null>(null)
   const [exerciseModal, setExerciseModal] = useState<{ show: boolean; exerciseGroup: ExerciseGroup | null; workoutDay: WorkoutDay | null }>({ show: false, exerciseGroup: null, workoutDay: null })
+  const [editObservationModal, setEditObservationModal] = useState<{
+    show: boolean;
+    workoutId: number | null;
+    currentObservation: string;
+  }>({
+    show: false,
+    workoutId: null,
+    currentObservation: ''
+  });
 
   // Auto-hide success message after 3 seconds
   useEffect(() => {
@@ -354,6 +363,47 @@ export default function WorkoutHistory() {
     } catch (error) {
       console.error('Error actualizando nombre del entrenamiento:', error);
       alert(language === 'es' ? 'Error al actualizar el nombre del entrenamiento' : 'Error updating workout name');
+    }
+  };
+
+  const handleSaveObservation = async () => {
+    if (!editObservationModal.workoutId) return;
+
+    try {
+      // Si la observación está vacía, no la enviamos para evitar sobrescribir (o la enviamos vacía si esa es la intención del usuario al editar)
+      // Pero el requerimiento dice: "que las observaciones vacias de una serie no sobreescriban existentes"
+      // Si el usuario borra la observación en el modal, asumimos que quiere borrarla de ESA serie.
+      // La lógica de visualización (buscar la última NO vacía) se encargará de mostrar la anterior si esta queda vacía.
+
+      await apiClient.updateWorkout(editObservationModal.workoutId, {
+        observations: editObservationModal.currentObservation.trim()
+      });
+
+      // Recargar datos para reflejar cambios
+      await loadData();
+
+      // Actualizar el modal de ejercicios si está abierto
+      if (exerciseModal.show && exerciseModal.exerciseGroup) {
+        // Necesitamos actualizar el grupo de ejercicios actual con los nuevos datos
+        // Esto se hace indirectamente al recargar loadData, pero exerciseModal tiene una copia del estado.
+        // Lo ideal sería cerrar el modal o actualizar su estado.
+        // Vamos a intentar actualizar la observación en el estado local del modal para feedback inmediato
+        const updatedGroup = { ...exerciseModal.exerciseGroup };
+        const workoutIndex = updatedGroup.workouts.findIndex(w => w.id === editObservationModal.workoutId);
+        if (workoutIndex !== -1) {
+          updatedGroup.workouts[workoutIndex] = {
+            ...updatedGroup.workouts[workoutIndex],
+            observations: editObservationModal.currentObservation.trim()
+          };
+          setExerciseModal(prev => ({ ...prev, exerciseGroup: updatedGroup }));
+        }
+      }
+
+      setEditObservationModal({ show: false, workoutId: null, currentObservation: '' });
+      setSuccessMessage(language === 'es' ? 'Observación actualizada' : 'Observation updated');
+    } catch (error) {
+      console.error('Error actualizando observación:', error);
+      setError(language === 'es' ? 'Error al actualizar la observación' : 'Error updating observation');
     }
   };
 
@@ -833,6 +883,97 @@ export default function WorkoutHistory() {
           </DialogActions>
         </Dialog>
 
+        {/* Modal de edición de observación */}
+        <Dialog
+          open={editObservationModal.show}
+          onClose={(_, reason) => {
+            if (reason !== 'backdropClick') setEditObservationModal({ show: false, workoutId: null, currentObservation: '' })
+          }}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid',
+              borderColor: 'divider'
+            }
+          }}
+        >
+          <DialogTitle sx={{
+            pb: 1,
+            fontWeight: 600,
+            fontSize: '1.2rem',
+            color: 'primary.main',
+            borderBottom: '1px solid',
+            borderColor: 'divider'
+          }}>
+            {language === 'es' ? 'Editar observación' : 'Edit observation'}
+          </DialogTitle>
+          <DialogContent sx={{ pt: 3 }}>
+            <TextField
+              autoFocus
+              fullWidth
+              multiline
+              rows={4}
+              placeholder={language === 'es' ? 'Escribe una observación...' : 'Write an observation...'}
+              value={editObservationModal.currentObservation}
+              onChange={(e) => setEditObservationModal(prev => ({ ...prev, currentObservation: e.target.value }))}
+              variant="outlined"
+              sx={{
+                mt: 2,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    }
+                  }
+                }
+              }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button
+              onClick={() => setEditObservationModal({ show: false, workoutId: null, currentObservation: '' })}
+              sx={{
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                color: 'text.secondary',
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
+            >
+              {language === 'es' ? 'Cancelar' : 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleSaveObservation}
+              variant="contained"
+              sx={{
+                px: 4,
+                py: 1,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
+                }
+              }}
+            >
+              {language === 'es' ? 'Guardar' : 'Save'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         {/* Modal de ejercicio individual */}
         <Dialog
           open={exerciseModal.show}
@@ -889,32 +1030,78 @@ export default function WorkoutHistory() {
 
             {/* Observación general de la serie */}
             {(() => {
-              // Obtener la observación más reciente de cualquiera de los workouts de este grupo
-              const latestObs = [...(exerciseModal.exerciseGroup?.workouts || [])]
-                .sort((a, b) => b.id - a.id)
-                .find(w => w.observations)?.observations;
+              const workouts = exerciseModal.exerciseGroup?.workouts || [];
+              const sortedWorkouts = [...workouts].sort((a, b) => b.id - a.id); // Más recientes primero
 
-              if (latestObs) {
-                return (
-                  <Box sx={{
-                    mb: 3,
-                    p: 2,
-                    backgroundColor: 'rgba(25, 118, 210, 0.05)',
-                    borderRadius: 2,
-                    borderLeft: '4px solid',
-                    borderColor: 'primary.main',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                  }}>
-                    <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      📝 {language === 'es' ? 'Observación general' : 'General observation'}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.95rem' }}>
-                      "{latestObs}"
-                    </Typography>
-                  </Box>
-                )
-              }
-              return null
+              // Workout más reciente (para adjuntar nueva observación si no existe, o editar la última)
+              const latestWorkout = sortedWorkouts[0];
+
+              // Observación más reciente no vacía
+              const latestObsWorkout = sortedWorkouts.find(w => w.observations);
+              const latestObs = latestObsWorkout?.observations;
+
+              return (
+                <Box sx={{ mb: 3 }}>
+                  {latestObs ? (
+                    <Box sx={{
+                      p: 2,
+                      backgroundColor: 'rgba(25, 118, 210, 0.05)',
+                      borderRadius: 2,
+                      borderLeft: '4px solid',
+                      borderColor: 'primary.main',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      position: 'relative'
+                    }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                          📝 {language === 'es' ? 'Observación general' : 'General observation'}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            // Al editar, usamos el workout más reciente para guardar la observación,
+                            // pero pre-llenamos con la observación visible actual.
+                            setEditObservationModal({
+                              show: true,
+                              workoutId: latestWorkout?.id || null,
+                              currentObservation: latestObs
+                            });
+                          }}
+                          sx={{ mt: -1, mr: -1, color: 'primary.main', opacity: 0.7 }}
+                        >
+                          <ModeEditIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.95rem' }}>
+                        "{latestObs}"
+                      </Typography>
+                    </Box>
+                  ) : (
+                    latestWorkout && (
+                      <Button
+                        startIcon={<ModeEditIcon />}
+                        size="small"
+                        onClick={() => {
+                          setEditObservationModal({
+                            show: true,
+                            workoutId: latestWorkout.id,
+                            currentObservation: ''
+                          });
+                        }}
+                        sx={{
+                          textTransform: 'none',
+                          color: 'text.secondary',
+                          borderColor: 'divider'
+                        }}
+                        variant="outlined"
+                        fullWidth
+                      >
+                        {language === 'es' ? 'Agregar observación general' : 'Add general observation'}
+                      </Button>
+                    )
+                  )}
+                </Box>
+              );
             })()}
 
             <Stack spacing={2}>
