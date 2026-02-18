@@ -369,22 +369,34 @@ export default function WorkoutForm({
         observations: data.observations
       }
 
-      // Solo incluir reps si tiene un valor válido mayor a 0
+
+
+      const selectedExercise = exercises.find(ex => ex.id === data.exercise_id)
+      const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
+
+      const isWarmupOrStretching = exerciseName.toLowerCase().includes('calentamiento') ||
+        exerciseName.toLowerCase().includes('warm up') ||
+        exerciseName.toLowerCase().includes('estiramiento') ||
+        exerciseName.toLowerCase().includes('stretching');
+
+      // Solo incluir reps si tiene un valor válido mayor a 0, O si es warmup/stretching (en cuyo caso se envía 0 si no hay valor)
       if (data.reps !== undefined && data.reps !== null && data.reps > 0) {
         workoutData.reps = data.reps
       } else if (isRunningOrBiciExercise) {
         // Para Running y Bici, enviar 1 como valor mínimo
         workoutData.reps = 1
+      } else if (isWarmupOrStretching) {
+        // Para calentamiento/estiramiento, permitir 0 reps
+        workoutData.reps = 0
       }
 
-      // Solo incluir weight si tiene un valor válido mayor a 0
+      // Solo incluir weight si tiene un valor válido mayor a 0, O si es warmup/stretching (en cuyo caso se envía 0 si no hay valor)
       if (data.weight !== undefined && data.weight !== null && data.weight > 0) {
         workoutData.weight = data.weight
+      } else if (isWarmupOrStretching) {
+        // Para calentamiento/estiramiento, permitir 0 peso
+        workoutData.weight = 0
       }
-
-      // Obtener el nombre del ejercicio seleccionado
-      const selectedExercise = exercises.find(ex => ex.id === data.exercise_id)
-      const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
 
       await onSubmit(workoutData)
 
