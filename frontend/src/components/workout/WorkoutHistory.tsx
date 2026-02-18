@@ -51,6 +51,19 @@ export default function WorkoutHistory() {
     currentObservation: ''
   });
 
+  const [editValueModal, setEditValueModal] = useState<{
+    show: boolean;
+    workoutId: number | null;
+    field: 'weight' | 'reps' | null;
+    currentValue: string;
+    unit?: string;
+  }>({
+    show: false,
+    workoutId: null,
+    field: null,
+    currentValue: ''
+  });
+
   // Auto-hide success message after 3 seconds
   useEffect(() => {
     if (successMessage) {
@@ -404,6 +417,39 @@ export default function WorkoutHistory() {
     } catch (error) {
       console.error('Error actualizando observación:', error);
       setError(language === 'es' ? 'Error al actualizar la observación' : 'Error updating observation');
+    }
+  };
+
+  const handleSaveValue = async () => {
+    if (!editValueModal.workoutId || !editValueModal.field) return;
+
+    try {
+      const numValue = parseFloat(editValueModal.currentValue);
+      const updateData = {
+        [editValueModal.field]: isNaN(numValue) ? 0 : numValue
+      };
+
+      await apiClient.updateWorkout(editValueModal.workoutId, updateData);
+
+      await loadData();
+
+      if (exerciseModal.show && exerciseModal.exerciseGroup) {
+        const updatedGroup = { ...exerciseModal.exerciseGroup };
+        const workoutIndex = updatedGroup.workouts.findIndex(w => w.id === editValueModal.workoutId);
+        if (workoutIndex !== -1) {
+          updatedGroup.workouts[workoutIndex] = {
+            ...updatedGroup.workouts[workoutIndex],
+            [editValueModal.field!]: isNaN(numValue) ? 0 : numValue
+          };
+          setExerciseModal(prev => ({ ...prev, exerciseGroup: updatedGroup }));
+        }
+      }
+
+      setEditValueModal({ show: false, workoutId: null, field: null, currentValue: '' });
+      setSuccessMessage(language === 'es' ? 'Valor actualizado' : 'Value updated');
+    } catch (error) {
+      console.error('Error updating value:', error);
+      setError(language === 'es' ? 'Error al actualizar el valor' : 'Error updating value');
     }
   };
 
@@ -1180,8 +1226,19 @@ export default function WorkoutHistory() {
                                     minWidth: workout.weight === 0 ? '100px' : '60px',
                                     '&:hover': {
                                       backgroundColor: '#2196f3',
-                                      color: 'white'
+                                      color: 'white',
+                                      cursor: 'pointer'
                                     }
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditValueModal({
+                                      show: true,
+                                      workoutId: workout.id,
+                                      field: 'weight',
+                                      currentValue: workout.weight.toString(),
+                                      unit: workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'
+                                    });
                                   }}
                                 />
                                 {!workout.exercise_name.toLowerCase().includes('running') && !workout.exercise_name.toLowerCase().includes('bici') && (
@@ -1196,8 +1253,19 @@ export default function WorkoutHistory() {
                                       minWidth: '60px',
                                       '&:hover': {
                                         backgroundColor: '#4caf50',
-                                        color: 'white'
+                                        color: 'white',
+                                        cursor: 'pointer'
                                       }
+                                    }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditValueModal({
+                                        show: true,
+                                        workoutId: workout.id,
+                                        field: 'reps',
+                                        currentValue: workout.reps.toString(),
+                                        unit: 'reps'
+                                      });
                                     }}
                                   />
                                 )}
@@ -1248,6 +1316,78 @@ export default function WorkoutHistory() {
               }}
             >
               Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Modal de edición de valor (peso/reps) */}
+        <Dialog
+          open={editValueModal.show}
+          onClose={(_, reason) => {
+            if (reason !== 'backdropClick') setEditValueModal({ show: false, workoutId: null, field: null, currentValue: '' })
+          }}
+          maxWidth="xs"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid',
+              borderColor: 'divider'
+            }
+          }}
+        >
+          <DialogTitle sx={{
+            pb: 1,
+            fontWeight: 600,
+            fontSize: '1.2rem',
+            color: 'primary.main',
+            borderBottom: '1px solid',
+            borderColor: 'divider'
+          }}>
+            {language === 'es' ? 'Editar valor' : 'Edit value'}
+          </DialogTitle>
+          <DialogContent sx={{ pt: 3 }}>
+            <TextField
+              autoFocus
+              fullWidth
+              type="number"
+              label={editValueModal.unit}
+              value={editValueModal.currentValue}
+              onChange={(e) => setEditValueModal(prev => ({ ...prev, currentValue: e.target.value }))}
+              variant="outlined"
+              sx={{
+                mt: 2,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2
+                }
+              }}
+              onFocus={(e) => e.target.select()}
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button
+              onClick={() => setEditValueModal({ show: false, workoutId: null, field: null, currentValue: '' })}
+              sx={{
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                color: 'text.secondary'
+              }}
+            >
+              {language === 'es' ? 'Cancelar' : 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleSaveValue}
+              variant="contained"
+              sx={{
+                px: 4,
+                py: 1,
+                borderRadius: 2,
+                backgroundColor: '#1976d2'
+              }}
+            >
+              {language === 'es' ? 'Guardar' : 'Save'}
             </Button>
           </DialogActions>
         </Dialog>

@@ -352,7 +352,7 @@ export default function WorkoutForm({
       if (isSportExercise) {
         if (!data.seconds || data.seconds <= 0) {
           setMessageInObservations('❌ El tiempo de entrenamiento es obligatorio para deportes')
-          setValue('observations', '❌ El tiempo de entrenamiento es obligatorio para deportes')
+          // setValue('observations', '❌ El tiempo de entrenamiento es obligatorio para deportes')
           return
         }
         // El valor ya está en segundos desde el onChange del campo
@@ -390,7 +390,7 @@ export default function WorkoutForm({
 
       // Mostrar mensaje de éxito
       setMessageInObservations(`✅ '${exerciseName}' registrado exitosamente`)
-      setValue('observations', `✅ '${exerciseName}' registrado exitosamente`)
+      // setValue('observations', `✅ '${exerciseName}' registrado exitosamente`)
 
       // Disparar evento para actualizar el feed social
       console.log('🔄 Disparando evento de actualización del feed social')
@@ -433,7 +433,7 @@ export default function WorkoutForm({
       const selectedExercise = exercises.find(ex => ex.id === watch('exercise_id'))
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
       setMessageInObservations(`❌ Error al registrar '${exerciseName}'. Por favor, intenta de nuevo.`)
-      setValue('observations', `❌ Error al registrar '${exerciseName}'. Por favor, intenta de nuevo.`)
+      // setValue('observations', `❌ Error al registrar '${exerciseName}'. Por favor, intenta de nuevo.`)
     }
   })
 
