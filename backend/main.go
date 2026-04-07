@@ -123,7 +123,9 @@ func main() {
 	// Configurar CORS
 	corsOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if corsOrigins == "" {
-		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app"
+		// Dominios permitidos por defecto (incluyendo localhost para desarrollo)
+		// Se añade soporte para el dominio oficial de la app y subdominios de Railway
+		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app,https://entrenar.up.railway.app"
 	}
 	
 	allowedOrigins := strings.Split(corsOrigins, ",")
@@ -131,17 +133,21 @@ func main() {
 		allowedOrigins[i] = strings.TrimSpace(origin)
 	}
 	
+	log.Printf("CORS configurado para los siguientes orígenes: %v", allowedOrigins)
+
 	c := cors.New(cors.Options{
-		AllowedOrigins: allowedOrigins,
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{
+		AllowedOrigins:   allowedOrigins,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{
 			"Content-Type", 
 			"Authorization", 
 			"X-Requested-With",
 			"Accept",
 			"Origin",
+			"Access-Control-Allow-Origin",
 		},
 		AllowCredentials: true,
+		Debug:            false, // Cambiar a true si el problema de CORS persiste
 	})
 
 	handler := c.Handler(r)

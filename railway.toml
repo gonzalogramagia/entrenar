@@ -1,5 +1,6 @@
 [build]
 builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 restartPolicyType = "on_failure"
@@ -8,13 +9,12 @@ serverless = true
 
 [[services]]
 name = "entrenar-backend"
-source = "backend"
+source = "."
 
 [services.variables]
 GO_VERSION = "1.21"
-CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app"
+CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app,https://entrenar.up.railway.app"
 
-# Healthcheck (opcional para serverless)
 [services.healthcheck]
 path = "/api/health"
 intervalSeconds = 30

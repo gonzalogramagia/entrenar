@@ -3,15 +3,17 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-# Copy go mod files from backend directory
-COPY backend/go.mod backend/go.sum ./
+# Copy all files from the root
+COPY . .
+
+# Move to the backend directory to build
+WORKDIR /app/backend
+
+# Download dependencies
 RUN go mod download
 
-# Copy source code from backend directory
-COPY backend/ .
-
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/main .
 
 # Final stage
 FROM alpine:latest
@@ -22,7 +24,8 @@ RUN apk --no-cache add ca-certificates
 # Copy the binary from builder stage
 COPY --from=builder /app/main /app/main
 
-# Expose port
+# Railway will pass the PORT env var. The app will bind to it automatically.
+# We don't need to specify a port here, but just for reference:
 EXPOSE 3210
 
 # Command to run
