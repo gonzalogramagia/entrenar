@@ -128,26 +128,35 @@ func main() {
 		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app,https://entrenar.up.railway.app"
 	}
 	
-	allowedOrigins := strings.Split(corsOrigins, ",")
-	for i, origin := range allowedOrigins {
-		allowedOrigins[i] = strings.TrimSpace(origin)
+	// Limpiar y validar orígenes
+	rawOrigins := strings.Split(corsOrigins, ",")
+	var allowedOrigins []string
+	for _, origin := range rawOrigins {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			allowedOrigins = append(allowedOrigins, trimmed)
+		}
 	}
 	
 	log.Printf("CORS configurado para los siguientes orígenes: %v", allowedOrigins)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   allowedOrigins,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowedHeaders:   []string{
-			"Content-Type", 
-			"Authorization", 
-			"X-Requested-With",
 			"Accept",
+			"Authorization",
+			"Content-Type",
+			"X-Requested-With",
 			"Origin",
-			"Access-Control-Allow-Origin",
+			"X-Client-Info",
+			"X-Supabase-Auth",
+			"apikey",
 		},
+		ExposedHeaders:   []string{"Content-Length", "Content-Type"},
 		AllowCredentials: true,
-		Debug:            false, // Cambiar a true si el problema de CORS persiste
+		MaxAge:           86400, // 24 horas
+		Debug:            true,  // Habilitado temporalmente para diagnosticar problemas de CORS en producción
 	})
 
 	handler := c.Handler(r)

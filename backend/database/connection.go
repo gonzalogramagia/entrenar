@@ -16,9 +16,15 @@ var (
 
 // InitDB inicializa la conexión con la base de datos
 func InitDB() error {
+	// Intentar obtener la URL de conexión de múltiples variables de entorno
+	// SUPABASE_DB_URL es nuestra específica, DATABASE_URL es el estándar de Railway/Heroku
 	supabaseURL := os.Getenv("SUPABASE_DB_URL")
 	if supabaseURL == "" {
-		return fmt.Errorf("SUPABASE_DB_URL no está configurada")
+		supabaseURL = os.Getenv("DATABASE_URL")
+	}
+
+	if supabaseURL == "" {
+		return fmt.Errorf("SUPABASE_DB_URL o DATABASE_URL no están configuradas")
 	}
 
 	var err error
