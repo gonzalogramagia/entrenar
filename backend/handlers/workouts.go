@@ -62,8 +62,8 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.DB.Query(query, args...)
 	if err != nil {
-		fmt.Printf("Error consultando workouts: %v\n", err)
-		http.Error(w, "Error consultando workouts", http.StatusInternalServerError)
+		fmt.Printf("Error consultando workouts para usuario %s: %v\n", userID, err)
+		http.Error(w, fmt.Sprintf("Error consultando workouts: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -123,8 +123,8 @@ func GetWorkoutDaysHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.DB.Query(query, userID)
 	if err != nil {
-		fmt.Printf("Error consultando días de entrenamiento: %v\n", err)
-		http.Error(w, "Error consultando días de entrenamiento", http.StatusInternalServerError)
+		fmt.Printf("Error consultando días de entrenamiento para usuario %s: %v\n", userID, err)
+		http.Error(w, fmt.Sprintf("Error consultando días de entrenamiento: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()

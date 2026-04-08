@@ -47,6 +47,7 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 	var userMetadataJSON []byte
 	var profileName *string
 
+	fmt.Printf("Debug: Buscando usuario en DB con ID: %s\n", userID)
 	err := database.DB.QueryRow(query, userID).Scan(
 		&user.ID,
 		&user.Email,
@@ -57,7 +58,8 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+		fmt.Printf("Error en GetCurrentUserHandler para ID %s: %v\n", userID, err)
+		http.Error(w, fmt.Sprintf("Usuario no encontrado (Error DB: %v)", err), http.StatusNotFound)
 		return
 	}
 
