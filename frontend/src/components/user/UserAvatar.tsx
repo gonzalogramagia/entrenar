@@ -89,7 +89,12 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
       <IconButton
         onClick={handleClick}
         size="small"
-        sx={{ ml: 2 }}
+        sx={{ 
+          ml: 2,
+          '&:focus': { outline: 'none' },
+          '&:focus-visible': { outline: 'none' },
+          WebkitTapHighlightColor: 'transparent',
+        }}
         aria-controls={open ? 'account-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}

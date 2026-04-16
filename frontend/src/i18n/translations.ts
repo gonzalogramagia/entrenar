@@ -80,6 +80,8 @@ export const translations = {
             choose: 'Elegir',
         },
         social: {
+            title: 'Muro de la Comunidad',
+            subtitle: 'Entrenamientos de las personas que usan la app',
             noWorkouts: 'No hay entrenamientos registrados',
             firstKudos: 'Dar el primer kudos',
             kudos: 'kudos',
@@ -171,6 +173,8 @@ export const translations = {
             choose: 'Choose',
         },
         social: {
+            title: 'Community Wall',
+            subtitle: 'Workouts from people using the app',
             noWorkouts: 'No workouts registered',
             firstKudos: 'Give the first kudos',
             kudos: 'kudos',

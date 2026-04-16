@@ -389,6 +389,26 @@ export default function SocialList() {
 
   return (
     <Box sx={{ p: 1 }} data-testid="social-feed-container">
+      <Box sx={{ mb: 4, mt: 2, textAlign: 'center' }}>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 800, 
+          color: 'primary.main', 
+          mb: 1,
+          letterSpacing: '-0.5px',
+          textTransform: 'uppercase',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' }
+        }}>
+          {t.title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ 
+          fontStyle: 'italic', 
+          opacity: 0.8,
+          fontWeight: 500,
+          px: 2
+        }}>
+          {t.subtitle}
+        </Typography>
+      </Box>
 
       <Stack spacing={3}>
         {groupedWorkouts.length > 0 ? (

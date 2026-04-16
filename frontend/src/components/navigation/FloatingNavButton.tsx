@@ -126,7 +126,14 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
           transition: 'all 0.2s ease-in-out',
           '& .MuiSvgIcon-root': {
             color: '#fff'
-          }
+          },
+          '&:focus': {
+            outline: 'none',
+          },
+          '&:focus-visible': {
+            outline: 'none',
+          },
+          WebkitTapHighlightColor: 'transparent',
         }}
       >
         {getIcon()}

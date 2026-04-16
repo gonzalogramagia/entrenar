@@ -324,7 +324,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             maxWidth: '100%',
             overflow: 'hidden'
           }}>
-            A            {sortedRoutines?.map((routine) => (
+            {sortedRoutines?.map((routine) => (
               <Card
                 key={routine.id}
                 elevation={2}

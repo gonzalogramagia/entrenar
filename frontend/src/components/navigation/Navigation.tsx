@@ -304,7 +304,12 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                 aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ ml: 0 }}
+                sx={{ 
+                  ml: 0,
+                  '&:focus': { outline: 'none' },
+                  '&:focus-visible': { outline: 'none' },
+                  WebkitTapHighlightColor: 'transparent',
+                }}
               >
                 {drawerOpen ? <CloseIcon /> : <MenuIcon />}
               </IconButton>
@@ -382,13 +387,16 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                       '&:hover': {
                         backgroundColor: '#1565c0',
                       },
-                      '&.Mui-selected': {
-                        backgroundColor: '#1565c0',
-                        '&:hover': {
-                          backgroundColor: '#0d47a1',
+                        '&.Mui-selected': {
+                          backgroundColor: '#1565c0',
+                          '&:hover': {
+                            backgroundColor: '#0d47a1',
+                          },
                         },
-                      },
-                    }}
+                        '&:focus': { outline: 'none' },
+                        '&:focus-visible': { outline: 'none' },
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
                   >
                     <ListItemIcon sx={{ color: 'white' }}>
                       {item.icon}

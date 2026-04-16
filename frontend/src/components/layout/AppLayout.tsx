@@ -50,6 +50,43 @@ const theme = createTheme({
         },
       },
     },
+    MuiButtonBase: {
+      styleOverrides: {
+        root: {
+          '&:focus': {
+            outline: 'none',
+          },
+          '&.Mui-focusVisible': {
+            outline: 'none',
+          },
+          WebkitTapHighlightColor: 'transparent',
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          '&:focus': {
+            outline: 'none',
+          },
+          '&.Mui-focusVisible': {
+            outline: 'none',
+          },
+        },
+      },
+    },
+    MuiFab: {
+      styleOverrides: {
+        root: {
+          '&:focus': {
+            outline: 'none',
+          },
+          '&.Mui-focusVisible': {
+            outline: 'none',
+          },
+        },
+      },
+    },
   },
 })
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, IconButton } from '@mui/material'
-import { ToggleLeft, ToggleRight } from 'lucide-react'
+import { Languages } from 'lucide-react'
 import { GitHub as GithubIcon } from '@mui/icons-material'
 import { useLanguage } from '../../contexts/LanguageContext'
 
@@ -22,6 +22,13 @@ const FloatingLinks: React.FC = () => {
             transform: 'scale(1.08)',
             boxShadow: '0 8px 12px -2px rgba(0, 0, 0, 0.2)',
         },
+        '&:focus': {
+            outline: 'none',
+        },
+        '&:focus-visible': {
+            outline: 'none',
+        },
+        WebkitTapHighlightColor: 'transparent',
     }
 
 
@@ -63,11 +70,7 @@ const FloatingLinks: React.FC = () => {
                     aria-label={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
                     title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
                 >
-                    {language === 'es' ? (
-                        <ToggleLeft className="icon" style={iconStyles} />
-                    ) : (
-                        <ToggleRight className="icon" style={iconStyles} />
-                    )}
+                    <Languages className="icon" style={iconStyles} />
                 </IconButton>
             </Box>
 
