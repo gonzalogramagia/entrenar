@@ -19,6 +19,7 @@ import HistoryIcon from '@mui/icons-material/History'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import PeopleIcon from '@mui/icons-material/People'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
+import BoltIcon from '@mui/icons-material/Bolt'
 import UserAvatar from '../user/UserAvatar'
 import { TABS, type TabType } from '../../constants/tabs'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -152,6 +153,13 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
     { label: t.history, icon: <HistoryIcon />, value: TABS.HISTORY },
     { label: t.routines, icon: <FitnessCenterIcon />, value: TABS.ROUTINES },
     { label: t.social, icon: <PeopleIcon />, value: TABS.SOCIAL },
+    { 
+      label: 'Energizate con Frutos Secos', 
+      icon: <BoltIcon />, 
+      value: 'ad' as any,
+      url: 'https://moovimiento.com',
+      isAd: true 
+    },
   ]
 
   return (
@@ -378,7 +386,14 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                 <ListItem disablePadding>
                   <ListItemButton
                     selected={activeTab === item.value}
-                    onClick={() => handleTabChange(item.value)}
+                    onClick={() => {
+                      if (item.url) {
+                        window.open(item.url, '_blank')
+                        setDrawerOpen(false)
+                      } else {
+                        handleTabChange(item.value as any)
+                      }
+                    }}
                     sx={{
                       color: 'white',
                       pl: { xs: '24px', sm: '33px' },
@@ -408,6 +423,25 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                         fontWeight: activeTab === item.value ? 'bold' : 'normal'
                       }}
                     />
+                    {item.isAd && (
+                      <Box sx={{
+                        backgroundColor: 'white',
+                        color: '#1976d2',
+                        px: 0.6,
+                        py: 0.2,
+                        borderRadius: '4px',
+                        fontWeight: '1000',
+                        fontSize: '0.65rem',
+                        lineHeight: 1,
+                        ml: 1,
+                        mr: { xs: '12px', sm: '22px' },
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        AD
+                      </Box>
+                    )}
                   </ListItemButton>
                 </ListItem>
               </Fade>

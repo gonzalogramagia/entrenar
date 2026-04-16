@@ -391,7 +391,7 @@ export default function SocialList() {
     <Box sx={{ p: 1 }} data-testid="social-feed-container">
       <Box sx={{ mb: 4, mt: 2, textAlign: 'center' }}>
         <Typography variant="h5" sx={{ 
-          fontWeight: 800, 
+          fontWeight: 1000, 
           color: 'primary.main', 
           mb: 1,
           letterSpacing: '-0.5px',
@@ -400,11 +400,16 @@ export default function SocialList() {
         }}>
           {t.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ 
-          fontStyle: 'italic', 
-          opacity: 0.8,
+        <Typography sx={{ 
+          fontSize: '0.800rem',
+          lineHeight: 1.43,
+          letterSpacing: '0.01071em',
+          color: 'rgba(0, 0, 0, 0.6)',
+          fontStyle: 'normal',
+          opacity: 1,
           fontWeight: 500,
-          px: 2
+          px: 2,
+          textAlign: 'center'
         }}>
           {t.subtitle}
         </Typography>
