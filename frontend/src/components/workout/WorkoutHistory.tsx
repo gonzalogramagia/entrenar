@@ -36,17 +36,44 @@ import { translations } from '../../i18n/translations'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
 
 /**
+ * Utilidades de fecha compartidas
+ */
+const normalizeDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  return dateStr.split('T')[0].split(' ')[0];
+}
+
+const getDateString = (date: any) => {
+  if (!date) return '';
+  // Handle both Date and potentially other objects if MUI Adapter changes
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return '';
+  
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+const parseDate = (dateStr: string) => {
+  try {
+    const normalized = normalizeDate(dateStr);
+    const [year, month, day] = normalized.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  } catch (e) {
+    console.error('Error parseando fecha:', dateStr, e);
+    return new Date(dateStr);
+  }
+}
+
+/**
  * Componente personalizado para renderizar los días del calendario
  * Resalta aquellos días que tienen entrenamientos registrados
  */
 function ServerDay(props: any) {
   const { highlightedDays = new Set(), day, outsideCurrentMonth, ...other } = props;
 
-  // Usar la misma lógica de normalización
-  const year = day?.getFullYear();
-  const month = String((day?.getMonth() || 0) + 1).padStart(2, '0');
-  const dateNum = String(day?.getDate() || 0).padStart(2, '0');
-  const dateStr = `${year}-${month}-${dateNum}`;
+  const dateStr = getDateString(day);
   
   const hasWorkout = !outsideCurrentMonth && highlightedDays.has(dateStr);
 
@@ -132,35 +159,6 @@ export default function WorkoutHistory() {
   }, [successMessage])
 
 
-
-  // Función para normalizar una fecha (ISO o YYYY-MM-DD) a string YYYY-MM-DD
-  const normalizeDate = (dateStr: string) => {
-    if (!dateStr) return '';
-    // Tomar solo la parte de la fecha (ignorar T... o espacio ...)
-    return dateStr.split('T')[0].split(' ')[0];
-  }
-
-  // Función para convertir un objeto Date a string YYYY-MM-DD local
-  const getDateString = (date: Date) => {
-    if (!date) return '';
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  // Función para parsear un string YYYY-MM-DD a un objeto Date local
-  const parseDate = (dateStr: string) => {
-    try {
-      const normalized = normalizeDate(dateStr);
-      const [year, month, day] = normalized.split('-').map(Number);
-      // Mes es 0-indexed en Date
-      return new Date(year, month - 1, day);
-    } catch (e) {
-      console.error('Error parseando fecha:', dateStr, e);
-      return new Date(dateStr);
-    }
-  }
 
   const formatDate = (dateString: string) => {
     try {
@@ -656,10 +654,7 @@ export default function WorkoutHistory() {
             showDaysOutsideCurrentMonth
             fixedWeekNumber={6}
             shouldDisableDate={(date: Date) => {
-              const year = date.getFullYear();
-              const month = String(date.getMonth() + 1).padStart(2, '0');
-              const dateNum = String(date.getDate()).padStart(2, '0');
-              const dateStr = `${year}-${month}-${dateNum}`;
+              const dateStr = getDateString(date);
               return !trainingDates.has(dateStr);
             }}
             onChange={(newDate: Date | null) => {
