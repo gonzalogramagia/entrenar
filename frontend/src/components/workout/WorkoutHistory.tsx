@@ -130,6 +130,7 @@ export default function WorkoutHistory() {
     currentObservation: ''
   });
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [isCalendarSearch, setIsCalendarSearch] = useState(false);
 
   const [editValueModal, setEditValueModal] = useState<{
     show: boolean;
@@ -291,8 +292,17 @@ export default function WorkoutHistory() {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(day => {
         // Buscar en fecha formateada (ej: "Lunes 12 de Agosto")
-        const formattedDate = formatDate(day.workoutDay.date);
-        const dateMatch = formattedDate.toLowerCase().includes(searchLower);
+        const formattedDate = formatDate(day.workoutDay.date).toLowerCase();
+        
+        let dateMatch = false;
+        if (isCalendarSearch) {
+          // Si viene del calendario, buscamos coincidencia exacta de día y mes para no mezclar 8 con 18
+          dateMatch = formattedDate.startsWith(searchLower) || 
+                     formattedDate.includes(` ${searchLower}`);
+        } else {
+          // Si el usuario escribe manualmente, permitimos búsqueda parcial normal
+          dateMatch = formattedDate.includes(searchLower);
+        }
 
         // Buscar en nombre del entrenamiento
         const workoutNameMatch = day.workoutDay.name?.toLowerCase().includes(searchLower) || false;
@@ -545,7 +555,10 @@ export default function WorkoutHistory() {
   const shouldHaveScroll = filteredWorkoutDays.length > 3 || hasExpandedWorkouts
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={language === 'es' ? es : enUS}>
+    <LocalizationProvider 
+      dateAdapter={AdapterDateFns} 
+      adapterLocale={language === 'es' ? { ...es, options: { ...es.options, weekStartsOn: 0 } } : enUS}
+    >
       <Box sx={{
         p: 1,
         height: shouldHaveScroll ? '100%' : 'auto',
@@ -578,7 +591,10 @@ export default function WorkoutHistory() {
             <TextField
               placeholder={language === 'es' ? 'Filtrar mis entrenamientos...' : 'Filter my workouts...'}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setIsCalendarSearch(false);
+              }}
               sx={{
                 flex: 1,
                 minWidth: 200,
@@ -668,6 +684,7 @@ export default function WorkoutHistory() {
                   : `${capitalizedMonth} ${dayNum}`
                 
                 setSearchTerm(searchString)
+                setIsCalendarSearch(true)
 
                 // Hacer scroll al primer resultado
                 setTimeout(() => {
@@ -696,6 +713,9 @@ export default function WorkoutHistory() {
               },
               '& .MuiDayCalendar-monthContainer': {
                 minHeight: '240px'
+              },
+              '& .MuiPickersCalendarHeader-label': {
+                textTransform: 'capitalize'
               }
             }}
           />
