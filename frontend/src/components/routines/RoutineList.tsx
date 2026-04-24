@@ -225,9 +225,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   return (
     <Box sx={{
-      p: 1,
+      p: 1.5,
       height: (!routines || routines.length === 0) ? 'auto' : '100%',
-      overflow: (!routines || routines.length === 0) ? 'visible' : 'hidden'
+      overflow: (!routines || routines.length === 0) ? 'visible' : 'visible'
     }}>
 
       {error && (
@@ -318,13 +318,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             gap: 2,
             gridTemplateColumns: {
               xs: '1fr',
-              sm: 'repeat(auto-fill, minmax(320px, 1fr))',
-              md: 'repeat(auto-fill, minmax(380px, 1fr))'
+              sm: 'repeat(auto-fill, minmax(300px, 1fr))',
+              md: 'repeat(auto-fill, minmax(340px, 1fr))'
             },
             width: '100%',
             maxWidth: '100%',
             px: 0.5,
-            py: 1, // Reducido para que sea igual al historial
+            py: 1,
             overflow: 'visible'
           }}>
             {sortedRoutines?.map((routine) => (
@@ -334,12 +334,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 onClick={() => handleViewRoutine(routine)}
                 sx={{
                   width: '100%',
-                  minWidth: { xs: '100%', sm: '340px' },
+                  minWidth: { xs: '100%', sm: '280px' },
                   maxWidth: '500px',
                   border: '1px solid',
                   borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'rgba(0,0,0,0.08)'),
                   borderRadius: '20px',
-                  overflow: 'visible', // Evitar cortes de sombras o bordes
+                  overflow: 'visible',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   position: 'relative',
                   cursor: 'pointer',
@@ -403,7 +403,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     sx={{
                       opacity: 0.6,
                       fontWeight: 500,
-                      mb: 2,
+                      mb: 1,
                       textAlign: 'left'
                     }}
                   >
@@ -419,7 +419,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   gap: 1.5,
                   px: { xs: 2, sm: 3 },
                   pb: 3,
-                  pt: 0.5
+                  pt: 0
                 }}>
                   <Box sx={{
                     display: 'flex',
