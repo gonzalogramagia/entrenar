@@ -554,7 +554,7 @@ function AuthenticatedAppContent() {
 
       <Box sx={{
         flexGrow: 1,
-        p: 2,
+        p: { xs: 1, sm: 2 },
         pb: 0,
         overflow: 'auto',
         '&::-webkit-scrollbar': {

@@ -225,7 +225,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   return (
     <Box sx={{
-      p: 1.5,
+      p: { xs: 0.5, sm: 1.5 },
       height: (!routines || routines.length === 0) ? 'auto' : '100%',
       overflow: (!routines || routines.length === 0) ? 'visible' : 'visible'
     }}>
