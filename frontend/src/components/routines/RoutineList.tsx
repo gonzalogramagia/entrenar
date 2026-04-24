@@ -332,12 +332,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 elevation={0}
                 onClick={() => handleViewRoutine(routine)}
                 sx={{
-                  height: '100%',
                   width: '100%',
+                  minWidth: { xs: '100%', sm: '340px' },
+                  maxWidth: '500px',
                   border: '1px solid',
                   borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'rgba(0,0,0,0.08)'),
                   borderRadius: '20px',
-                  overflow: 'hidden',
+                  overflow: 'visible', // Evitar cortes de sombras o bordes
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   position: 'relative',
                   cursor: 'pointer',
@@ -437,8 +438,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       sx={{
                         fontWeight: 700,
                         borderRadius: '12px',
-                        px: 1,
-                        textTransform: 'none',
+                        px: 1.5,
+                        py: 1,
                         whiteSpace: 'pre-line',
                         lineHeight: 1.1,
                         fontSize: '0.8rem',
@@ -481,8 +482,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                         sx={{
                           fontWeight: 700,
                           borderRadius: '12px',
-                          px: 1,
-                          textTransform: 'none',
+                          px: 1.5,
+                          py: 1,
                           whiteSpace: 'pre-line',
                           lineHeight: 1.1,
                           fontSize: '0.8rem',
