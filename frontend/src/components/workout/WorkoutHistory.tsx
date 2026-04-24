@@ -28,7 +28,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
-import { PickersDay, type PickersDayProps } from '@mui/x-date-pickers/PickersDay'
+import { PickersDay } from '@mui/x-date-pickers/PickersDay'
 import { es, enUS } from 'date-fns/locale'
 import { apiClient } from '../../lib/api'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -39,19 +39,17 @@ import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from
  * Componente personalizado para renderizar los días del calendario
  * Resalta aquellos días que tienen entrenamientos registrados
  */
-function ServerDay(props: PickersDayProps & { highlightedDays?: string[] }) {
+function ServerDay(props: any) {
   const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
 
-  // Formato YYYY-MM-DD para comparar con el backend
-  const dateStr = day.getFullYear() + '-' + 
-                 String(day.getMonth() + 1).padStart(2, '0') + '-' + 
-                 String(day.getDate()).padStart(2, '0');
+  // Formato YYYY-MM-DD para comparar con el backend (usando métodos locales para evitar offsets)
+  const dateStr = day ? `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}` : '';
   
   const hasWorkout = !outsideCurrentMonth && highlightedDays.indexOf(dateStr) >= 0;
 
   return (
     <Badge
-      key={props.day.toString()}
+      key={props.day?.toString()}
       overlap="circular"
       badgeContent={hasWorkout ? '🏋️' : undefined}
       sx={{ 
@@ -201,18 +199,6 @@ export default function WorkoutHistory() {
     const safeWorkoutDays = workoutDays || [];
     const safeWorkouts = workouts || [];
 
-    console.log('🔍 Debug workoutDays:', {
-      workoutDays: safeWorkoutDays.map(d => ({
-        id: d.id,
-        date: d.date
-      })),
-      workouts: safeWorkouts.map(w => ({
-        id: w.id,
-        created_at: w.created_at,
-        workout_day_id: w.workout_day_id
-      }))
-    });
-
     // Agrupar workouts por workout_day_id
     const workoutsByDay = new Map<number, Workout[]>();
     safeWorkouts.forEach(workout => {
@@ -223,13 +209,9 @@ export default function WorkoutHistory() {
       workoutsByDay.get(dayId)!.push(workout);
     });
 
-    console.log('🔍 Workouts agrupados por day_id:', Object.fromEntries(workoutsByDay));
-
     safeWorkoutDays.forEach(day => {
       // Filtrar workouts por workout_day_id
       const dayWorkouts = workoutsByDay.get(day.id) || [];
-
-      console.log(`🔍 Día ${day.id}: encontró ${dayWorkouts.length} workouts`)
 
       // Agrupar ejercicios por nombre
       const exerciseGroups: ExerciseGroup[] = [];
@@ -258,12 +240,6 @@ export default function WorkoutHistory() {
           totalWorkouts: exerciseGroups.length // Usar número de grupos de ejercicios únicos, no total de series
         });
       }
-    });
-
-    console.log('🔍 WorkoutHistory Debug:', {
-      workoutDaysCount: safeWorkoutDays.length,
-      workoutsCount: safeWorkouts.length,
-      workoutDaysWithExercisesCount: days.length
     });
 
     return days;
@@ -356,19 +332,14 @@ export default function WorkoutHistory() {
   };
 
   const handleDeleteWorkout = async (workoutId: number) => {
-    console.log('🔍 handleDeleteWorkout llamado con ID:', workoutId)
     setLoadingWorkoutId(workoutId)
     try {
-      console.log('🔍 Llamando a apiClient.deleteWorkout...')
       await apiClient.deleteWorkout(workoutId)
-      console.log('🔍 Workout eliminado exitosamente')
       // Recargar datos después de eliminar
       await loadData()
-      console.log('🔍 Datos recargados')
       setSuccessMessage(language === 'es' ? 'Ejercicio eliminado exitosamente' : 'Exercise deleted successfully')
 
       // Disparar evento para actualizar el feed social
-      console.log('🔄 Disparando evento de actualización del feed social después de eliminar')
       window.dispatchEvent(new CustomEvent('socialFeedRefresh'))
     } catch (error) {
       console.error('❌ Error eliminando workout:', error)
@@ -537,36 +508,40 @@ export default function WorkoutHistory() {
   const shouldHaveScroll = filteredWorkoutDays.length > 3 || hasExpandedWorkouts
 
   return (
-    <Box sx={{
-      p: 1,
-      height: shouldHaveScroll ? '100%' : 'auto',
-      overflow: shouldHaveScroll ? 'hidden' : 'visible'
-    }}>
-
-      <Stack spacing={3} sx={{
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={language === 'es' ? es : enUS}>
+      <Box sx={{
+        p: 1,
         height: shouldHaveScroll ? '100%' : 'auto',
-        overflow: shouldHaveScroll ? 'auto' : 'visible',
-        '&::-webkit-scrollbar': {
-          display: 'none'
-        },
-        '&::-moz-scrollbar': {
-          display: 'none'
-        },
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
+        overflow: shouldHaveScroll ? 'hidden' : 'visible'
       }}>
-        {/* Calendario de Entrenamientos */}
-        <Card sx={{ 
-          mx: 0.5, 
-          borderRadius: 3, 
-          boxShadow: 2,
-          border: '1px solid',
-          borderColor: 'divider',
-          overflow: 'hidden',
-          background: 'linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)'
+
+        <Stack spacing={3} sx={{
+          height: shouldHaveScroll ? '100%' : 'auto',
+          overflow: shouldHaveScroll ? 'auto' : 'visible',
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          '&::-moz-scrollbar': {
+            display: 'none'
+          },
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
         }}>
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={language === 'es' ? es : enUS}>
+          {/* Calendario de Entrenamientos */}
+          <Card sx={{ 
+            mx: 0.5, 
+            borderRadius: 3, 
+            boxShadow: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+            overflow: 'hidden',
+            background: 'white',
+            minHeight: '360px',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
             <DateCalendar 
+              defaultValue={new Date()}
               showDaysOutsideCurrentMonth
               fixedWeekNumber={6}
               onChange={(newDate: Date | null) => {
@@ -592,6 +567,7 @@ export default function WorkoutHistory() {
               }}
               sx={{
                 width: '100%',
+                flexGrow: 1,
                 '& .MuiPickersDay-root.Mui-selected': {
                   backgroundColor: 'primary.main',
                 },
@@ -599,11 +575,13 @@ export default function WorkoutHistory() {
                   borderBottom: '1px solid',
                   borderColor: 'divider',
                   mb: 1
+                },
+                '& .MuiDayCalendar-monthContainer': {
+                  minHeight: '240px'
                 }
               }}
             />
-          </LocalizationProvider>
-        </Card>
+          </Card>
 
         {/* Buscador y ordenamiento */}
         <Box sx={{
@@ -1526,5 +1504,6 @@ export default function WorkoutHistory() {
         </Snackbar>
       </Stack>
     </Box>
+    </LocalizationProvider>
   )
 }
