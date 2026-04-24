@@ -216,6 +216,16 @@ export default function WorkoutForm({
   // Detectar si el ejercicio seleccionado es un deporte
   const isSportExercise = selectedExercise?.is_sport || false
 
+  // Detectar si es calentamiento o estiramiento
+  const isWarmupOrStretching = useMemo(() => {
+    if (!selectedExercise) return false;
+    const name = selectedExercise.name.toLowerCase();
+    return name.includes('calentamiento') ||
+           name.includes('warm up') ||
+           name.includes('estiramiento') ||
+           name.includes('stretching');
+  }, [selectedExercise]);
+
   // Establecer reps = 1 automáticamente cuando se selecciona Running, Bici o un deporte
   useEffect(() => {
     if (isRunningOrBiciExercise || isSportExercise) {
@@ -297,6 +307,13 @@ export default function WorkoutForm({
 
     // Normalizar el valor: convertir coma a punto para parseFloat
     const normalizedValue = value.replace(',', '.')
+    
+    // Si el valor es exactamente '0', permitirlo si es calentamiento o estiramiento
+    if (normalizedValue === '0' && isWarmupOrStretching) {
+      setValue(field, '0')
+      return
+    }
+
     const numValue = parseFloat(normalizedValue)
 
     if (isNaN(numValue)) {
@@ -315,17 +332,12 @@ export default function WorkoutForm({
           minLimit = 0.1 // 100 metros mínimo
         } else {
           maxLimit = 1000
-          minLimit = 0.1
-        }
-        // Permitir valores vacíos para peso opcional
-        if (value === '') {
-          setValue(field, '')
-          return
+          minLimit = isWarmupOrStretching ? 0 : 0.1
         }
         break
       case 'reps':
         maxLimit = 100
-        minLimit = 1
+        minLimit = isWarmupOrStretching ? 0 : 1
         break
       case 'seconds':
         maxLimit = 3600
@@ -369,33 +381,19 @@ export default function WorkoutForm({
         observations: data.observations
       }
 
-
-
-      const selectedExercise = exercises.find(ex => ex.id === data.exercise_id)
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
 
-      const isWarmupOrStretching = exerciseName.toLowerCase().includes('calentamiento') ||
-        exerciseName.toLowerCase().includes('warm up') ||
-        exerciseName.toLowerCase().includes('estiramiento') ||
-        exerciseName.toLowerCase().includes('stretching');
-
-      // Solo incluir reps si tiene un valor válido mayor a 0, O si es warmup/stretching (en cuyo caso se envía 0 si no hay valor)
-      if (data.reps !== undefined && data.reps !== null && data.reps > 0) {
-        workoutData.reps = data.reps
+      // Solo incluir reps si tiene un valor válido (mayor a 0, o 0 para calentamientos)
+      if (data.reps !== undefined && data.reps !== null && (data.reps > 0 || isWarmupOrStretching)) {
+        workoutData.reps = (data.reps === 0 || !data.reps) && isWarmupOrStretching ? 0 : data.reps
       } else if (isRunningOrBiciExercise) {
         // Para Running y Bici, enviar 1 como valor mínimo
         workoutData.reps = 1
-      } else if (isWarmupOrStretching) {
-        // Para calentamiento/estiramiento, permitir 0 reps
-        workoutData.reps = 0
       }
 
-      // Solo incluir weight si tiene un valor válido mayor a 0, O si es warmup/stretching (en cuyo caso se envía 0 si no hay valor)
-      if (data.weight !== undefined && data.weight !== null && data.weight > 0) {
-        workoutData.weight = data.weight
-      } else if (isWarmupOrStretching) {
-        // Para calentamiento/estiramiento, permitir 0 peso
-        workoutData.weight = 0
+      // Solo incluir weight si tiene un valor válido (mayor a 0, o 0 para calentamientos)
+      if (data.weight !== undefined && data.weight !== null && (data.weight > 0 || isWarmupOrStretching)) {
+        workoutData.weight = (data.weight === 0 || !data.weight) && isWarmupOrStretching ? 0 : data.weight
       }
 
       await onSubmit(workoutData)
@@ -874,7 +872,7 @@ export default function WorkoutForm({
                 inputProps={{
                   step: 'any',
                   inputMode: 'decimal',
-                  min: isRunningOrBiciExercise ? 0.1 : 0.1,
+                  min: isWarmupOrStretching ? 0 : 0.1,
                   max: isRunningOrBiciExercise ? 100 : 1000
                 }}
                 onFocus={() => setValue('weight', '')}
@@ -901,7 +899,7 @@ export default function WorkoutForm({
                   onChange={(e) => handleNumberInput('reps', e.target.value)}
                   inputProps={{
                     inputMode: 'numeric',
-                    min: 1,
+                    min: isWarmupOrStretching ? 0 : 1,
                     max: 100
                   }}
                   onFocus={(e) => e.target.select()}

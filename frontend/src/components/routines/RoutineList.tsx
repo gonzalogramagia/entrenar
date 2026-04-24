@@ -318,8 +318,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             gap: 2,
             gridTemplateColumns: {
               xs: '1fr',
-              sm: 'repeat(auto-fill, minmax(250px, 1fr))',
-              md: 'repeat(auto-fill, minmax(280px, 1fr))'
+              sm: 'repeat(auto-fill, minmax(320px, 1fr))',
+              md: 'repeat(auto-fill, minmax(380px, 1fr))'
             },
             width: '100%',
             maxWidth: '100%',
@@ -448,7 +448,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                         }
                       }}
                     >
-                      {t.details}
+                      {language === 'es' ? 'Ver / Editar' : 'View / Edit'}
                     </Button>
 
                     {!isRoutineComplete(routine) && (
