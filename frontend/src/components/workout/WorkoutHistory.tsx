@@ -508,7 +508,7 @@ export default function WorkoutHistory() {
     try {
       const numValue = parseFloat(editValueModal.currentValue);
       const updateData = {
-        [editValueModal.field]: isNaN(numValue) ? 0 : numValue
+        [editValueModal.field]: isNaN(numValue) ? 0 : (editValueModal.field === 'seconds' ? numValue * 60 : numValue)
       };
 
       await apiClient.updateWorkout(editValueModal.workoutId, updateData);
@@ -521,7 +521,7 @@ export default function WorkoutHistory() {
         if (workoutIndex !== -1) {
           updatedGroup.workouts[workoutIndex] = {
             ...updatedGroup.workouts[workoutIndex],
-            [editValueModal.field!]: isNaN(numValue) ? 0 : numValue
+            [editValueModal.field!]: isNaN(numValue) ? 0 : (editValueModal.field === 'seconds' ? numValue * 60 : numValue)
           };
           setExerciseModal(prev => ({ ...prev, exerciseGroup: updatedGroup }));
         }
