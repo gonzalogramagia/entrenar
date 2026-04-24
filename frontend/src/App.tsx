@@ -1,6 +1,7 @@
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TabProvider } from './contexts/TabContext'
 import { LanguageProvider } from './contexts/LanguageContext'
+import { Box, CircularProgress } from '@mui/material'
 import LoginComponent from './components/auth/LoginComponent'
 import AuthenticatedApp from './components/app/AuthenticatedApp'
 import AppLayout from './components/layout/AppLayout'
@@ -20,7 +21,24 @@ function AppContent() {
 }
 
 function AppContentInner() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
+
+  // Mientras se está cargando la sesión inicial de Supabase, 
+  // mostramos una pantalla de carga para evitar que parpadee el login
+  if (isLoading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh', 
+        width: '100vw',
+        bgcolor: '#FFD700' 
+      }}>
+        <CircularProgress sx={{ color: 'white' }} />
+      </Box>
+    )
+  }
 
   if (!isAuthenticated) {
     return <LoginComponent />

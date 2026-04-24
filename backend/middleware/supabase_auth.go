@@ -48,17 +48,21 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := parts[1]
 
-		// Permitir setup de usuario sin verificar existencia en DB (para usuarios nuevos)
-		if strings.HasSuffix(r.URL.Path, "/setup") {
-			fmt.Printf("🔧 Setup endpoint detectado - validando JWT sin verificar DB\n")
+		// Permitir endpoints de usuario sin verificar existencia en DB (para usuarios nuevos)
+		// Esto es necesario porque /me se llama para verificar si el usuario tiene perfil
+		// y /setup se llama para crearlo.
+		isMeEndpoint := strings.HasSuffix(r.URL.Path, "/me") || strings.Contains(r.URL.Path, "/me/")
+		
+		if isMeEndpoint {
+			fmt.Printf("👤 User endpoint detectado (%s) - validando JWT sin verificar DB\n", r.URL.Path)
 			// Validar JWT pero no verificar existencia en DB
 			userID, err := validateSupabaseJWT(tokenString)
 			if err != nil {
-				fmt.Printf("❌ JWT inválido en setup: %v\n", err)
+				fmt.Printf("❌ JWT inválido en endpoint de usuario: %v\n", err)
 				http.Error(w, fmt.Sprintf("Token inválido: %v", err), http.StatusUnauthorized)
 				return
 			}
-			fmt.Printf("✅ JWT válido para setup - UserID: %s\n", userID)
+			fmt.Printf("✅ JWT válido para endpoint de usuario - UserID: %s\n", userID)
 			// Agregar user_id al contexto sin verificar existencia en DB
 			ctx := context.WithValue(r.Context(), "user_id", userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
