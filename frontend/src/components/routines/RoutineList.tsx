@@ -314,15 +314,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
         }}>
 
           <Box sx={{
-            display: 'grid',
+            display: 'flex',
+            flexDirection: 'column',
             gap: 2,
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(auto-fill, minmax(300px, 1fr))',
-              md: 'repeat(auto-fill, minmax(340px, 1fr))'
-            },
             width: '100%',
-            maxWidth: '100%',
             px: 0.5,
             py: 1,
             overflow: 'visible'
@@ -334,8 +329,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 onClick={() => handleViewRoutine(routine)}
                 sx={{
                   width: '100%',
-                  minWidth: { xs: '100%', sm: '280px' },
-                  maxWidth: '500px',
+                  minWidth: 0,
+                  maxWidth: '100%',
                   border: '1px solid',
                   borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'rgba(0,0,0,0.08)'),
                   borderRadius: '20px',
