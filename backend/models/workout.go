@@ -33,8 +33,8 @@ type Workout struct {
 // CreateWorkoutRequest representa la solicitud para crear un workout
 type CreateWorkoutRequest struct {
 	ExerciseID   int      `json:"exercise_id" validate:"required,gt=0"`
-	Weight       *float64 `json:"weight" validate:"omitempty,gt=0"`
-	Reps         *int     `json:"reps" validate:"omitempty,gt=0"`
+	Weight       *float64 `json:"weight" validate:"omitempty,gte=0"`
+	Reps         *int     `json:"reps" validate:"omitempty,gte=0"`
 	Set          *int     `json:"set"`
 	Seconds      *int     `json:"seconds" validate:"omitempty,gt=0"`
 	Observations string   `json:"observations"`

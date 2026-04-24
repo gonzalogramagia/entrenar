@@ -188,15 +188,15 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validaciones
-	if req.Reps != nil && *req.Reps <= 0 {
-		http.Error(w, "Repeticiones deben ser mayores a 0 si se proporcionan", http.StatusBadRequest)
+	if req.Reps != nil && *req.Reps < 0 {
+		http.Error(w, "Repeticiones no pueden ser negativas", http.StatusBadRequest)
 		return
 	}
 
 	// Validar peso si se proporciona
 	if req.Weight != nil {
-		if *req.Weight <= 0 {
-			http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
+		if *req.Weight < 0 {
+			http.Error(w, "Peso no puede ser negativo", http.StatusBadRequest)
 			return
 		}
 	}
@@ -433,14 +433,14 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validaciones
-	if req.Reps != nil && *req.Reps <= 0 {
-		http.Error(w, "Repeticiones deben ser mayores a 0 si se proporcionan", http.StatusBadRequest)
+	if req.Reps != nil && *req.Reps < 0 {
+		http.Error(w, "Repeticiones no pueden ser negativas", http.StatusBadRequest)
 		return
 	}
 
 	// Validar peso si se proporciona
-	if req.Weight != nil && *req.Weight <= 0 {
-		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
+	if req.Weight != nil && *req.Weight < 0 {
+		http.Error(w, "Peso no puede ser negativo", http.StatusBadRequest)
 		return
 	}
 
