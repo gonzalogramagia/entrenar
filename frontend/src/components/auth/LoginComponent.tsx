@@ -7,7 +7,7 @@ import { translations } from '../../i18n/translations'
 
 export default function LoginComponent() {
   const [error, setError] = useState('')
-  const { signInWithGoogle, isSigningIn } = useAuth()
+  const { signInWithGoogle, isSigningIn, enterAsGuest } = useAuth()
   const { language } = useLanguage()
   const t = translations[language].login
 
@@ -138,6 +138,23 @@ export default function LoginComponent() {
         >
           {isSigningIn ? t.signingIn : t.continueWithGoogle}
         </Button>
+
+        <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Typography
+            variant="body2"
+            onClick={enterAsGuest}
+            sx={{
+              color: 'text.secondary',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+          >
+            {language === 'es' ? 'Modo invitado' : 'Guest mode'}
+          </Typography>
+        </Box>
 
         {error && (
           <Alert severity="error" sx={{ mt: 2 }}>

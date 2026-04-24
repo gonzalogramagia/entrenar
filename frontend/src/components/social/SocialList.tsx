@@ -8,7 +8,8 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  IconButton
+  IconButton,
+  Button
 } from '@mui/material'
 import {
   ThumbUp as ThumbUpIcon,
@@ -47,7 +48,7 @@ type SocialExercise = {
 export default function SocialList() {
   const { language } = useLanguage()
   const t = translations[language].social
-  const { user } = useAuth()
+  const { user, isGuest, signInWithGoogle } = useAuth()
   const { setOnSocialSettingsChange } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,8 +59,6 @@ export default function SocialList() {
   const currentOffsetRef = useRef(0)
   const loadingMoreRef = useRef(false)
   const hasMoreRef = useRef(true)
-
-
 
   const formatDate = (dateString: string) => {
     try {
@@ -116,6 +115,72 @@ export default function SocialList() {
       } else {
         setLoadingMore(true)
         loadingMoreRef.current = true
+      }
+
+      if (isGuest) {
+        // Datos Mock para Modo Invitado
+        const mockSocialWorkouts: SocialWorkout[] = [
+          {
+            session_id: 10001,
+            user_id: 'guest1',
+            user_name: 'Carlos Ruiz',
+            workout_date: new Date().toISOString(),
+            created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // Hace 30 min
+            total_exercises: 3,
+            total_sets: 9,
+            exercises: [],
+            kudos_count: 3,
+            has_kudos: false
+          },
+          {
+            session_id: 10002,
+            user_id: 'guest2',
+            user_name: 'Marta García',
+            workout_date: new Date().toISOString(),
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // Hace 2 horas
+            total_exercises: 4,
+            total_sets: 12,
+            exercises: [],
+            kudos_count: 5,
+            has_kudos: true
+          },
+          {
+            session_id: 10003,
+            user_id: 'guest3',
+            user_name: 'Juan Pérez',
+            workout_date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Ayer
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
+            total_exercises: 5,
+            total_sets: 15,
+            exercises: [],
+            kudos_count: 8,
+            has_kudos: false
+          },
+          {
+            session_id: 10004,
+            user_id: 'guest4',
+            user_name: 'Sofía López',
+            workout_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // Hace 2 días
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2 - 1000 * 60 * 60).toISOString(),
+            total_exercises: 4,
+            total_sets: 12,
+            exercises: [],
+            kudos_count: 12,
+            has_kudos: false
+          }
+        ]
+
+        if (reset) {
+          setSocialWorkouts(mockSocialWorkouts)
+        } else {
+          // No cargamos más en modo invitado para simplificar
+          setHasMore(false)
+          hasMoreRef.current = false
+        }
+        setLoading(false)
+        setLoadingMore(false)
+        loadingMoreRef.current = false
+        return
       }
 
       const offset = reset ? 0 : currentOffsetRef.current
@@ -193,8 +258,12 @@ export default function SocialList() {
   }, []) // Sin dependencias para evitar bucles
 
   const handleKudos = async (workoutId: number) => {
+    if (isGuest) {
+      signInWithGoogle()
+      return
+    }
     if (!user) return
-
+    
     // Solo permitir dar kudos si no se ha dado ya
     const workout = socialWorkouts.find(w => w.session_id === workoutId)
     if (!workout || workout.has_kudos) return
@@ -558,10 +627,38 @@ export default function SocialList() {
 
         {/* Mensaje cuando no hay más entrenamientos */}
         {!hasMore && socialWorkouts.length > 0 && (
-          <Box sx={{ textAlign: 'center', py: 3 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-              {t.noMore}
-            </Typography>
+          <Box sx={{ textAlign: 'center', py: 4, px: 2 }}>
+            {isGuest ? (
+              <Box sx={{ 
+                bgcolor: 'rgba(25, 118, 210, 0.05)', 
+                p: 3, 
+                borderRadius: 4, 
+                border: '1px dashed', 
+                borderColor: 'primary.main' 
+              }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, mb: 2 }}>
+                  {language === 'es' 
+                    ? 'Estos son datos de prueba para el modo invitado. Para ver actividad real de otros usuarios, inicia sesión.'
+                    : 'This is mock data for guest mode. To see real activity from other users, please sign in.'}
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  onClick={signInWithGoogle}
+                  sx={{ 
+                    borderRadius: '20px', 
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    px: 3
+                  }}
+                >
+                  {language === 'es' ? 'Iniciar sesión con Google' : 'Sign in with Google'}
+                </Button>
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                {t.noMore}
+              </Typography>
+            )}
           </Box>
         )}
       </Stack>

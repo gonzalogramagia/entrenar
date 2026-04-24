@@ -20,6 +20,8 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 type NotificationType = 'general' | 'kudos' | 'announcement' | 'welcome'
 
@@ -46,6 +48,8 @@ type Notification = {
 
 export default function NotificationsList() {
   const { settings } = useUserSettings()
+  const { isGuest } = useAuth()
+  const { language } = useLanguage()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -55,6 +59,23 @@ export default function NotificationsList() {
     setError('')
     
     try {
+      if (isGuest) {
+        const mockNotification: Notification = {
+          id: 'guest_welcome',
+          type: 'welcome',
+          title: language === 'es' ? '¡Bienvenido al modo invitado!' : 'Welcome to guest mode!',
+          message: language === 'es' 
+            ? 'Explora todas las funcionalidades de la app. Para registrar tus propios entrenamientos y guardar tu progreso, inicia sesión con Google.' 
+            : 'Explore all the app features. To register your own workouts and save your progress, please sign in with Google.',
+          created_at: new Date().toISOString(),
+          read: false,
+          priority: 'high'
+        }
+        setNotifications([mockNotification])
+        setIsLoading(false)
+        return
+      }
+
       // Cargar notificaciones del usuario
       const userNotifications = await apiClient.getNotifications() as any[]
       
@@ -111,7 +132,7 @@ export default function NotificationsList() {
     } finally {
       setIsLoading(false)
     }
-  }, [settings.showOwnWorkoutsInSocial])
+  }, [isGuest, language, settings.showOwnWorkoutsInSocial])
 
   useEffect(() => {
     loadNotifications()

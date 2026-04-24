@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { translations } from '../../i18n/translations'
 
 type Exercise = {
@@ -39,9 +40,10 @@ type SettingsModalProps = {
 
 export default function SettingsModal({ open, onClose, exercises = [] }: SettingsModalProps) {
   const { language } = useLanguage()
+  const { isGuest, signInWithGoogle } = useAuth()
   const t = translations[language]
   const [hasChanges, setHasChanges] = useState(false)
-  const [tempSettings, setTempSettings] = useState<{ favoriteExercises: number[], hideRestSeconds: boolean }>({ favoriteExercises: [], hideRestSeconds: false })
+  const [tempSettings, setTempSettings] = useState<{ favoriteExercises: number[] }>({ favoriteExercises: [] })
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [saving, setSaving] = useState(false)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
@@ -56,8 +58,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         const parsed = JSON.parse(adminSettings)
         setTempSettings(prev => ({
           ...prev,
-          favoriteExercises: parsed.favoriteExercises || [],
-          hideRestSeconds: parsed.hideRestSeconds || false
+          favoriteExercises: parsed.favoriteExercises || []
         }))
       } else {
         // Si no hay configuraciones guardadas, inicializar con todos los ejercicios disponibles
@@ -100,8 +101,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       const adminSettings = localStorage.getItem('admin-exercise-settings')
       if (adminSettings) {
         const parsed = JSON.parse(adminSettings)
-        hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || []) ||
-          tempSettings.hideRestSeconds !== (parsed.hideRestSeconds || false)
+        hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(parsed.favoriteExercises || [])
       } else {
         // Si no hay configuraciones guardadas, cualquier cambio es válido
         hasFavoriteChanges = tempSettings.favoriteExercises.length > 0
@@ -127,13 +127,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
 
 
-  const handleToggleHideRestSeconds = () => {
-    setTempSettings(prev => ({
-      ...prev,
-      hideRestSeconds: !prev.hideRestSeconds
-    }))
-    setHasChanges(true)
-  }
 
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
@@ -155,7 +148,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       // Guardar en localStorage para todos los usuarios
       const settingsToSave = {
         favoriteExercises: tempSettings.favoriteExercises,
-        hideRestSeconds: tempSettings.hideRestSeconds,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
@@ -199,8 +191,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         const parsed = JSON.parse(adminSettings)
         setTempSettings(prev => ({
           ...prev,
-          favoriteExercises: parsed.favoriteExercises || [],
-          hideRestSeconds: parsed.hideRestSeconds || false
+          favoriteExercises: parsed.favoriteExercises || []
         }))
       }
     } catch (error) {
@@ -449,49 +440,46 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
               📊 {language === 'es' ? 'EXPORTAR MIS DATOS' : 'EXPORT MY DATA'}
             </Typography>
 
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {language === 'es' ? 'Descarga todos tus entrenamientos en formato CSV para análisis o respaldo' : 'Download all your workouts in CSV format for analysis or backup'}
-            </Typography>
+            {isGuest ? (
+              <Box sx={{ 
+                p: 2, 
+                bgcolor: 'rgba(25, 118, 210, 0.05)', 
+                borderRadius: 2, 
+                border: '1px dashed', 
+                borderColor: 'primary.main',
+                textAlign: 'center'
+              }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {language === 'es' 
+                    ? 'Inicia sesión para poder registrar y exportar tus propios entrenamientos.' 
+                    : 'Sign in to be able to register and export your own workouts.'}
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  size="small" 
+                  onClick={signInWithGoogle}
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  {language === 'es' ? 'Iniciar sesión con Google' : 'Sign in with Google'}
+                </Button>
+              </Box>
+            ) : (
+              <>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {language === 'es' ? 'Descarga todos tus entrenamientos en formato CSV para análisis o respaldo' : 'Download all your workouts in CSV format for analysis or backup'}
+                </Typography>
 
-            <Button
-              variant="outlined"
-              startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
-              onClick={handleDownloadWorkouts}
-              disabled={downloading}
-              sx={{ mb: 2 }}
-            >
-              {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
-            </Button>
-
-            <Divider sx={{ my: 1, borderStyle: 'dashed' }} />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={tempSettings.hideRestSeconds}
-                  onChange={handleToggleHideRestSeconds}
-                  color="primary"
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {language === 'es' ? 'Ocultar segundos de descanso' : 'Hide rest seconds'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {language === 'es'
-                      ? 'No mostrar el campo de segundos de descanso en el registro'
-                      : 'Do not show the rest seconds field in the log'}
-                  </Typography>
-                </Box>
-              }
-              sx={{
-                width: '100%',
-                m: 0,
-                mt: 1,
-                alignItems: 'center'
-              }}
-            />
+                <Button
+                  variant="outlined"
+                  startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+                  onClick={handleDownloadWorkouts}
+                  disabled={downloading}
+                  sx={{ mb: 2 }}
+                >
+                  {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
+                </Button>
+              </>
+            )}
           </Box>
 
           <Divider sx={{ my: 2 }} />
@@ -574,8 +562,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
               </Box>
             ) : (
               <Alert severity="info">
-                <Typography variant="body2">
-                  {language === 'es' ? 'Los ejercicios se cargarán automáticamente cuando estén disponibles' : 'Exercises will load automatically when available'}
+                <Typography variant="body2" color="info.main">
+                  {isGuest 
+                    ? (language === 'es' ? 'Inicia sesión para personalizar tus ejercicios favoritos' : 'Sign in to customize your favorite exercises')
+                    : (language === 'es' ? 'Los ejercicios se cargarán automáticamente cuando estén disponibles' : 'Exercises will load automatically when available')}
                 </Typography>
               </Alert>
             )}

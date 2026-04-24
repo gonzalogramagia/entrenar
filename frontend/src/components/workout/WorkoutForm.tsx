@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useAuth } from '../../contexts/AuthContext'
 
 type Exercise = {
   id: number
@@ -47,7 +48,7 @@ const workoutFormSchema = z.object({
   reps: z.coerce.number().int().refine(val => val === 0 || (val > 0 && val <= 100), ' ').optional(), // Máximo 100 reps, opcional
   set: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(28800).optional(), // Máximo 8 horas (28800 segundos) para deportes
-  restSeconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora de descanso
+  restSeconds: z.coerce.number().min(0).max(3600).optional(), // Mantener en esquema por compatibilidad si es necesario, pero oculto
   observations: z.string().default('')
 })
 
@@ -148,19 +149,6 @@ export default function WorkoutForm({
     return filtered
   }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin, refreshTrigger])
 
-  // Obtener configuración de ocultar descanso
-  const hideRestSeconds = useMemo(() => {
-    try {
-      const adminSettings = localStorage.getItem('admin-exercise-settings')
-      if (adminSettings) {
-        const parsed = JSON.parse(adminSettings)
-        return parsed.hideRestSeconds || false
-      }
-    } catch (error) {
-      console.error('Error loading hideRestSeconds setting:', error)
-    }
-    return false
-  }, [refreshTrigger])
 
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
@@ -170,7 +158,6 @@ export default function WorkoutForm({
       reps: '',
       set: 1,
       seconds: '',
-      restSeconds: '',
       observations: ''
     }
   })
@@ -260,8 +247,7 @@ export default function WorkoutForm({
         setValue('weight', preloadedExercise.weight?.toString() || '')
         setValue('reps', preloadedExercise.reps || '')
         // Si hay currentSet (auto-completado), usar ese valor, sino usar 1
-        setValue('set', preloadedExercise.currentSet || 1)
-        setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
+        setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '') // Esto se usa para el tiempo total en deportes
         setValue('observations', preloadedExercise.notes || '')
       }
 
@@ -357,7 +343,13 @@ export default function WorkoutForm({
     }
   }
 
+  const { isGuest, signInWithGoogle } = useAuth()
+
   const submit = handleSubmit(async (data: WorkoutFormData) => {
+    if (isGuest) {
+      signInWithGoogle()
+      return
+    }
     const originalObservations = data.observations
     try {
       // Para deportes, validar que el tiempo sea requerido
@@ -419,7 +411,6 @@ export default function WorkoutForm({
       const currentWeight = watch('weight') // Usamos watch para obtener el string original
       const currentReps = watch('reps')
       const currentSet = data.set
-      const currentRestSeconds = watch('restSeconds')
 
       reset({
         exercise_id: currentExerciseId,
@@ -427,7 +418,6 @@ export default function WorkoutForm({
         reps: currentReps || '',
         set: isSportExercise ? 1 : (currentSet < (isRunningOrBiciExercise ? 8 : 5) ? currentSet + 1 : currentSet),
         seconds: '',
-        restSeconds: currentRestSeconds || '',
         observations: originalObservations || ''
       })
 
@@ -941,26 +931,6 @@ export default function WorkoutForm({
             </Box>
           )}
 
-          {/* Campo de descanso en segundos - Oculto para deportes o por configuración */}
-          {!isSportExercise && !hideRestSeconds && (
-            <TextField
-              label={t.restAfterSet}
-              type="number"
-              disabled={isLoading}
-              error={Boolean(errors.restSeconds)}
-              {...register('restSeconds')}
-              inputProps={{
-                inputMode: 'numeric',
-                min: 0,
-                max: 3600 // 1 hora máximo
-              }}
-              sx={{
-                '& .MuiInputLabel-root': {
-                  color: 'text.primary'
-                }
-              }}
-            />
-          )}
 
           {/* Mensaje de éxito/error o campo de observaciones */}
           {messageInObservations ? (

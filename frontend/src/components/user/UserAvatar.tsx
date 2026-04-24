@@ -9,9 +9,10 @@ import {
   Divider,
   Box,
   IconButton,
-  Badge
+  Badge,
+  Button
 } from '@mui/material'
-import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon, Google as GoogleIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
@@ -26,7 +27,7 @@ type UserAvatarProps = {
 export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: UserAvatarProps) {
   const { language } = useLanguage()
   const t = translations[language]
-  const { user, logout, isAdmin, userRole } = useAuth()
+  const { user, logout, isAdmin, userRole, isGuest, signInWithGoogle } = useAuth()
   // const { settings } = useUserSettings() // Ya no se usa
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -163,27 +164,62 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {/* Información del usuario */}
-        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #e0e0e0' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Avatar
-              sx={{
-                width: 40,
-                height: 40,
-                mr: 1.5,
-                bgcolor: avatarUrl ? 'transparent' : 'primary.main'
-              }}
-              src={avatarUrl}
-            >
-              {!avatarUrl && getUserInitials()}
+        <Box sx={{ p: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            textAlign: 'center',
+            gap: 1, 
+            mb: 1 
+          }}>
+            <Avatar sx={{ 
+              bgcolor: 'primary.main', 
+              width: 56, 
+              height: 56,
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)'
+            }}>
+              {isGuest ? 'U' : (user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U')}
             </Avatar>
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || (language === 'es' ? 'Usuario' : 'User')}
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                {isGuest ? (language === 'es' ? 'Invitado' : 'Guest') : (user?.user_metadata?.full_name || user?.email?.split('@')[0] || (language === 'es' ? 'Usuario' : 'User'))}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {user?.email}
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                {isGuest ? (language === 'es' ? 'Modo de prueba' : 'Trial mode') : user?.email}
               </Typography>
             </Box>
+            
+            {isGuest && (
+              <Button
+                fullWidth
+                variant="contained"
+                size="medium"
+                startIcon={<GoogleIcon />}
+                onClick={() => {
+                  handleClose()
+                  signInWithGoogle()
+                }}
+                sx={{
+                  mt: 0.5,
+                  borderRadius: '12px',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  py: 1,
+                  backgroundColor: '#1976d2',
+                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                    boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)'
+                  }
+                }}
+              >
+                {language === 'es' ? 'Ingresar con Google' : 'Sign in with Google'}
+              </Button>
+            )}
           </Box>
         </Box>
 

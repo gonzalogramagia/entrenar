@@ -26,6 +26,8 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 type NotificationType = 'kudos' | 'announcement' | 'workout_created' | 'welcome'
 
@@ -60,6 +62,8 @@ type NotificationsModalProps = {
 
 export default function NotificationsModal({ open, onClose, onMarkAsRead }: NotificationsModalProps) {
   const { settings } = useUserSettings()
+  const { isGuest } = useAuth()
+  const { language } = useLanguage()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -69,6 +73,24 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     setError('')
     
     try {
+      if (isGuest) {
+        const isRead = localStorage.getItem('guest_welcome_read') === 'true'
+        const mockNotification: Notification = {
+          id: 999999, // Use a number as per type definition
+          type: 'welcome',
+          title: language === 'es' ? '¡Bienvenido al modo invitado!' : 'Welcome to guest mode!',
+          message: language === 'es' 
+            ? 'Explora todas las funcionalidades de la app. Para registrar tus propios entrenamientos y guardar tu progreso, inicia sesión con Google.' 
+            : 'Explore all the app features. To register your own workouts and save your progress, please sign in with Google.',
+          created_at: new Date().toISOString(),
+          is_read: isRead,
+          priority: 'high'
+        }
+        setNotifications([mockNotification])
+        setIsLoading(false)
+        return
+      }
+
       const notificationsData = await apiClient.getNotifications() as Notification[]
       
       // Filtrar notificaciones basándose en la configuración del usuario
@@ -87,7 +109,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     } finally {
       setIsLoading(false)
     }
-  }, [settings.showOwnWorkoutsInSocial])
+  }, [isGuest, language, settings.showOwnWorkoutsInSocial])
 
   useEffect(() => {
     if (open) {
@@ -97,6 +119,19 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
 
   const markAsRead = async (notificationId: number) => {
     try {
+      if (isGuest && notificationId === 999999) {
+        localStorage.setItem('guest_welcome_read', 'true')
+        setNotifications(prev => 
+          prev.map(notif => 
+            notif.id === notificationId 
+              ? { ...notif, is_read: true }
+              : notif
+          )
+        )
+        onMarkAsRead(1)
+        return
+      }
+
       const notification = notifications.find(n => n.id === notificationId)
       if (notification && !notification.is_read) {
         await apiClient.markNotificationAsRead(notificationId)

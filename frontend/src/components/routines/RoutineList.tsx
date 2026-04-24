@@ -32,6 +32,7 @@ import RoutineDetail from './RoutineDetail'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
+import { useAuth } from '../../contexts/AuthContext'
 
 interface RoutineListProps {
   activeRoutine?: any
@@ -42,6 +43,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   const { language } = useLanguage()
   const t = translations[language].routines
   const { getRoutineProgress, resetCompletedExercisesForDate } = useUserSettings()
+  const { isGuest, signInWithGoogle } = useAuth()
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
 
   // Función para detectar si una rutina está completa
@@ -73,29 +75,105 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     try {
       setLoading(true)
       setError(null)
+      
+      if (isGuest) {
+        // Rutina de prueba para modo invitado
+        const mockRoutine: RoutineWithExercises = {
+          id: 9999,
+          user_id: 'guest',
+          name: 'Rutina de Test',
+          is_active: true,
+          total_exercises: 3,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          exercises: [
+            {
+              id: 9995,
+              routine_id: 9999,
+              exercise_id: 100,
+              exercise_name: language === 'es' ? 'Calentamiento Dinámico' : 'Dynamic Warm Up',
+              sets: 1,
+              reps: 1,
+              weight: 0,
+              order_index: 0,
+              rest_time_seconds: 0,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 9996,
+              routine_id: 9999,
+              exercise_id: 1,
+              exercise_name: 'Press de Banca',
+              sets: 1,
+              reps: 10,
+              weight: 60,
+              order_index: 1,
+              rest_time_seconds: 60,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 9997,
+              routine_id: 9999,
+              exercise_id: 2,
+              exercise_name: 'Sentadilla',
+              sets: 1,
+              reps: 12,
+              weight: 80,
+              order_index: 2,
+              rest_time_seconds: 90,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 9998,
+              routine_id: 9999,
+              exercise_id: 3,
+              exercise_name: 'Peso Muerto',
+              sets: 1,
+              reps: 8,
+              weight: 100,
+              order_index: 3,
+              rest_time_seconds: 120,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 9999,
+              routine_id: 9999,
+              exercise_id: 101,
+              exercise_name: language === 'es' ? 'Estiramiento' : 'Stretching',
+              sets: 1,
+              reps: 1,
+              weight: 0,
+              order_index: 4,
+              rest_time_seconds: 0,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ]
+        }
+        setRoutines([mockRoutine])
+        setLoading(false)
+        return
+      }
+
       const data = await apiClient.getUserRoutines()
 
-      // Validar que data sea un array
       if (Array.isArray(data)) {
-
-        // Cargar las rutinas completas con ejercicios
         const fullRoutines = await Promise.all(
           data.map(async (routine: any) => {
             try {
               return await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
             } catch (error) {
               console.error(`Error cargando rutina ${routine.id}:`, error)
-              return routine // Devolver la rutina básica si falla
+              return routine
             }
           })
         )
-
         setRoutines(fullRoutines)
-      } else if (data === null || data === undefined) {
-        // Si no hay rutinas, establecer array vacío
-        setRoutines([])
       } else {
-        console.warn('⚠️ RoutineList - API devolvió datos no válidos:', data)
         setRoutines([])
       }
     } catch (err) {
@@ -105,13 +183,17 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isGuest])
 
   useEffect(() => {
     loadRoutines()
   }, [loadRoutines])
 
   const handleCreateRoutine = async (routineData: CreateRoutineRequest | UpdateRoutineRequest) => {
+    if (isGuest) {
+      signInWithGoogle()
+      return
+    }
     try {
       await apiClient.createUserRoutine(routineData as CreateRoutineRequest)
       setOpenCreateDialog(false)
@@ -280,7 +362,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               variant="contained"
               size="large"
               startIcon={<AddIcon sx={{ color: '#fff' }} />}
-              onClick={() => setOpenCreateDialog(true)}
+              onClick={() => {
+                if (isGuest) {
+                  signInWithGoogle()
+                  return
+                }
+                setOpenCreateDialog(true)
+              }}
               sx={{
                 fontWeight: 600,
                 borderRadius: '12px',
@@ -537,7 +625,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             {sortedRoutines && sortedRoutines.length > 0 && (
               <Card
                 elevation={0}
-                onClick={() => setOpenCreateDialog(true)}
+                onClick={() => {
+                  if (isGuest) {
+                    signInWithGoogle()
+                    return
+                  }
+                  setOpenCreateDialog(true)
+                }}
                 sx={{
                   height: '100%',
                   minHeight: '140px',

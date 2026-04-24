@@ -22,6 +22,8 @@ type AuthContextType = {
   isSigningIn: boolean
   isAdmin: boolean
   userRole: string
+  isGuest: boolean
+  enterAsGuest: () => void
   signInWithGoogle: () => Promise<{ error?: any }>
   logout: () => Promise<void>
 }
@@ -40,6 +42,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [userRole, setUserRole] = useState('user')
+  const [isGuest, setIsGuest] = useState(() => {
+    return localStorage.getItem('isGuest') === 'true'
+  })
 
   useEffect(() => {
     // Get initial session
@@ -49,6 +54,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         setSession(session)
         setUser(session?.user ?? null)
+        
+        // Si hay una sesión real, el usuario ya no es invitado
+        if (session?.user) {
+          setIsGuest(false)
+          localStorage.removeItem('isGuest')
+        }
       }
       setIsLoading(false)
     })
@@ -61,6 +72,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false)
         // Reset signing in state when auth state changes
         setIsSigningIn(false)
+        
+        // Si hay una sesión real, el usuario ya no es invitado
+        if (session?.user) {
+          setIsGuest(false)
+          localStorage.removeItem('isGuest')
+        }
       }
     )
 
@@ -69,7 +86,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Función para obtener información del usuario
   const fetchUserInfo = useCallback(async () => {
-    if (user) {
+    if (user && !isGuest) {
       try {
         const userInfo = await apiClient.getCurrentUser() as UserInfo
         setIsAdmin(userInfo.is_admin || false)
@@ -103,14 +120,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAdmin(false)
       setUserRole('user')
     }
-  }, [user])
+  }, [user, isGuest])
 
   // Obtener información del usuario incluyendo is_admin cuando cambie el usuario
   useEffect(() => {
     fetchUserInfo()
-  }, [user]) // Solo depender de user, no de fetchUserInfo
+  }, [user, isGuest]) // Solo depender de user, no de fetchUserInfo
 
-
+  const enterAsGuest = () => {
+    setIsGuest(true)
+    localStorage.setItem('isGuest', 'true')
+  }
 
   const signInWithGoogle = async () => {
     setIsSigningIn(true)
@@ -134,6 +154,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setSession(null)
       setIsAdmin(false)
       setUserRole('user')
+      setIsGuest(false)
+      localStorage.removeItem('isGuest')
       // Forzar recarga para limpiar completamente el estado
       window.location.reload()
     } catch (error) {
@@ -145,7 +167,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  const isAuthenticated = !!user
+  const isAuthenticated = !!user || isGuest
 
   return (
     <AuthContext.Provider value={{ 
@@ -157,6 +179,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isSigningIn,
       isAdmin,
       userRole,
+      isGuest,
+      enterAsGuest,
       signInWithGoogle, 
       logout 
     }}>

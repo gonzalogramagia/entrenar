@@ -24,6 +24,7 @@ import type { RoutineWithExercises } from '../../types/routine'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
+import { useAuth } from '../../contexts/AuthContext'
 
 interface RoutineDetailProps {
   routine: RoutineWithExercises
@@ -50,6 +51,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
 }) => {
   const { language } = useLanguage()
   const t = translations[language]
+  const { isGuest, signInWithGoogle } = useAuth()
   const { toggleExerciseCompleted, getCompletedExercisesForRoutine, getRoutineProgress, resetCompletedExercisesForDate } = useUserSettings()
 
   // Obtener fecha actual y ejercicios completados
@@ -179,7 +181,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       color="error"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onDelete()
+                        if (isGuest) {
+                          signInWithGoogle()
+                          return
+                        }
+                        onDelete?.()
                       }}
                       sx={{
                         backgroundColor: 'transparent',
@@ -216,7 +222,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       }}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onEdit()
+                        if (isGuest) {
+                          signInWithGoogle()
+                          return
+                        }
+                        onEdit?.()
                       }}
                     >
                       <EditIcon />
@@ -315,7 +325,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     color="error"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onDelete()
+                      if (isGuest) {
+                        signInWithGoogle()
+                        return
+                      }
+                      onDelete?.()
                     }}
                     sx={{
                       backgroundColor: 'transparent',
@@ -339,7 +353,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     }}
                     onClick={(e) => {
                       e.stopPropagation()
-                      onEdit()
+                      if (isGuest) {
+                        signInWithGoogle()
+                        return
+                      }
+                      onEdit?.()
                     }}
                   >
                     <EditIcon />
