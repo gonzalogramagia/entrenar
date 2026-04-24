@@ -870,8 +870,8 @@ export default function WorkoutHistory() {
             p: 6, 
             textAlign: 'center', 
             mx: 0.5,
-            mt: -1, // Menos espaciado arriba
-            mb: 10,  // Más espaciado abajo
+            mt: -3, // Anula completamente el spacing={3} del Stack superior
+            mb: 15,  // Mucho más espaciado abajo
             bgcolor: 'rgba(0,0,0,0.02)', 
             borderRadius: 4,
             border: '2px dashed',
@@ -1343,7 +1343,9 @@ export default function WorkoutHistory() {
                         sx={{
                           textTransform: 'none',
                           color: 'text.secondary',
-                          borderColor: 'divider'
+                          borderColor: 'divider',
+                          py: 1.2,
+                          borderRadius: 2
                         }}
                         variant="outlined"
                         fullWidth
@@ -1387,7 +1389,8 @@ export default function WorkoutHistory() {
                       </Box>
                     )}
                     <CardContent sx={{
-                      p: 2
+                      p: 2,
+                      '&:last-child': { pb: 2 }
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -1404,7 +1407,7 @@ export default function WorkoutHistory() {
                               workout.seconds && workout.seconds > 0 && (
                                 <Chip
                                   label={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
                                       {formatTimeForSport(workout.seconds)}
                                       <ModeEditIcon className="edit-icon" sx={{ fontSize: '0.9rem', opacity: 0, transition: 'opacity 0.2s' }} />
                                     </Box>
@@ -1415,13 +1418,13 @@ export default function WorkoutHistory() {
                                     fontWeight: 'bold',
                                     borderColor: '#ff9800',
                                     color: '#ff9800',
-                                    minWidth: '80px',
                                     transition: 'all 0.2s',
                                     '&:hover': {
                                       backgroundColor: 'rgba(255, 152, 0, 0.08)',
                                       cursor: 'pointer',
-                                      '& .edit-icon': { opacity: 1 }
-                                    }
+                                      '& .edit-icon': { opacity: 1, width: 'auto', ml: 0.5 }
+                                    },
+                                    '& .edit-icon': { width: 0, overflow: 'hidden' }
                                   }}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -1440,7 +1443,7 @@ export default function WorkoutHistory() {
                               <>
                                 <Chip
                                   label={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
                                       {workout.weight === 0 ? (language === 'es' ? 'Peso corporal' : 'Bodyweight') : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`}
                                       <ModeEditIcon className="edit-icon" sx={{ fontSize: '0.9rem', opacity: 0, transition: 'opacity 0.2s' }} />
                                     </Box>
@@ -1451,13 +1454,13 @@ export default function WorkoutHistory() {
                                     fontWeight: 'bold',
                                     borderColor: '#2196f3',
                                     color: '#2196f3',
-                                    minWidth: workout.weight === 0 ? '110px' : '70px',
                                     transition: 'all 0.2s',
                                     '&:hover': {
                                       backgroundColor: 'rgba(33, 150, 243, 0.08)',
                                       cursor: 'pointer',
-                                      '& .edit-icon': { opacity: 1 }
-                                    }
+                                      '& .edit-icon': { opacity: 1, width: 'auto', ml: 0.5 }
+                                    },
+                                    '& .edit-icon': { width: 0, overflow: 'hidden' }
                                   }}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -1473,7 +1476,7 @@ export default function WorkoutHistory() {
                                 {!workout.exercise_name.toLowerCase().includes('running') && !workout.exercise_name.toLowerCase().includes('bici') && (
                                   <Chip
                                     label={
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
                                         {`${workout.reps} reps`}
                                         <ModeEditIcon className="edit-icon" sx={{ fontSize: '0.9rem', opacity: 0, transition: 'opacity 0.2s' }} />
                                       </Box>
@@ -1484,13 +1487,13 @@ export default function WorkoutHistory() {
                                       fontWeight: 'bold',
                                       borderColor: '#4caf50',
                                       color: '#4caf50',
-                                      minWidth: '70px',
                                       transition: 'all 0.2s',
                                       '&:hover': {
                                         backgroundColor: 'rgba(76, 175, 80, 0.08)',
                                         cursor: 'pointer',
-                                        '& .edit-icon': { opacity: 1 }
-                                      }
+                                        '& .edit-icon': { opacity: 1, width: 'auto', ml: 0.5 }
+                                      },
+                                      '& .edit-icon': { width: 0, overflow: 'hidden' }
                                     }}
                                     onClick={(e) => {
                                       e.stopPropagation();

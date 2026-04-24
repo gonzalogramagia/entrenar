@@ -414,9 +414,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 </CardContent>
 
                 <CardActions sx={{
-                  flexDirection: 'column', // Apilar botones en mobile o centrarlos en desktop
+                  flexDirection: 'column',
                   gap: 1.5,
-                  px: 3,
+                  px: { xs: 2, sm: 3 },
                   pb: 3,
                   pt: 0.5
                 }}>
@@ -443,6 +443,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                         whiteSpace: 'pre-line',
                         lineHeight: 1.1,
                         fontSize: '0.8rem',
+                        textTransform: 'none',
+                        letterSpacing: 0,
                         minWidth: '0',
                         borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
                         color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFDA91' : 'primary.main'),
@@ -479,22 +481,24 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                             }
                           }
                         }}
-                        sx={{
-                          fontWeight: 700,
-                          borderRadius: '12px',
-                          px: 1.5,
-                          py: 1,
-                          whiteSpace: 'pre-line',
-                          lineHeight: 1.1,
-                          fontSize: '0.8rem',
-                          minWidth: '0',
-                          backgroundColor: activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main',
-                          color: 'white',
-                          flex: 1,
-                          '&:hover': {
-                            backgroundColor: activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark',
-                          }
-                        }}
+                         sx={{
+                           fontWeight: 700,
+                           borderRadius: '12px',
+                           px: 1.5,
+                           py: 1,
+                           whiteSpace: 'pre-line',
+                           lineHeight: 1.1,
+                           fontSize: '0.8rem',
+                           textTransform: 'none',
+                           letterSpacing: 0,
+                           minWidth: '0',
+                           backgroundColor: activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main',
+                           color: 'white',
+                           flex: 1,
+                           '&:hover': {
+                             backgroundColor: activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark',
+                           }
+                         }}
                       >
                         {activeRoutine?.id === routine.id
                           ? (language === 'es' ? 'Detener\nRutina' : 'Stop\nRoutine')
