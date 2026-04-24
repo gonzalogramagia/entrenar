@@ -135,7 +135,7 @@ export default function WorkoutHistory() {
   const [editValueModal, setEditValueModal] = useState<{
     show: boolean;
     workoutId: number | null;
-    field: 'weight' | 'reps' | null;
+    field: 'weight' | 'reps' | 'seconds' | null;
     currentValue: string;
     unit?: string;
   }>({
@@ -1428,8 +1428,8 @@ export default function WorkoutHistory() {
                                     setEditValueModal({
                                       show: true,
                                       workoutId: workout.id,
-                                      field: 'sport_time',
-                                      currentValue: Math.floor(workout.seconds / 60).toString(),
+                                      field: 'seconds',
+                                      currentValue: Math.floor((workout.seconds || 0) / 60).toString(),
                                       unit: 'min'
                                     });
                                   }}
