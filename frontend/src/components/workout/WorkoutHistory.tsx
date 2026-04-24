@@ -42,7 +42,11 @@ import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from
 function ServerDay(props: any) {
   const { highlightedDays = new Set(), day, outsideCurrentMonth, ...other } = props;
 
-  const dateStr = day ? `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}` : '';
+  // Usar la misma lógica de normalización
+  const year = day?.getFullYear();
+  const month = String((day?.getMonth() || 0) + 1).padStart(2, '0');
+  const dateNum = String(day?.getDate() || 0).padStart(2, '0');
+  const dateStr = `${year}-${month}-${dateNum}`;
   
   const hasWorkout = !outsideCurrentMonth && highlightedDays.has(dateStr);
 
@@ -129,11 +133,38 @@ export default function WorkoutHistory() {
 
 
 
+  // Función para normalizar una fecha (ISO o YYYY-MM-DD) a string YYYY-MM-DD
+  const normalizeDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    // Tomar solo la parte de la fecha (ignorar T... o espacio ...)
+    return dateStr.split('T')[0].split(' ')[0];
+  }
+
+  // Función para convertir un objeto Date a string YYYY-MM-DD local
+  const getDateString = (date: Date) => {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // Función para parsear un string YYYY-MM-DD a un objeto Date local
+  const parseDate = (dateStr: string) => {
+    try {
+      const normalized = normalizeDate(dateStr);
+      const [year, month, day] = normalized.split('-').map(Number);
+      // Mes es 0-indexed en Date
+      return new Date(year, month - 1, day);
+    } catch (e) {
+      console.error('Error parseando fecha:', dateStr, e);
+      return new Date(dateStr);
+    }
+  }
+
   const formatDate = (dateString: string) => {
     try {
-      // Ajustar la fecha para compensar el problema del día de atraso
-      const date = new Date(dateString);
-      date.setDate(date.getDate() + 1);
+      const date = parseDate(dateString);
 
       const weekday = date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { weekday: 'long' })
       const day = date.getDate()
@@ -249,7 +280,7 @@ export default function WorkoutHistory() {
   }, [workoutDays, workouts]);
 
   const trainingDates = useMemo(() => 
-    new Set(workoutDaysWithExercises.map(day => day.workoutDay.date)), 
+    new Set(workoutDaysWithExercises.map(day => normalizeDate(day.workoutDay.date))), 
     [workoutDaysWithExercises]
   );
 
@@ -580,17 +611,7 @@ export default function WorkoutHistory() {
               }}
             />
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton 
-                onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                sx={{ 
-                  color: 'white',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
-                }}
-              >
-                {sortOrder === 'desc' ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-              </IconButton>
-              {searchTerm && (
+              {searchTerm ? (
                 <IconButton 
                   onClick={() => setSearchTerm('')}
                   sx={{ 
@@ -600,6 +621,17 @@ export default function WorkoutHistory() {
                   }}
                 >
                   <CloseIcon />
+                </IconButton>
+              ) : (
+                <IconButton 
+                  onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                  sx={{ 
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
+                  }}
+                >
+                  {sortOrder === 'desc' ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </IconButton>
               )}
             </Box>
@@ -624,7 +656,10 @@ export default function WorkoutHistory() {
             showDaysOutsideCurrentMonth
             fixedWeekNumber={6}
             shouldDisableDate={(date: Date) => {
-              const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const dateNum = String(date.getDate()).padStart(2, '0');
+              const dateStr = `${year}-${month}-${dateNum}`;
               return !trainingDates.has(dateStr);
             }}
             onChange={(newDate: Date | null) => {
