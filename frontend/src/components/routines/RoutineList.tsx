@@ -22,7 +22,8 @@ import {
   Stop as StopIcon,
   FitnessCenter as FitnessCenterIcon,
   Close as CloseIcon,
-  Autorenew as AutorenewIcon
+  Autorenew as AutorenewIcon,
+  Visibility as VisibilityIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { RoutineWithExercises, CreateRoutineRequest, UpdateRoutineRequest } from '../../types/routine'
@@ -322,7 +323,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             },
             width: '100%',
             maxWidth: '100%',
-            overflow: 'hidden'
+            p: 2, // Añadimos padding para que el hover no se corte
+            overflow: 'visible'
           }}>
             {sortedRoutines?.map((routine) => (
               <Card
@@ -411,39 +413,49 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 </CardContent>
 
                 <CardActions sx={{
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  flexDirection: 'column', // Apilar botones en mobile o centrarlos en desktop
+                  gap: 1.5,
                   px: 3,
                   pb: 3,
                   pt: 0.5
                 }}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleViewRoutine(routine)
-                    }}
-                    sx={{
-                      fontWeight: 700,
-                      borderRadius: '10px',
-                      px: 2,
-                      textTransform: 'none',
-                      backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
-                      boxShadow: 'none',
-                      '&:hover': {
-                        backgroundColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark'),
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                      }
-                    }}
-                  >
-                    {t.details}
-                  </Button>
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: 1.5,
+                    width: '100%',
+                    justifyContent: 'center'
+                  }}>
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      startIcon={<VisibilityIcon />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleViewRoutine(routine)
+                      }}
+                      sx={{
+                        fontWeight: 700,
+                        borderRadius: '12px',
+                        px: 3,
+                        textTransform: 'none',
+                        borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main'),
+                        color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? '#FFDA91' : 'primary.main'),
+                        flex: 1,
+                        '&:hover': {
+                          borderColor: isRoutineComplete(routine) ? 'success.dark' : (activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark'),
+                          backgroundColor: 'rgba(0,0,0,0.02)'
+                        }
+                      }}
+                    >
+                      {t.details}
+                    </Button>
 
-                  <Box sx={{ display: 'flex', gap: 1 }}>
                     {!isRoutineComplete(routine) && (
-                      <IconButton
-                        size="small"
+                      <Button
+                        variant="contained"
+                        size="medium"
+                        startIcon={activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
                         onClick={async (e) => {
                           e.stopPropagation()
                           if (activeRoutine?.id === routine.id) {
@@ -463,43 +475,49 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                           }
                         }}
                         sx={{
-                          color: 'white',
+                          fontWeight: 700,
+                          borderRadius: '12px',
+                          px: 3,
+                          textTransform: 'none',
                           backgroundColor: activeRoutine?.id === routine.id ? '#FFB732' : 'primary.main',
-                          borderRadius: '10px',
-                          p: 1,
+                          color: 'white',
+                          flex: 2, // El botón de iniciar es más importante
                           '&:hover': {
                             backgroundColor: activeRoutine?.id === routine.id ? '#FFA000' : 'primary.dark',
-                            transform: 'scale(1.1)'
-                          },
-                          transition: 'all 0.2s ease'
+                          }
                         }}
                       >
-                        {activeRoutine?.id === routine.id ? <StopIcon fontSize="small" /> : <PlayIcon fontSize="small" />}
-                      </IconButton>
+                        {activeRoutine?.id === routine.id
+                          ? (language === 'es' ? 'Detener' : 'Stop')
+                          : (language === 'es' ? 'Iniciar' : 'Start')}
+                      </Button>
                     )}
 
                     {isRoutineComplete(routine) && (
-                      <IconButton
-                        size="small"
+                      <Button
+                        variant="contained"
+                        size="medium"
+                        startIcon={<AutorenewIcon />}
                         onClick={(e) => {
                           e.stopPropagation()
                           const today = new Date().toISOString().split('T')[0]
                           resetCompletedExercisesForDate(today)
                         }}
                         sx={{
-                          color: 'white',
+                          fontWeight: 700,
+                          borderRadius: '12px',
+                          px: 3,
+                          textTransform: 'none',
                           backgroundColor: 'success.main',
-                          borderRadius: '10px',
-                          p: 1,
+                          color: 'white',
+                          flex: 1,
                           '&:hover': {
                             backgroundColor: 'success.dark',
-                            transform: 'scale(1.1)'
-                          },
-                          transition: 'all 0.2s ease'
+                          }
                         }}
                       >
-                        <AutorenewIcon fontSize="small" />
-                      </IconButton>
+                        {language === 'es' ? 'Reiniciar' : 'Restart'}
+                      </Button>
                     )}
                   </Box>
                 </CardActions>
@@ -533,13 +551,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 }}
               >
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Box sx={{ 
-                    width: 48, 
-                    height: 48, 
-                    borderRadius: '12px', 
-                    backgroundColor: 'rgba(25, 118, 210, 0.1)', 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                  <Box sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     mx: 'auto',
                     mb: 2

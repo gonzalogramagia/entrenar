@@ -370,12 +370,25 @@ export default function WorkoutHistory() {
   // Funciones de UI
   const toggleDayExpansion = (date: string) => {
     const newExpanded = new Set(expandedDays);
-    if (newExpanded.has(date)) {
+    const isExpanding = !newExpanded.has(date);
+    
+    if (!isExpanding) {
       newExpanded.delete(date);
     } else {
       newExpanded.add(date);
     }
+    
     setExpandedDays(newExpanded);
+
+    // Si se está expandiendo, asegurarse de que el elemento siga visible después del cambio de altura
+    if (isExpanding) {
+      setTimeout(() => {
+        const element = document.querySelector(`[data-date="${date}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 50);
+    }
   };
 
   const handleDeleteWorkout = async (workoutId: number) => {
@@ -548,11 +561,6 @@ export default function WorkoutHistory() {
     );
   }
 
-  // Verificar si hay entrenamientos expandidos
-  const hasExpandedWorkouts = expandedDays.size > 0
-
-  // Determinar si debe tener scroll: más de 3 entrenamientos O hay algunos expandidos
-  const shouldHaveScroll = filteredWorkoutDays.length > 3 || hasExpandedWorkouts
 
   return (
     <LocalizationProvider 
@@ -561,13 +569,14 @@ export default function WorkoutHistory() {
     >
       <Box sx={{
         p: 1,
-        height: shouldHaveScroll ? '100%' : 'auto',
-        overflow: shouldHaveScroll ? 'hidden' : 'visible'
+        height: '100%',
+        overflow: 'hidden'
       }}>
 
         <Stack spacing={3} sx={{
-          height: shouldHaveScroll ? '100%' : 'auto',
-          overflow: shouldHaveScroll ? 'auto' : 'visible',
+          height: '100%',
+          overflowY: 'auto',
+          pr: 0.5, // Pequeño padding para que no se pegue el contenido al borde si hay scroll lateral invisible
           '&::-webkit-scrollbar': {
             display: 'none'
           },
@@ -722,9 +731,13 @@ export default function WorkoutHistory() {
         </Card>
 
         {/* Cards de entrenamientos */}
-        <Box ref={resultsRef} sx={{ mx: 0.5, pb: 40 }}>
+        <Box ref={resultsRef} sx={{ mx: 0.5, pb: filteredWorkoutDays.length > 0 ? 40 : 0 }}>
           {filteredWorkoutDays.map((day) => (
-            <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
+            <Box 
+              key={day.workoutDay.date} 
+              data-date={day.workoutDay.date}
+              sx={{ position: 'relative', mb: 2 }}
+            >
               <Card sx={{
                 boxShadow: 2,
                 width: '100%',
