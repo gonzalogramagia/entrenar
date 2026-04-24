@@ -19,7 +19,7 @@ import HistoryIcon from '@mui/icons-material/History'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import PeopleIcon from '@mui/icons-material/People'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
-import BoltIcon from '@mui/icons-material/Bolt'
+// import BoltIcon from '@mui/icons-material/Bolt'
 import UserAvatar from '../user/UserAvatar'
 import { TABS, type TabType } from '../../constants/tabs'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -148,18 +148,19 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
     }, reversedItems.length * 20 + 100) // 100ms adicionales (más rápido)
   }
 
-  const menuItems = [
+  interface MenuItem {
+    label: string
+    icon: React.ReactNode
+    value: TabType | 'ad'
+    url?: string
+    isAd?: boolean
+  }
+
+  const menuItems: MenuItem[] = [
     { label: t.workout, icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
     { label: t.history, icon: <HistoryIcon />, value: TABS.HISTORY },
     { label: t.routines, icon: <FitnessCenterIcon />, value: TABS.ROUTINES },
     { label: t.social, icon: <PeopleIcon />, value: TABS.SOCIAL },
-    /* { 
-      label: 'Energizate con Frutos Secos', 
-      icon: <BoltIcon />, 
-      value: 'ad' as any,
-      url: 'https://moovimiento.com',
-      isAd: true 
-    }, */
   ]
 
   return (
