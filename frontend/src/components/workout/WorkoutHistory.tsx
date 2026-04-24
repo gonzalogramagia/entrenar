@@ -15,7 +15,8 @@ import {
   TextField,
   CircularProgress,
   Alert,
-  Snackbar
+  Snackbar,
+  Badge
 } from '@mui/material'
 import {
   ExpandMore as ExpandMoreIcon,
@@ -24,10 +25,60 @@ import {
   ModeEdit as ModeEditIcon,
   Close as CloseIcon
 } from '@mui/icons-material'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
+import { PickersDay, type PickersDayProps } from '@mui/x-date-pickers/PickersDay'
+import { es, enUS } from 'date-fns/locale'
 import { apiClient } from '../../lib/api'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
+
+/**
+ * Componente personalizado para renderizar los días del calendario
+ * Resalta aquellos días que tienen entrenamientos registrados
+ */
+function ServerDay(props: PickersDayProps & { highlightedDays?: string[] }) {
+  const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
+
+  // Formato YYYY-MM-DD para comparar con el backend
+  const dateStr = day.getFullYear() + '-' + 
+                 String(day.getMonth() + 1).padStart(2, '0') + '-' + 
+                 String(day.getDate()).padStart(2, '0');
+  
+  const hasWorkout = !outsideCurrentMonth && highlightedDays.indexOf(dateStr) >= 0;
+
+  return (
+    <Badge
+      key={props.day.toString()}
+      overlap="circular"
+      badgeContent={hasWorkout ? '🏋️' : undefined}
+      sx={{ 
+        '& .MuiBadge-badge': { 
+          fontSize: '0.65rem',
+          top: 6,
+          right: 5,
+          backgroundColor: 'transparent'
+        } 
+      }}
+    >
+      <PickersDay 
+        {...other} 
+        outsideCurrentMonth={outsideCurrentMonth} 
+        day={day}
+        sx={hasWorkout ? {
+          backgroundColor: 'rgba(25, 118, 210, 0.08)',
+          fontWeight: 'bold',
+          border: '1px solid rgba(25, 118, 210, 0.3)',
+          '&:hover': {
+            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+          }
+        } : {}}
+      />
+    </Badge>
+  );
+}
 
 export default function WorkoutHistory() {
   const { language } = useLanguage()
@@ -504,6 +555,56 @@ export default function WorkoutHistory() {
         scrollbarWidth: 'none',
         msOverflowStyle: 'none'
       }}>
+        {/* Calendario de Entrenamientos */}
+        <Card sx={{ 
+          mx: 0.5, 
+          borderRadius: 3, 
+          boxShadow: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          background: 'linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)'
+        }}>
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={language === 'es' ? es : enUS}>
+            <DateCalendar 
+              showDaysOutsideCurrentMonth
+              fixedWeekNumber={6}
+              onChange={(newDate: Date | null) => {
+                if (newDate) {
+                  const dayNum = newDate.getDate()
+                  const monthName = newDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
+                  const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)
+                  
+                  const searchString = language === 'es' 
+                    ? `${dayNum} de ${capitalizedMonth}`
+                    : `${capitalizedMonth} ${dayNum}`
+                  
+                  setSearchTerm(searchString)
+                }
+              }}
+              slots={{
+                day: ServerDay,
+              }}
+              slotProps={{
+                day: {
+                  highlightedDays: workoutDays.map(d => d.date),
+                } as any,
+              }}
+              sx={{
+                width: '100%',
+                '& .MuiPickersDay-root.Mui-selected': {
+                  backgroundColor: 'primary.main',
+                },
+                '& .MuiDayCalendar-header': {
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  mb: 1
+                }
+              }}
+            />
+          </LocalizationProvider>
+        </Card>
+
         {/* Buscador y ordenamiento */}
         <Box sx={{
           p: 3,
