@@ -153,13 +153,13 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
     { label: t.history, icon: <HistoryIcon />, value: TABS.HISTORY },
     { label: t.routines, icon: <FitnessCenterIcon />, value: TABS.ROUTINES },
     { label: t.social, icon: <PeopleIcon />, value: TABS.SOCIAL },
-    { 
+    /* { 
       label: 'Energizate con Frutos Secos', 
       icon: <BoltIcon />, 
       value: 'ad' as any,
       url: 'https://moovimiento.com',
       isAd: true 
-    },
+    }, */
   ]
 
   return (
