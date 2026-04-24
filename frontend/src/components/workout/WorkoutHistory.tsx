@@ -722,7 +722,7 @@ export default function WorkoutHistory() {
         </Card>
 
         {/* Cards de entrenamientos */}
-        <Box ref={resultsRef} sx={{ mx: 0.5 }}>
+        <Box ref={resultsRef} sx={{ mx: 0.5, pb: 40 }}>
           {filteredWorkoutDays.map((day) => (
             <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
               <Card sx={{
