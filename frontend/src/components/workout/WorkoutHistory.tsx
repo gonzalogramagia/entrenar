@@ -870,7 +870,6 @@ export default function WorkoutHistory() {
             p: 6, 
             textAlign: 'center', 
             mx: 0.5,
-            mt: -3, // Anula completamente el spacing={3} del Stack superior
             mb: 15,  // Mucho más espaciado abajo
             bgcolor: 'rgba(0,0,0,0.02)', 
             borderRadius: 4,

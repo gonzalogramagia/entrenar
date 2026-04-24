@@ -323,7 +323,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
             },
             width: '100%',
             maxWidth: '100%',
-            p: 2, // Añadimos padding para que el hover no se corte
+            px: 0.5,
+            py: 1, // Reducido para que sea igual al historial
             overflow: 'visible'
           }}>
             {sortedRoutines?.map((routine) => (
