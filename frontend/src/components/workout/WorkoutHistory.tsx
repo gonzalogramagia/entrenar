@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Box,
   Typography,
@@ -40,23 +40,22 @@ import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from
  * Resalta aquellos días que tienen entrenamientos registrados
  */
 function ServerDay(props: any) {
-  const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
+  const { highlightedDays = new Set(), day, outsideCurrentMonth, ...other } = props;
 
-  // Formato YYYY-MM-DD para comparar con el backend (usando métodos locales para evitar offsets)
   const dateStr = day ? `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}` : '';
   
-  const hasWorkout = !outsideCurrentMonth && highlightedDays.indexOf(dateStr) >= 0;
+  const hasWorkout = !outsideCurrentMonth && highlightedDays.has(dateStr);
 
   return (
     <Badge
-      key={props.day?.toString()}
       overlap="circular"
-      badgeContent={hasWorkout ? '🏋️' : undefined}
+      badgeContent={hasWorkout ? '•' : undefined}
       sx={{ 
         '& .MuiBadge-badge': { 
-          fontSize: '0.65rem',
-          top: 6,
-          right: 5,
+          fontSize: '1.2rem',
+          top: 28,
+          right: 18,
+          color: 'primary.main',
           backgroundColor: 'transparent'
         } 
       }}
@@ -66,11 +65,11 @@ function ServerDay(props: any) {
         outsideCurrentMonth={outsideCurrentMonth} 
         day={day}
         sx={hasWorkout ? {
-          backgroundColor: 'rgba(25, 118, 210, 0.08)',
-          fontWeight: 'bold',
-          border: '1px solid rgba(25, 118, 210, 0.3)',
+          backgroundColor: 'rgba(25, 118, 210, 0.12)',
+          fontWeight: '700',
+          fontSize: '0.9rem',
           '&:hover': {
-            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+            backgroundColor: 'rgba(25, 118, 210, 0.2)',
           }
         } : {}}
       />
@@ -99,6 +98,7 @@ export default function WorkoutHistory() {
     workoutId: null,
     currentObservation: ''
   });
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const [editValueModal, setEditValueModal] = useState<{
     show: boolean;
@@ -112,6 +112,9 @@ export default function WorkoutHistory() {
     field: null,
     currentValue: ''
   });
+
+  const resultsRef = useRef<HTMLDivElement>(null);
+
 
   // Auto-hide success message after 3 seconds
   useEffect(() => {
@@ -245,6 +248,11 @@ export default function WorkoutHistory() {
     return days;
   }, [workoutDays, workouts]);
 
+  const trainingDates = useMemo(() => 
+    new Set(workoutDaysWithExercises.map(day => day.workoutDay.date)), 
+    [workoutDaysWithExercises]
+  );
+
   // Filtrar días
   const filteredWorkoutDays = useMemo(() => {
     let filtered = workoutDaysWithExercises;
@@ -285,15 +293,15 @@ export default function WorkoutHistory() {
       });
     }
 
-    // Ordenar por fecha (más recientes primero)
+    // Ordenar por fecha
     filtered.sort((a, b) => {
-      const dateA = new Date(a.workoutDay.date);
-      const dateB = new Date(b.workoutDay.date);
-      return dateB.getTime() - dateA.getTime();
+      const dateA = new Date(a.workoutDay.date).getTime();
+      const dateB = new Date(b.workoutDay.date).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
     return filtered;
-  }, [workoutDaysWithExercises, searchTerm]);
+  }, [workoutDaysWithExercises, searchTerm, sortOrder]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -527,62 +535,6 @@ export default function WorkoutHistory() {
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}>
-          {/* Calendario de Entrenamientos */}
-          <Card sx={{ 
-            mx: 0.5, 
-            borderRadius: 3, 
-            boxShadow: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            overflow: 'hidden',
-            background: 'white',
-            minHeight: '360px',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <DateCalendar 
-              defaultValue={new Date()}
-              showDaysOutsideCurrentMonth
-              fixedWeekNumber={6}
-              onChange={(newDate: Date | null) => {
-                if (newDate) {
-                  const dayNum = newDate.getDate()
-                  const monthName = newDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
-                  const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)
-                  
-                  const searchString = language === 'es' 
-                    ? `${dayNum} de ${capitalizedMonth}`
-                    : `${capitalizedMonth} ${dayNum}`
-                  
-                  setSearchTerm(searchString)
-                }
-              }}
-              slots={{
-                day: ServerDay,
-              }}
-              slotProps={{
-                day: {
-                  highlightedDays: workoutDays.map(d => d.date),
-                } as any,
-              }}
-              sx={{
-                width: '100%',
-                flexGrow: 1,
-                '& .MuiPickersDay-root.Mui-selected': {
-                  backgroundColor: 'primary.main',
-                },
-                '& .MuiDayCalendar-header': {
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  mb: 1
-                },
-                '& .MuiDayCalendar-monthContainer': {
-                  minHeight: '240px'
-                }
-              }}
-            />
-          </Card>
-
         {/* Buscador y ordenamiento */}
         <Box sx={{
           p: 3,
@@ -627,13 +579,100 @@ export default function WorkoutHistory() {
                 }
               }}
             />
-
-
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton 
+                onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                sx={{ 
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
+                }}
+              >
+                {sortOrder === 'desc' ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+              </IconButton>
+              {searchTerm && (
+                <IconButton 
+                  onClick={() => setSearchTerm('')}
+                  sx={{ 
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              )}
+            </Box>
           </Box>
         </Box>
 
+        {/* Calendario de Entrenamientos */}
+        <Card sx={{ 
+          mx: 0.5, 
+          borderRadius: 3, 
+          boxShadow: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          background: 'white',
+          minHeight: '360px',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <DateCalendar 
+            defaultValue={new Date()}
+            showDaysOutsideCurrentMonth
+            fixedWeekNumber={6}
+            shouldDisableDate={(date: Date) => {
+              const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+              return !trainingDates.has(dateStr);
+            }}
+            onChange={(newDate: Date | null) => {
+              if (newDate) {
+                const dayNum = newDate.getDate()
+                const monthName = newDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
+                const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)
+                
+                const searchString = language === 'es' 
+                  ? `${dayNum} de ${capitalizedMonth}`
+                  : `${capitalizedMonth} ${dayNum}`
+                
+                setSearchTerm(searchString)
+
+                // Hacer scroll al primer resultado
+                setTimeout(() => {
+                  resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+              }
+            }}
+            slots={{
+              day: ServerDay,
+            }}
+            slotProps={{
+              day: {
+                highlightedDays: trainingDates,
+              } as any,
+            }}
+            sx={{
+              width: '100%',
+              flexGrow: 1,
+              '& .MuiPickersDay-root.Mui-selected': {
+                backgroundColor: 'primary.main',
+              },
+              '& .MuiDayCalendar-header': {
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                mb: 1
+              },
+              '& .MuiDayCalendar-monthContainer': {
+                minHeight: '240px'
+              }
+            }}
+          />
+        </Card>
+
         {/* Cards de entrenamientos */}
-        <Box sx={{ mx: 0.5 }}>
+        <Box ref={resultsRef} sx={{ mx: 0.5 }}>
           {filteredWorkoutDays.map((day) => (
             <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
               <Card sx={{
@@ -764,10 +803,33 @@ export default function WorkoutHistory() {
         </Box>
 
         {filteredWorkoutDays.length === 0 && (
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
-              {searchTerm ? 'No se encontraron entrenamientos con esa búsqueda' : 'No hay entrenamientos registrados'}
+          <Box sx={{ 
+            p: 6, 
+            textAlign: 'center', 
+            mx: 0.5,
+            bgcolor: 'rgba(0,0,0,0.02)', 
+            borderRadius: 4,
+            border: '2px dashed',
+            borderColor: 'divider'
+          }}>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+              {language === 'es' ? 'Sin resultados' : 'No results'}
             </Typography>
+            <Typography color="text.secondary" sx={{ opacity: 0.8 }}>
+              {searchTerm 
+                ? (language === 'es' ? 'No se encontraron entrenamientos que coincidan con tu búsqueda.' : 'We couldn’t find any workouts matching your search.')
+                : (language === 'es' ? 'Aún no tienes entrenamientos registrados.' : 'You don’t have any workouts recorded yet.')
+              }
+            </Typography>
+            {searchTerm && (
+              <Button 
+                onClick={() => setSearchTerm('')}
+                sx={{ mt: 3, textTransform: 'none', fontWeight: 600 }}
+                variant="outlined"
+              >
+                {language === 'es' ? 'Limpiar búsqueda' : 'Clear search'}
+              </Button>
+            )}
           </Box>
         )}
 
