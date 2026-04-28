@@ -225,6 +225,11 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
 
+	// Si se proporciona una fecha en el request, usar esa
+	if req.Date != "" {
+		today = req.Date
+	}
+
 	var workoutDayID int
 
 	// Verificar si ya existe un día de entrenamiento para hoy

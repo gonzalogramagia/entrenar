@@ -760,11 +760,11 @@ function AuthenticatedAppContent() {
   const handleWorkoutSubmit = async (data: any): Promise<void> => {
     setIsSubmittingWorkout(true)
     try {
-      const today = new Date().toISOString().split('T')[0]
+      const selectedDate = data.date || new Date().toISOString().split('T')[0]
 
       // Buscar si ya existe un workout day para hoy
       let currentWorkoutDay = workoutDays.find(day =>
-        day.date === today
+        day.date === selectedDate
       )
 
       // Si no existe, crear uno nuevo en el backend
@@ -779,7 +779,8 @@ function AuthenticatedAppContent() {
         reps: data.reps || 0,
         set: data.set || 1,
         seconds: data.seconds || undefined,
-        observations: data.observations || ''
+        observations: data.observations || '',
+        date: selectedDate
       }
 
       // Solo incluir weight si tiene un valor válido mayor a 0

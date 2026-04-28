@@ -176,6 +176,15 @@ export default function WorkoutForm({
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
 
+  // Estado para la fecha seleccionada
+  const now = new Date()
+  const [selectedDay, setSelectedDay] = useState<number | string>(now.getDate())
+  const currentMonth = now.getMonth() + 1
+  const currentYear = now.getFullYear()
+
+  // Calcular días del mes actual
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate()
+
   // Obtener fecha actual y ejercicios completados
   const today = new Date().toISOString().split('T')[0]
   const completedExercises = activeRoutine
@@ -370,7 +379,8 @@ export default function WorkoutForm({
         exercise_id: data.exercise_id,
         set: data.set,
         seconds: data.seconds,
-        observations: data.observations
+        observations: data.observations,
+        date: `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${selectedDay.toString().padStart(2, '0')}`
       }
 
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
@@ -966,6 +976,57 @@ export default function WorkoutForm({
               }}
             />
           )}
+          {/* Selección de Fecha */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label={t.day}
+              type="number"
+              size="small"
+              fullWidth
+              value={selectedDay}
+              onChange={(e) => {
+                const val = parseInt(e.target.value)
+                if (e.target.value === '') {
+                  setSelectedDay('')
+                  return
+                }
+                if (!isNaN(val) && val >= 1 && val <= daysInMonth) {
+                  setSelectedDay(val)
+                }
+              }}
+              inputProps={{ 
+                min: 1, 
+                max: daysInMonth,
+                inputMode: 'numeric'
+              }}
+              disabled={isLoading}
+            />
+            <FormControl fullWidth size="small" disabled>
+              <InputLabel id="month-select-label">{t.month}</InputLabel>
+              <Select
+                labelId="month-select-label"
+                label={t.month}
+                value={currentMonth}
+              >
+                <MenuItem value={currentMonth}>
+                  {(() => {
+                    const monthName = new Date(currentYear, currentMonth - 1).toLocaleString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' });
+                    return monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                  })()}
+                </MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small" disabled>
+              <InputLabel id="year-select-label">{t.year}</InputLabel>
+              <Select
+                labelId="year-select-label"
+                label={t.year}
+                value={currentYear}
+              >
+                <MenuItem value={currentYear}>{currentYear}</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
 
           {/* Botón de envío */}
           <Button

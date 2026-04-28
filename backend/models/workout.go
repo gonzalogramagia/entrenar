@@ -38,6 +38,7 @@ type CreateWorkoutRequest struct {
 	Set          *int     `json:"set"`
 	Seconds      *int     `json:"seconds" validate:"omitempty,gt=0"`
 	Observations string   `json:"observations"`
+	Date         string   `json:"date"`
 }
 
 // UpdateWorkoutDayRequest representa la solicitud para actualizar un día de entrenamiento

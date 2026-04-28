@@ -62,6 +62,9 @@ export const translations = {
             noExercisesFound: 'No se encontraron ejercicios',
             loadingExercises: 'Cargando ejercicios...',
             routineCompleteLabel: 'completa',
+            day: 'Día',
+            month: 'Mes',
+            year: 'Año',
         },
         routines: {
             noRoutines: '0 rutinas creadas',
@@ -155,6 +158,9 @@ export const translations = {
             noExercisesFound: 'No exercises found',
             loadingExercises: 'Loading exercises...',
             routineCompleteLabel: 'complete',
+            day: 'Day',
+            month: 'Month',
+            year: 'Year',
         },
         routines: {
             noRoutines: '0 routines created',
