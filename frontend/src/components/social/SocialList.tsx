@@ -8,13 +8,9 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  IconButton,
   Button
 } from '@mui/material'
-import {
-  ThumbUp as ThumbUpIcon,
-  ThumbUpOutlined as ThumbUpOutlinedIcon
-} from '@mui/icons-material'
+
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -48,12 +44,12 @@ type SocialExercise = {
 export default function SocialList() {
   const { language } = useLanguage()
   const t = translations[language].social
-  const { user, isGuest, signInWithGoogle } = useAuth()
+  const { isGuest, signInWithGoogle } = useAuth()
   const { setOnSocialSettingsChange } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [loadingKudos, setLoadingKudos] = useState<Set<number>>(new Set())
+
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const currentOffsetRef = useRef(0)
@@ -257,48 +253,7 @@ export default function SocialList() {
     }
   }, []) // Sin dependencias para evitar bucles
 
-  const handleKudos = async (workoutId: number) => {
-    if (isGuest) {
-      signInWithGoogle()
-      return
-    }
-    if (!user) return
-    
-    // Solo permitir dar kudos si no se ha dado ya
-    const workout = socialWorkouts.find(w => w.session_id === workoutId)
-    if (!workout || workout.has_kudos) return
 
-    try {
-      setLoadingKudos(prev => new Set(prev).add(workoutId))
-
-      // Llamada a la API para dar kudos
-      await apiClient.giveKudos(workoutId)
-
-      // Actualizar estado local
-      setSocialWorkouts(prev => prev.map(workout => {
-        if (workout.session_id === workoutId) {
-          return {
-            ...workout,
-            has_kudos: true,
-            kudos_count: workout.kudos_count + 1
-          }
-        }
-        return workout
-      }))
-
-    } catch (error) {
-      console.error('Error dando kudos:', error)
-      // Mostrar error más específico
-      const errorMessage = error instanceof Error ? error.message : 'Error al dar kudos'
-      setError(`Error al dar kudos: ${errorMessage}`)
-    } finally {
-      setLoadingKudos(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(workoutId)
-        return newSet
-      })
-    }
-  }
 
   // Filtrar y agrupar workouts por día
   const groupedWorkouts = useMemo(() => {
@@ -515,7 +470,7 @@ export default function SocialList() {
                   }}>
                     <CardContent sx={{ p: 3 }}>
                       {/* Header del workout */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar
                           sx={{
                             width: 40,
@@ -544,35 +499,7 @@ export default function SocialList() {
                         </Box>
                       </Box>
 
-                      {/* Acciones */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {workout.kudos_count === 0
-                            ? t.firstKudos
-                            : `${workout.kudos_count} ${t.kudos}`
-                          }
-                        </Typography>
 
-                        <IconButton
-                          onClick={() => handleKudos(workout.session_id)}
-                          disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
-                          sx={{
-                            color: workout.has_kudos ? '#FF9800' : 'text.secondary',
-                            mr: -1, // Compensar padding del CardContent
-                            '&:hover': {
-                              color: workout.has_kudos ? '#FF9800' : 'primary.main'
-                            }
-                          }}
-                        >
-                          {loadingKudos.has(workout.session_id) ? (
-                            <CircularProgress size={20} />
-                          ) : workout.has_kudos ? (
-                            <ThumbUpIcon />
-                          ) : (
-                            <ThumbUpOutlinedIcon />
-                          )}
-                        </IconButton>
-                      </Box>
                     </CardContent>
                   </Card>
                 ))}
