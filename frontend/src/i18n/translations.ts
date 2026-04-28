@@ -67,6 +67,8 @@ export const translations = {
             year: 'Año',
         },
         routines: {
+            title: 'Mis Rutinas',
+            subtitle: 'Crea y organiza tus rutinas de entrenamiento',
             noRoutines: '0 rutinas creadas',
             createFirst: 'Crea tu primera rutina personalizada para organizar mejor tus entrenamientos',
             create: 'Crear',
@@ -84,7 +86,7 @@ export const translations = {
         },
         social: {
             title: 'Muro de la Comunidad',
-            subtitle: 'Entrenamientos de las personas que usan la app',
+            subtitle: 'Explora el progreso de quienes usan la app',
             noWorkouts: 'No hay entrenamientos registrados',
             firstKudos: 'Dar el primer kudos',
             kudos: 'kudos',
@@ -163,6 +165,8 @@ export const translations = {
             year: 'Year',
         },
         routines: {
+            title: 'My Routines',
+            subtitle: 'Create and organize your workout routines',
             noRoutines: '0 routines created',
             createFirst: 'Create your first personalized routine to better organize your workouts',
             create: 'Create',
@@ -180,7 +184,7 @@ export const translations = {
         },
         social: {
             title: 'Community Wall',
-            subtitle: 'Workouts from people using the app',
+            subtitle: 'Explore the progress of those using the app',
             noWorkouts: 'No workouts registered',
             firstKudos: 'Give the first kudos',
             kudos: 'kudos',

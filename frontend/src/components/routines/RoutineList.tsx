@@ -312,6 +312,32 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       overflow: (!routines || routines.length === 0) ? 'visible' : 'visible'
     }}>
 
+      <Box sx={{ mb: 4, mt: 1.5, textAlign: 'center' }}>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 1000, 
+          color: 'primary.main', 
+          mb: 1,
+          letterSpacing: '-0.5px',
+          textTransform: 'uppercase',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' }
+        }}>
+          {t.title}
+        </Typography>
+        <Typography sx={{ 
+          fontSize: '0.800rem',
+          lineHeight: 1.43,
+          letterSpacing: '0.01071em',
+          color: 'rgba(0, 0, 0, 0.6)',
+          fontStyle: 'normal',
+          opacity: 1,
+          fontWeight: 500,
+          px: 2,
+          textAlign: 'center'
+        }}>
+          {t.subtitle}
+        </Typography>
+      </Box>
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
