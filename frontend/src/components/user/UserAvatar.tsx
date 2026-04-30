@@ -12,7 +12,7 @@ import {
   Badge,
   Button
 } from '@mui/material'
-import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon, Google as GoogleIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon, Google as GoogleIcon, Star as StarIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
@@ -280,6 +280,17 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           <ListItemText>
             {t.navigation.notifications}
           </ListItemText>
+        </MenuItem>
+
+        {/* Opción de Puntá en Github */}
+        <MenuItem onClick={() => {
+          handleClose();
+          window.open('https://github.com/gonzalogramagia/entrenar', '_blank');
+        }}>
+          <ListItemIcon>
+            <StarIcon fontSize="small" sx={{ color: '#ffb400' }} />
+          </ListItemIcon>
+          <ListItemText>{t.navigation.rateOnGithub}</ListItemText>
         </MenuItem>
 
         {/* Opción de logout */}

@@ -8,10 +8,9 @@ import (
 	"time"
 
 	"github.com/goalritmo/gym/backend/database"
-	"github.com/gorilla/mux"
 )
 
-// SocialWorkout representa un entrenamiento para la vista social
+// SocialWorkout represents a workout for the social view
 type SocialWorkout struct {
 	SessionID     int       `json:"session_id"`
 	UserID        string    `json:"user_id"`
@@ -24,7 +23,7 @@ type SocialWorkout struct {
 	Exercises     []SocialExercise `json:"exercises"`
 }
 
-// SocialExercise representa un ejercicio en la vista social
+// SocialExercise represents an exercise in the social view
 type SocialExercise struct {
 	ExerciseName string  `json:"exercise_name"`
 	Weight       float64 `json:"weight"`
@@ -33,21 +32,18 @@ type SocialExercise struct {
 	Set          int     `json:"set"`
 }
 
-// GetSocialWorkoutsHandler obtiene entrenamientos sociales de todos los usuarios
+// GetSocialWorkoutsHandler fetches social workouts from all users
 func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
-		fmt.Printf("Error: user_id no encontrado en contexto\n")
+		fmt.Printf("Error: user_id not found in context\n")
 		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
 		return
 	}
 
-	// Por ahora, asumir que la funcionalidad social está habilitada para todos
-	// En el futuro, esto se verificará contra la tabla user_settings
-
-	// Obtener parámetros de paginación
+	// Pagination parameters
 	limit := 10
 	offset := 0
 	
@@ -63,21 +59,22 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
-
-	// Query actualizada para usar workout_days con kudos reales y filtrar por configuración de usuario
+	// Simplified query to avoid grouping and permission issues with auth.users
+	// We get basic data from workout_days and join with user_profiles
+	// The avatar is fetched via a safe subquery to auth.users
+	// Exercises are fetched via a subquery to avoid duplicates and complex GROUP BY
 	query := `
 		SELECT 
 			wd.id as session_id,
 			wd.user_id,
 			COALESCE(up.name, 'Usuario') as user_name,
-			COALESCE(u.raw_user_meta_data->>'avatar_url', '') as user_avatar_url,
+			COALESCE((SELECT raw_user_meta_data->>'avatar_url' FROM auth.users WHERE id = wd.user_id), '') as user_avatar_url,
 			wd.date as workout_date,
 			wd.created_at as workout_created_at,
-			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
-			COALESCE(COUNT(w.id), 0) as total_series,
+			(SELECT COUNT(DISTINCT w2.exercise_id) FROM workouts w2 WHERE w2.workout_day_id = wd.id) as total_exercises,
+			(SELECT COUNT(*) FROM workouts w2 WHERE w2.workout_day_id = wd.id) as total_sets,
 			COALESCE(
-				json_agg(
+				(SELECT json_agg(
 					json_build_object(
 						'exercise_name', e.name,
 						'weight', w.weight,
@@ -85,32 +82,30 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 						'seconds', w.seconds,
 						'set', w.set
 					) ORDER BY w.set
-				) FILTER (WHERE w.id IS NOT NULL),
+				) 
+				 FROM workouts w 
+				 JOIN exercises e ON w.exercise_id = e.id 
+				 WHERE w.workout_day_id = wd.id
+				),
 				'[]'::json
 			) as exercises
 		FROM workout_days wd
 		LEFT JOIN user_profiles up ON wd.user_id = up.user_id
-		LEFT JOIN auth.users u ON wd.user_id = u.id
-		LEFT JOIN workouts w ON wd.id = w.workout_day_id
-		LEFT JOIN exercises e ON w.exercise_id = e.id
-		WHERE 1=1
-		GROUP BY wd.id, wd.user_id, up.name, u.raw_user_meta_data, wd.date, wd.created_at
 		ORDER BY wd.date DESC, wd.created_at DESC
 		LIMIT $1 OFFSET $2
 	`
 
-
-	fmt.Printf("Ejecutando query con parámetros: limit=%d, offset=%d, userID=%s\n", limit, offset, userID)
+	fmt.Printf("Executing social query with params: limit=%d, offset=%d\n", limit, offset)
 	
 	rows, err := database.DB.Query(query, limit, offset)
 	if err != nil {
-		fmt.Printf("Error consultando entrenamientos sociales: %v\n", err)
-		http.Error(w, "Error consultando entrenamientos sociales", http.StatusInternalServerError)
+		fmt.Printf("Error querying social workouts: %v\n", err)
+		http.Error(w, fmt.Sprintf("Error querying social workouts: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	fmt.Printf("Query ejecutada exitosamente, procesando resultados...\n")
+	fmt.Printf("Query executed successfully, processing results...\n")
 
 	var socialWorkouts []SocialWorkout
 	for rows.Next() {
@@ -131,31 +126,29 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			&exercisesJSON,
 		)
 		if err != nil {
-			fmt.Printf("Error escaneando entrenamiento social: %v\n", err)
+			fmt.Printf("Error scanning social workout: %v\n", err)
 			continue
 		}
 
-		// Convertir fecha a zona horaria de Argentina
+		// Convert date to Argentina timezone
 		loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
 		if err != nil {
 			loc = time.FixedZone("UTC-3", -3*60*60)
 		}
 		
-		workout.WorkoutDate = workoutDate // Es un string YYYY-MM-DD
+		workout.WorkoutDate = workoutDate // It's a YYYY-MM-DD string
 		workout.CreatedAt = createdAt.In(loc).Format(time.RFC3339)
 
-		// Parsear el JSON de ejercicios
+		// Parse exercises JSON
 		if err := json.Unmarshal([]byte(exercisesJSON), &workout.Exercises); err != nil {
-			fmt.Printf("Error parseando ejercicios: %v\n", err)
+			fmt.Printf("Error parsing exercises: %v\n", err)
 			continue
 		}
-
-		// Los kudos ahora vienen de la base de datos
 
 		socialWorkouts = append(socialWorkouts, workout)
 	}
 
-	fmt.Printf("Encontrados %d entrenamientos sociales\n", len(socialWorkouts))
+	fmt.Printf("Found %d social workouts\n", len(socialWorkouts))
 	json.NewEncoder(w).Encode(socialWorkouts)
 }
 
