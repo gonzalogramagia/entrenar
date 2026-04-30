@@ -71,6 +71,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         // Guardar automáticamente todos los ejercicios como favoritos en localStorage
         const settingsToSave = {
           favoriteExercises: allExerciseIds,
+          hasConfigured: true,
           lastUpdated: new Date().toISOString()
         }
         localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
@@ -148,6 +149,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       // Guardar en localStorage para todos los usuarios
       const settingsToSave = {
         favoriteExercises: tempSettings.favoriteExercises,
+        hasConfigured: true,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))

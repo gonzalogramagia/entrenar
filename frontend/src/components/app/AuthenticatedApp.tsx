@@ -4,7 +4,6 @@ import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
 
-import SocialList from '../social/SocialList'
 import RoutineList from '../routines/RoutineList'
 import AdminPanel from '../admin/AdminPanel'
 import Navigation from '../navigation/Navigation'

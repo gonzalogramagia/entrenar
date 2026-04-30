@@ -118,35 +118,33 @@ export default function WorkoutForm({
 
   // Filtrar ejercicios favoritos según configuraciones
   const filteredExercises = useMemo(() => {
-    let filtered = exercises // Incluir todos los ejercicios inicialmente
-
-    // Para usuarios Admin, Staff o Profe, usar configuraciones de localStorage
-    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
-      try {
-        const adminSettings = localStorage.getItem('admin-exercise-settings')
-        if (adminSettings) {
-          const parsed = JSON.parse(adminSettings)
-          // Si el usuario ha configurado sus favoritos (aunque la lista esté vacía), respetamos su elección
-          if (parsed.hasConfigured) {
-            filtered = filtered.filter(exercise => (parsed.favoriteExercises || []).includes(exercise.id))
-          } else if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
-            // Fallback para versiones anteriores sin hasConfigured
-            filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
-          }
+    let filtered = exercises
+    // Usar configuraciones de localStorage (admin-exercise-settings es el nuevo estándar para todos)
+    try {
+      const adminSettings = localStorage.getItem('admin-exercise-settings')
+      if (adminSettings) {
+        const parsed = JSON.parse(adminSettings)
+        // Si el usuario ha configurado sus favoritos (aunque la lista esté vacía), respetamos su elección
+        if (parsed.hasConfigured) {
+          filtered = filtered.filter(exercise => (parsed.favoriteExercises || []).includes(exercise.id))
+        } else if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
+          // Fallback para versiones anteriores sin hasConfigured
+          filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
+        } else {
+          // Si no ha configurado nada explícitamente, excluir deportes por defecto
+          filtered = exercises.filter(exercise => !exercise.is_sport)
         }
-      } catch (error) {
-        console.error('Error loading admin exercise settings:', error)
-        // Fallback: excluir deportes si hay error
-        filtered = exercises.filter(exercise => !exercise.is_sport)
-      }
-    } else {
-      // Para usuarios normales, usar configuraciones del contexto
-      if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
-        filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
       } else {
-        // Fallback: excluir deportes para usuarios normales
-        filtered = exercises.filter(exercise => !exercise.is_sport)
+        // Fallback: si no hay settings guardados, intentar usar los del contexto (legacy) o excluir deportes
+        if (settings.hasConfiguredFavorites) {
+          filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+        } else {
+          filtered = exercises.filter(exercise => !exercise.is_sport)
+        }
       }
+    } catch (error) {
+      console.error('Error loading exercise settings:', error)
+      filtered = exercises.filter(exercise => !exercise.is_sport)
     }
 
     return filtered

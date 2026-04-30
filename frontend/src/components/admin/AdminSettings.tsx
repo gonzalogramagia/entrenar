@@ -59,6 +59,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
           // Guardar automáticamente la configuración inicial
           const settingsToSave = {
             favoriteExercises: nonSportExerciseIds,
+            hasConfigured: true,
             lastUpdated: new Date().toISOString()
           }
           localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
