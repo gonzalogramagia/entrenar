@@ -961,12 +961,6 @@ function AuthenticatedAppContent() {
           </Box>
         )}
 
-        {/* Pestaña Social */}
-        {activeTab === TABS.SOCIAL && (
-          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
-            <SocialList />
-          </Box>
-        )}
 
       </Box>
 

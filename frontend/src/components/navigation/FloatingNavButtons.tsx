@@ -15,7 +15,7 @@ const FloatingNavButtons: React.FC = () => {
     switch (activeTab) {
       case TABS.WORKOUT:
         return {
-          left: { tab: TABS.SOCIAL, icon: <ArrowBackIcon />, tooltip: 'Ir a Social' },
+          left: { tab: TABS.ROUTINES, icon: <ArrowBackIcon />, tooltip: 'Ir a Mis Rutinas' },
           right: { tab: TABS.HISTORY, icon: <ArrowForwardIcon />, tooltip: 'Ir a Mis Entrenamientos' }
         }
       case TABS.HISTORY:
@@ -26,11 +26,6 @@ const FloatingNavButtons: React.FC = () => {
       case TABS.ROUTINES:
         return {
           left: { tab: TABS.HISTORY, icon: <ArrowBackIcon />, tooltip: 'Ir a Mis Entrenamientos' },
-          right: { tab: TABS.SOCIAL, icon: <ArrowForwardIcon />, tooltip: 'Ir a Social' }
-        }
-      case TABS.SOCIAL:
-        return {
-          left: { tab: TABS.ROUTINES, icon: <ArrowBackIcon />, tooltip: 'Ir a Mis Rutinas' },
           right: { tab: TABS.WORKOUT, icon: <ArrowForwardIcon />, tooltip: 'Ir a Registro' }
         }
       default:
