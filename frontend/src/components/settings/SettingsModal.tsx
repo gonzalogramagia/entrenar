@@ -479,6 +479,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                     {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
                   </Button>
 
+                  {/* 
                   <Button
                     variant="outlined"
                     startIcon={<Box sx={{ mr: 1 }}>✉️</Box>}
@@ -489,6 +490,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                   >
                     {language === 'es' ? 'Enviar por mail' : 'Send by email'}
                   </Button>
+                  */}
                 </Box>
               </>
             )}

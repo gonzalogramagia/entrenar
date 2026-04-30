@@ -228,7 +228,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         {/* Opción de Panel de Admin - se muestra si el usuario es administrador, profe o staff */}
         {(isAdmin || userRole === 'profe' || userRole === 'staff') && (
           <MenuItem onClick={handleOpenAdminPanel}>
-            <ListItemIcon sx={{ minWidth: 40 }}>
+            <ListItemIcon sx={{ minWidth: 32 }}>
               <AdminIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>
@@ -242,7 +242,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         {/* Opción de configuración - solo para usuarios normales (no staff, profe, admin) */}
         {!(isAdmin || userRole === 'profe' || userRole === 'staff') && (
           <MenuItem onClick={handleOpenSettings}>
-            <ListItemIcon sx={{ minWidth: 40 }}>
+            <ListItemIcon sx={{ minWidth: 32 }}>
               <AdminIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>{t.navigation.userPanel}</ListItemText>
@@ -251,7 +251,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
 
         {/* Opción de notificaciones - siempre visible */}
         <MenuItem onClick={handleOpenNotifications}>
-          <ListItemIcon sx={{ minWidth: 40 }}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
             <Box sx={{ position: 'relative' }}>
               <NotificationsIcon fontSize="small" />
               {unreadNotifications > 0 && (
@@ -287,7 +287,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           handleClose();
           window.open('https://github.com/gonzalogramagia/entrenar', '_blank');
         }}>
-          <ListItemIcon sx={{ minWidth: 40 }}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
             <StarIcon fontSize="small" sx={{ color: '#ffb400' }} />
           </ListItemIcon>
           <ListItemText>{t.navigation.rateOnGithub}</ListItemText>
@@ -295,7 +295,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
 
         {/* Opción de logout */}
         <MenuItem onClick={handleLogout}>
-          <ListItemIcon sx={{ minWidth: 40 }}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t.navigation.logout}</ListItemText>

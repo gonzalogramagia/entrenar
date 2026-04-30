@@ -42,14 +42,27 @@ func InitDB() error {
 		}
 
 		// Configurar pool de conexiones para serverless
-		// En serverless, las conexiones se crean y destruyen rápidamente
-		DB.SetMaxOpenConns(5)  // Reducido para serverless
-		DB.SetMaxIdleConns(1)  // Mínimo para serverless
-		DB.SetConnMaxLifetime(0) // Sin límite de tiempo de vida
-		DB.SetConnMaxIdleTime(0) // Sin límite de tiempo idle
+		DB.SetMaxOpenConns(5)
+		DB.SetMaxIdleConns(1)
+		DB.SetConnMaxLifetime(0)
+		DB.SetConnMaxIdleTime(0)
+
+		// Ejecutar migraciones básicas de forma síncrona
+		runBasicMigrations(DB)
 	})
 
 	return err
+}
+
+func runBasicMigrations(db *sql.DB) {
+	fmt.Println("🚀 Ejecutando migraciones básicas...")
+	// Añadir columna avatar_url a user_profiles si no existe
+	_, err := db.Exec("ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;")
+	if err != nil {
+		fmt.Printf("⚠️ Aviso: No se pudo añadir avatar_url a user_profiles: %v\n", err)
+	} else {
+		fmt.Println("✅ Columna avatar_url verificada/añadida en user_profiles")
+	}
 }
 
 // GetDB retorna la conexión de base de datos, inicializándola si es necesario

@@ -63,12 +63,14 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	// We get basic data from workout_days and join with user_profiles
 	// The avatar is fetched via a safe subquery to auth.users
 	// Exercises are fetched via a subquery to avoid duplicates and complex GROUP BY
+	fmt.Printf("🔄 Consultando entrenamientos sociales - Limit: %d, Offset: %d\n", limit, offset)
+
 	query := `
 		SELECT 
 			wd.id as session_id,
 			wd.user_id,
 			COALESCE(up.name, 'Usuario') as user_name,
-			'' as user_avatar_url,
+			'',
 			wd.date as workout_date,
 			wd.created_at as workout_created_at,
 			(SELECT COUNT(DISTINCT w2.exercise_id) FROM workouts w2 WHERE w2.workout_day_id = wd.id) as total_exercises,
@@ -76,11 +78,11 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			COALESCE(
 				(SELECT json_agg(
 					json_build_object(
-						'exercise_name', e.name,
-						'weight', w.weight,
-						'reps', w.reps,
-						'seconds', w.seconds,
-						'set', w.set
+						'exercise_name', COALESCE(e.name, 'Ejercicio'),
+						'weight', COALESCE(w.weight, 0),
+						'reps', COALESCE(w.reps, 0),
+						'seconds', COALESCE(w.seconds, 0),
+						'set', COALESCE(w.set, 1)
 					) ORDER BY w.set
 				) 
 				 FROM workouts w 
@@ -95,49 +97,68 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		LIMIT $1 OFFSET $2
 	`
 
-	fmt.Printf("Executing social query with params: limit=%d, offset=%d\n", limit, offset)
-	
 	rows, err := database.DB.Query(query, limit, offset)
 	if err != nil {
-		fmt.Printf("Error querying social workouts: %v\n", err)
-		http.Error(w, fmt.Sprintf("Error querying social workouts: %v", err), http.StatusInternalServerError)
+		fmt.Printf("❌ Error consultando entrenamientos sociales: %v\n", err)
+		http.Error(w, "Error consultando entrenamientos sociales: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	fmt.Printf("Query executed successfully, processing results...\n")
-
 	var socialWorkouts []SocialWorkout
 	for rows.Next() {
 		var workout SocialWorkout
-		var exercisesJSON string
+		var workoutDateRaw interface{}
+		var createdAtRaw interface{}
+		var exercisesJSON []byte
+		var totalExercises int64
+		var totalSets int64
 		
-		var workoutDate string
-		var createdAt time.Time
 		err := rows.Scan(
 			&workout.SessionID,
 			&workout.UserID,
 			&workout.UserName,
 			&workout.UserAvatarURL,
-			&workoutDate,
-			&createdAt,
-			&workout.TotalExercises,
-			&workout.TotalSeries,
+			&workoutDateRaw,
+			&createdAtRaw,
+			&totalExercises,
+			&totalSets,
 			&exercisesJSON,
 		)
 		if err != nil {
-			fmt.Printf("Error scanning social workout: %v\n", err)
+			fmt.Printf("⚠️ Error escaneando fila de entrenamiento social: %v\n", err)
 			continue
 		}
 
-		// Convert date to Argentina timezone
+		workout.TotalExercises = int(totalExercises)
+		workout.TotalSeries = int(totalSets)
+
+		// Configurar zona horaria de Argentina
 		loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
 		if err != nil {
 			loc = time.FixedZone("UTC-3", -3*60*60)
 		}
-		
-		workout.WorkoutDate = workoutDate // It's a YYYY-MM-DD string
-		workout.CreatedAt = createdAt.In(loc).Format(time.RFC3339)
+
+		// Procesar fecha del entrenamiento
+		if t, ok := workoutDateRaw.(time.Time); ok {
+			workout.WorkoutDate = t.In(loc).Format("2006-01-02")
+		} else if s, ok := workoutDateRaw.(string); ok {
+			workout.WorkoutDate = s
+		} else {
+			workout.WorkoutDate = fmt.Sprintf("%v", workoutDateRaw)
+		}
+
+		// Procesar fecha de creación
+		var createdAtTime time.Time
+		if t, ok := createdAtRaw.(time.Time); ok {
+			createdAtTime = t.In(loc)
+		} else if s, ok := createdAtRaw.(string); ok {
+			parsedTime, _ := time.Parse(time.RFC3339, s)
+			createdAtTime = parsedTime.In(loc)
+		} else {
+			createdAtTime = time.Now().In(loc) // Fallback
+		}
+		workout.CreatedAt = createdAtTime.Format(time.RFC3339)
 
 		// Parse exercises JSON
 		if err := json.Unmarshal([]byte(exercisesJSON), &workout.Exercises); err != nil {

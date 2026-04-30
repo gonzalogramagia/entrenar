@@ -101,6 +101,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       // Guardar en localStorage
       const settingsToSave = {
         favoriteExercises: tempFavoriteExercises,
+        hasConfigured: true,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
@@ -298,6 +299,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
               {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
             </Button>
 
+            {/* 
             <Button
               variant="outlined"
               startIcon={<Box sx={{ mr: 1 }}>✉️</Box>}
@@ -308,6 +310,7 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
             >
               Enviar por mail
             </Button>
+            */}
           </Box>
 
         </Box>

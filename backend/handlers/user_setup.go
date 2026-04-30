@@ -52,16 +52,19 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Obtener nombre de Google desde la base de datos
 	var fullName string
+	var avatarURL string
 	err = tx.QueryRow(`
-		SELECT COALESCE(
-			raw_user_meta_data->>'name',
-			raw_user_meta_data->>'given_name',
-			raw_user_meta_data->>'display_name',
-			$1
-		) as user_name
+		SELECT 
+			COALESCE(
+				raw_user_meta_data->>'name',
+				raw_user_meta_data->>'given_name',
+				raw_user_meta_data->>'display_name',
+				$1
+			) as user_name,
+			COALESCE(raw_user_meta_data->>'avatar_url', '') as avatar_url
 		FROM auth.users 
 		WHERE id = $2
-	`, req.Name, req.UserID).Scan(&fullName)
+	`, req.Name, req.UserID).Scan(&fullName, &avatarURL)
 	
 
 	
@@ -80,13 +83,14 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Crear perfil de usuario
 	result, err := tx.Exec(`
-		INSERT INTO user_profiles (user_id, name, is_admin, role)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO user_profiles (user_id, name, is_admin, role, avatar_url)
+		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (user_id) DO UPDATE SET
 			name = EXCLUDED.name,
-			is_admin = EXCLUDED.is_admin
+			is_admin = EXCLUDED.is_admin,
+			avatar_url = EXCLUDED.avatar_url
 			-- No actualizar el rol para preservar roles existentes
-	`, req.UserID, userName, false, "user")
+	`, req.UserID, userName, false, "user", avatarURL)
 	
 	if err == nil {
 		rowsAffected, _ := result.RowsAffected()

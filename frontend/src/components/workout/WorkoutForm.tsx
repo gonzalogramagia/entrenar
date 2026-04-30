@@ -126,8 +126,11 @@ export default function WorkoutForm({
         const adminSettings = localStorage.getItem('admin-exercise-settings')
         if (adminSettings) {
           const parsed = JSON.parse(adminSettings)
-          if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
-            // Filtrar solo los ejercicios seleccionados (pueden incluir deportes)
+          // Si el usuario ha configurado sus favoritos (aunque la lista esté vacía), respetamos su elección
+          if (parsed.hasConfigured) {
+            filtered = filtered.filter(exercise => (parsed.favoriteExercises || []).includes(exercise.id))
+          } else if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
+            // Fallback para versiones anteriores sin hasConfigured
             filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
           }
         }
