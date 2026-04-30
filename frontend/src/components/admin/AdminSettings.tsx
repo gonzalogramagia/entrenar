@@ -46,13 +46,26 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
 
         // Cargar configuraciones desde localStorage
         const savedSettings = localStorage.getItem('admin-exercise-settings')
+        const nonSportExerciseIds = (response as Exercise[])?.filter((ex: Exercise) => !ex.is_sport).map((ex: Exercise) => ex.id) || []
+
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings)
-          setFavoriteExercises(parsed.favoriteExercises || [])
-          setTempFavoriteExercises(parsed.favoriteExercises || [])
+          // Si el usuario ya ha configurado explícitamente sus favoritos, usamos lo que guardó
+          if (parsed.hasConfigured) {
+            setFavoriteExercises(parsed.favoriteExercises || [])
+            setTempFavoriteExercises(parsed.favoriteExercises || [])
+          } else {
+            // Si hay datos pero no están marcados como configurados, 
+            // usamos los favoritos guardados si existen, sino los no-deportes
+            const initialFavs = (parsed.favoriteExercises && parsed.favoriteExercises.length > 0)
+              ? parsed.favoriteExercises
+              : nonSportExerciseIds
+            
+            setFavoriteExercises(initialFavs)
+            setTempFavoriteExercises(initialFavs)
+          }
         } else {
           // Si no hay configuraciones guardadas, inicializar solo con ejercicios no-deportes
-          const nonSportExerciseIds = (response as Exercise[])?.filter((ex: Exercise) => !ex.is_sport).map((ex: Exercise) => ex.id) || []
           setFavoriteExercises(nonSportExerciseIds)
           setTempFavoriteExercises(nonSportExerciseIds)
 

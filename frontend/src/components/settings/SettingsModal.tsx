@@ -54,23 +54,38 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     // Todos los usuarios usan localStorage
     try {
       const adminSettings = localStorage.getItem('admin-exercise-settings')
+      const nonSportExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+
       if (adminSettings) {
         const parsed = JSON.parse(adminSettings)
-        setTempSettings(prev => ({
-          ...prev,
-          favoriteExercises: parsed.favoriteExercises || []
-        }))
+        
+        // Si ya ha configurado explícitamente
+        if (parsed.hasConfigured) {
+          setTempSettings(prev => ({
+            ...prev,
+            favoriteExercises: parsed.favoriteExercises || []
+          }))
+        } else {
+          // Si no está marcado como configurado, usar favoritos si existen o todos los no-deportes
+          const initialFavs = (parsed.favoriteExercises && parsed.favoriteExercises.length > 0)
+            ? parsed.favoriteExercises
+            : nonSportExerciseIds
+
+          setTempSettings(prev => ({
+            ...prev,
+            favoriteExercises: initialFavs
+          }))
+        }
       } else {
-        // Si no hay configuraciones guardadas, inicializar con todos los ejercicios disponibles
-        const allExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+        // Si no hay configuraciones guardadas, inicializar con todos los ejercicios no-deportes
         setTempSettings(prev => ({
           ...prev,
-          favoriteExercises: allExerciseIds
+          favoriteExercises: nonSportExerciseIds
         }))
 
-        // Guardar automáticamente todos los ejercicios como favoritos en localStorage
+        // Guardar automáticamente la configuración inicial
         const settingsToSave = {
-          favoriteExercises: allExerciseIds,
+          favoriteExercises: nonSportExerciseIds,
           hasConfigured: true,
           lastUpdated: new Date().toISOString()
         }
@@ -78,19 +93,11 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       }
     } catch (error) {
       console.error('Error loading exercise settings:', error)
-      // Fallback: inicializar con todos los ejercicios disponibles
-      const allExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
+      const nonSportExerciseIds = exercises.filter(ex => !ex.is_sport).map(ex => ex.id)
       setTempSettings(prev => ({
         ...prev,
-        favoriteExercises: allExerciseIds
+        favoriteExercises: nonSportExerciseIds
       }))
-
-      // Guardar automáticamente en localStorage
-      const settingsToSave = {
-        favoriteExercises: allExerciseIds,
-        lastUpdated: new Date().toISOString()
-      }
-      localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
     }
   }, [exercises])
 
