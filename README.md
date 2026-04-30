@@ -1,54 +1,45 @@
 # 🚀 Entrenar App
 
-**A comprehensive workout logging and tracking application designed for serious training.**
+**A comprehensive, multi-language workout logging and tracking application designed for a premium training experience.**
 
-"Entrenar App" is your digital partner for tracking progress and managing routines. Built with performance and usability in mind, it helps you focus on what matters: your training.
+"Entrenar App" is your digital partner for tracking progress and managing routines. Built with performance and aesthetics in mind, it provides a professional trial through Guest Mode and full interactive features for registered users.
 
 ---
 
 ## ✨ Key Features
 
-- **✅ Workout Logging**: Detailed tracking for weight, reps, sets, and time with a complete form.
-- **⏱️ Smart Stopwatch**: Integrated timer to manage rest periods efficiently between sets.
-- **🏋️ Exercise Library**: Browse exercises with advanced filtering capabilities.
-- **🔔 Notification System**: Stay on track with manual and automatic notifications.
-- **📊 Progress Tracking**: Visual insights into your training history and improvements.
-- **🔄 Custom Routines**: Create and manage personalized workout routines.
-- **🧭 Quick Navigation**: Floating navigation buttons for easy access to Home, Emojis, Music apps, and GitHub repository.
+- **🌐 Multi-language Support**: Full support for **Spanish** and **English**, including localized notifications and UI elements.
+- **👣 Guest Mode**: Explore the app's core features with mock data before committing to a full account.
+- **✅ Advanced Workout Logging**: Detailed tracking for weight, reps, sets, and time with retroactive registration support.
+- **🛠️ Admin Panel**: Robust management suite for administrators to control exercises, user roles, and broadcast notifications.
+- **🏋️ Exercise Library**: Comprehensive library with advanced filtering and responsive grid layouts.
+- **🔄 Custom Routines**: Create, edit, and follow personalized workout routines.
 - **🔐 Secure Auth**: Seamless Google OAuth authentication powered by Supabase.
-- **⚡ High Performance**: Fast and responsive with a Go backend and Vite frontend.
+- **⚡ High Performance**: Fast and responsive architecture with a **Go (Fiber)** backend and **React (Vite)** frontend.
+- **🎨 Premium UI/UX**: Modern design with glassmorphism, responsive grids, and curated color palettes.
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Framework**: [Vite](https://vitejs.dev/) + [React](https://react.dev/)
-- **Styling**: [Material UI](https://mui.com/) + [Emotion](https://emotion.sh/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/) + [Go](https://go.dev/)
-- **Database**: [Supabase](https://supabase.com/)
-- **Testing**: [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/)
-
----
-
-## 🕹 Usage
-
-### 🏋️ Logging Workouts
-- **Record**: Enter your sets, reps, and weights easily.
-- **Track**: View your history and analyze progress over time.
-
-### ⏱️ Using Tools
-- **Stopwatch**: Use the built-in timer for consistent rest intervals.
-- **Library**: Search for specific exercises.
-
-### 📋 Managing Routines
-- **Create**: Setup custom routines for different training days.
-- **Follow**: Execute your planned routines with guided tracking.
+- **Frontend**: [React](https://react.dev/) + [Vite](https://vitejs.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Material UI (MUI)](https://mui.com/) + [Vanilla CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+- **Backend**: [Go](https://go.dev/) (High-performance API)
+- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL & OAuth)
+- **Package Manager**: [Yarn 4](https://yarnpkg.com/) (with Zero-Installs for optimized Dev Containers)
+- **State Management**: [TanStack Query](https://tanstack.com/query/latest) (React Query)
 
 ---
 
 ## 📄 License
 
 This project is created for personal use and is shared as-is. Feel free to explore and modify it!
+
+---
+
+## ⭐ Support the Project
+
+If **Entrenar App** has helped you in your fitness journey, please consider giving this repository a **Star** as a token of appreciation. It helps the project reach more users! 🚀 
 
 ---
 
