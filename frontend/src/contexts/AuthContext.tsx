@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useLanguage } from './LanguageContext'
 import type { ReactNode } from 'react'
 import { auth } from '../lib/supabase'
 import { apiClient } from '../lib/api'
@@ -42,6 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [userRole, setUserRole] = useState('user')
+  const { language } = useLanguage()
   const [isGuest, setIsGuest] = useState(() => {
     return localStorage.getItem('isGuest') === 'true'
   })
@@ -107,7 +109,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const emailName = user.email?.split('@')[0] || ''
             const finalName = userName || (emailName ? emailName.charAt(0).toUpperCase() + emailName.slice(1).toLowerCase() : 'Usuario')
             console.log('Setting up user with name:', finalName, 'from metadata:', userName, 'from email:', emailName)
-            await apiClient.setupUser(user.id, user.email || '', finalName)
+            await apiClient.setupUser(user.id, user.email || '', finalName, language)
           } catch (error) {
             console.error('Error setting up user:', error)
           }
@@ -120,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAdmin(false)
       setUserRole('user')
     }
-  }, [user, isGuest])
+  }, [user, isGuest, language])
 
   // Obtener información del usuario incluyendo is_admin cuando cambie el usuario
   useEffect(() => {

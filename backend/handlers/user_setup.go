@@ -12,9 +12,10 @@ import (
 
 // UserSetupRequest representa la solicitud para configurar un usuario
 type UserSetupRequest struct {
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
-	Name   string `json:"name"`
+	UserID   string `json:"user_id"`
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Language string `json:"language"`
 }
 
 // UserSetupHandler crea los registros necesarios para un usuario recién registrado
@@ -108,6 +109,14 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 3. Crear notificación de bienvenida (solo si no existe)
 	fmt.Printf("Creando notificación de bienvenida para usuario %s\n", req.UserID)
+	title := "¡Te damos la bienvenida! 🎉"
+	message := "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, crear rutinas y ver tu progreso. ¡Buen entrenamiento!"
+	
+	if req.Language == "en" {
+		title = "Welcome! 🎉"
+		message = "We're excited to have you join our fitness community! Here you can register your workouts, create routines, and track your progress. Have a great workout!"
+	}
+
 	result, err = tx.Exec(`
 		INSERT INTO notifications (user_id, title, message, type, created_at)
 		SELECT $1, $2, $3, $4, $5
@@ -115,7 +124,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 			SELECT 1 FROM notifications 
 			WHERE user_id = $1 AND type = 'welcome'
 		)
-	`, req.UserID, "¡Te damos la bienvenida! 🎉", "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, ver tu progreso y conectar con otros usuarios de la UNC. ¡Buen entrenamiento!", "welcome", time.Now())
+	`, req.UserID, title, message, "welcome", time.Now())
 	
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)

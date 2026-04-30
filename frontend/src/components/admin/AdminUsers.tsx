@@ -234,7 +234,7 @@ export function AdminUsers() {
         pt: 2 // Padding superior para bajar el contenido
       }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-          Beneficiarios
+          Comunidad
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {filteredUsers.length} de {users.length} usuarios

@@ -54,7 +54,7 @@ func CreateWelcomeNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		userID,
 		"welcome",
 		"¡Te damos la bienvenida! 🎉",
-		"¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, ver tu progreso y conectar con otros usuarios de la UNC. ¡Buen entrenamiento!",
+		"¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, crear rutinas y ver tu progreso. ¡Buen entrenamiento!",
 		time.Now(),
 	).Scan(&notificationID)
 

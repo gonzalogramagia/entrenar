@@ -125,10 +125,10 @@ class ApiClient {
   }
 
   // Setup user after registration
-  async setupUser(userId: string, email: string, name?: string) {
+  async setupUser(userId: string, email: string, name?: string, language?: string) {
     return this.request('/me/setup', {
       method: 'POST',
-      body: { user_id: userId, email, name }
+      body: { user_id: userId, email, name, language }
     })
   }
 
