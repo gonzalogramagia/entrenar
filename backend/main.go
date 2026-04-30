@@ -74,8 +74,6 @@ func main() {
 
 	// Social endpoints
 	api.HandleFunc("/social/workouts", handlers.GetSocialWorkoutsHandler).Methods("GET")
-	api.HandleFunc("/social/workouts/{id}/kudos", handlers.GiveKudosHandler).Methods("POST")
-	api.HandleFunc("/kudos-notification", handlers.CreateKudosNotificationHandler).Methods("POST")
 
 	// Notifications endpoints
 	api.HandleFunc("/notifications", handlers.GetNotificationsHandler).Methods("GET")

@@ -28,8 +28,6 @@ type SocialWorkout = {
   total_exercises: number
   total_sets: number
   exercises: SocialExercise[]
-  kudos_count: number
-  has_kudos: boolean
 }
 
 type SocialExercise = {
@@ -124,9 +122,7 @@ export default function SocialList() {
             created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // Hace 30 min
             total_exercises: 3,
             total_sets: 9,
-            exercises: [],
-            kudos_count: 3,
-            has_kudos: false
+            exercises: []
           },
           {
             session_id: 10002,
@@ -136,9 +132,7 @@ export default function SocialList() {
             created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // Hace 2 horas
             total_exercises: 4,
             total_sets: 12,
-            exercises: [],
-            kudos_count: 5,
-            has_kudos: true
+            exercises: []
           },
           {
             session_id: 10003,
@@ -148,9 +142,7 @@ export default function SocialList() {
             created_at: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
             total_exercises: 5,
             total_sets: 15,
-            exercises: [],
-            kudos_count: 8,
-            has_kudos: false
+            exercises: []
           },
           {
             session_id: 10004,
@@ -160,9 +152,7 @@ export default function SocialList() {
             created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2 - 1000 * 60 * 60).toISOString(),
             total_exercises: 4,
             total_sets: 12,
-            exercises: [],
-            kudos_count: 12,
-            has_kudos: false
+            exercises: []
           }
         ]
 
@@ -188,9 +178,6 @@ export default function SocialList() {
 
       if (Array.isArray(workouts) && workouts.length > 0) {
         console.log('🔍 Primer workout detalle:', {
-          sessionId: workouts[0].session_id,
-          kudosCount: workouts[0].kudos_count,
-          hasKudos: workouts[0].has_kudos,
           totalExercises: workouts[0].total_exercises
         })
       }
