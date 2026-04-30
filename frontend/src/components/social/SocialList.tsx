@@ -66,8 +66,8 @@ export default function SocialList() {
       const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1)
 
       return language === 'es'
-        ? `${capitalizedWeekday} ${day} de ${capitalizedMonth}`
-        : `${capitalizedWeekday}, ${capitalizedMonth} ${day}`
+        ? `${capitalizedWeekday} ${day} de ${capitalizedMonth} del ${date.getFullYear()}`
+        : `${capitalizedWeekday}, ${capitalizedMonth} ${day}, ${date.getFullYear()}`
     } catch (error) {
       console.error('Error formateando fecha:', error)
       return dateString

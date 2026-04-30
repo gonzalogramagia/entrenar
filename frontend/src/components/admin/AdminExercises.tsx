@@ -145,7 +145,7 @@ export function AdminExercises() {
 
   return (
     <Box sx={{
-      maxWidth: '900px',
+      maxWidth: '1200px',
       mx: 'auto',
       px: { xs: 2, sm: 3, md: 4 },
       height: 'calc(100vh - 300px)',

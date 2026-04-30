@@ -4,7 +4,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Stack,
   CircularProgress,
   Alert,
   TextField,
@@ -79,10 +78,7 @@ export function AdminUsers() {
     const day = date.getDate()
     const month = months[date.getMonth()]
     const year = date.getFullYear()
-    const hours = date.getHours().toString().padStart(2, '0')
-    const minutes = date.getMinutes().toString().padStart(2, '0')
-    
-    return `${weekday} ${day} de ${month} de ${year} a las ${hours}:${minutes}`
+    return `${weekday} ${day} de ${month} del ${year}`
   }
 
   const handleDeleteClick = (user: AdminUser) => {
@@ -218,7 +214,7 @@ export function AdminUsers() {
 
   return (
     <Box sx={{
-      maxWidth: '900px',
+      maxWidth: '1200px',
       mx: 'auto',
       px: { xs: 2, sm: 3, md: 4 },
       height: 'calc(100vh - 300px)',
@@ -290,7 +286,12 @@ export function AdminUsers() {
           },
         },
       }}>
-        <Stack spacing={2} sx={{ pb: 3 }}>
+        <Box sx={{ 
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+          gap: 2,
+          pb: 3 
+        }}>
           {filteredUsers.length === 0 ? (
             <Box sx={{ 
               display: 'flex', 
@@ -428,7 +429,7 @@ export function AdminUsers() {
               </Card>
             ))
           )}
-        </Stack>
+        </Box>
       </Box>
 
       {/* Delete Confirmation Dialog */}

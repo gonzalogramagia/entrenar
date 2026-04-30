@@ -153,10 +153,8 @@ export function AdminNotifications() {
     const weekday = weekdays[date.getDay()]
     const day = date.getDate()
     const month = months[date.getMonth()]
-    const hours = date.getHours().toString().padStart(2, '0')
-    const minutes = date.getMinutes().toString().padStart(2, '0')
-    
-    return `${weekday} ${day} de ${month} a las ${hours}:${minutes}`
+    const year = date.getFullYear()
+    return `${weekday} ${day} de ${month} del ${year}`
   }
 
   // Filtrar notificaciones por título o mensaje
