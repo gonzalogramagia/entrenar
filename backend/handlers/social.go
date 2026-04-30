@@ -71,7 +71,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			wd.id as session_id,
 			wd.user_id,
 			COALESCE(up.name, 'Usuario') as user_name,
-			COALESCE(up.avatar_url, '') as user_avatar_url,
+			COALESCE(u.raw_user_meta_data->>'avatar_url', '') as user_avatar_url,
 			wd.date as workout_date,
 			wd.created_at as workout_created_at,
 			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
@@ -90,10 +90,11 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			) as exercises
 		FROM workout_days wd
 		LEFT JOIN user_profiles up ON wd.user_id = up.user_id
+		LEFT JOIN auth.users u ON wd.user_id = u.id
 		LEFT JOIN workouts w ON wd.id = w.workout_day_id
 		LEFT JOIN exercises e ON w.exercise_id = e.id
 		WHERE 1=1
-		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.date, wd.created_at
+		GROUP BY wd.id, wd.user_id, up.name, u.raw_user_meta_data, wd.date, wd.created_at
 		ORDER BY wd.date DESC, wd.created_at DESC
 		LIMIT $1 OFFSET $2
 	`
@@ -116,7 +117,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		var workout SocialWorkout
 		var exercisesJSON string
 		
-		var workoutDate time.Time
+		var workoutDate string
 		var createdAt time.Time
 		err := rows.Scan(
 			&workout.SessionID,
@@ -139,7 +140,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			loc = time.FixedZone("UTC-3", -3*60*60)
 		}
-		workout.WorkoutDate = workoutDate.In(loc).Format(time.RFC3339)
+		
+		workout.WorkoutDate = workoutDate // Es un string YYYY-MM-DD
 		workout.CreatedAt = createdAt.In(loc).Format(time.RFC3339)
 
 		// Parsear el JSON de ejercicios
