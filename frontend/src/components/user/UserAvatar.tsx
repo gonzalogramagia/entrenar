@@ -90,7 +90,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
       <IconButton
         onClick={handleClick}
         size="small"
-        sx={{ 
+        sx={{
           ml: 2,
           '&:focus': { outline: 'none' },
           '&:focus-visible': { outline: 'none' },
@@ -165,17 +165,17 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
       >
         {/* Información del usuario */}
         <Box sx={{ p: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             textAlign: 'center',
-            gap: 1, 
-            mb: 1 
+            gap: 1,
+            mb: 1
           }}>
-            <Avatar sx={{ 
-              bgcolor: 'primary.main', 
-              width: 56, 
+            <Avatar sx={{
+              bgcolor: 'primary.main',
+              width: 56,
               height: 56,
               fontSize: '1.5rem',
               fontWeight: 'bold',
@@ -191,7 +191,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
                 {isGuest ? (language === 'es' ? 'Modo de prueba' : 'Trial mode') : user?.email}
               </Typography>
             </Box>
-            
+
             {isGuest && (
               <Button
                 fullWidth
@@ -253,7 +253,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         <MenuItem onClick={handleOpenNotifications}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <Box sx={{ position: 'relative' }}>
-              <NotificationsIcon fontSize="small" />
+              <NotificationsIcon fontSize="small" sx={{ mt: 0.25 }} />
               {unreadNotifications > 0 && (
                 <Box
                   sx={{
