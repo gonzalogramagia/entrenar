@@ -177,13 +177,60 @@ export default function WorkoutForm({
   const isLoadingExercises = filteredExercises.length === 0
 
   // Estado para la fecha seleccionada
-  const now = new Date()
-  const [selectedDay, setSelectedDay] = useState<number | string>(now.getDate())
-  const currentMonth = now.getMonth() + 1
-  const currentYear = now.getFullYear()
+  const now = useMemo(() => new Date(), [])
+  const currentDay = now.getDate()
+  const currentMonthNum = now.getMonth() + 1
+  const currentYearNum = now.getFullYear()
 
-  // Calcular días del mes actual
-  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate()
+  const [selectedDay, setSelectedDay] = useState<number | string>(currentDay)
+  const [selectedMonth, setSelectedMonth] = useState<number>(currentMonthNum)
+  const [selectedYear, setSelectedYear] = useState<number>(currentYearNum)
+
+  // Calcular días del mes seleccionado
+  const daysInMonth = useMemo(() => new Date(selectedYear, selectedMonth, 0).getDate(), [selectedYear, selectedMonth])
+
+  // Límite máximo para el día (no permitir fechas futuras)
+  const maxDayAllowed = useMemo(() => {
+    if (selectedYear === currentYearNum && selectedMonth === currentMonthNum) {
+      return currentDay
+    }
+    return daysInMonth
+  }, [selectedYear, selectedMonth, currentYearNum, currentMonthNum, currentDay, daysInMonth])
+
+  // Ajustar el día si queda fuera de los límites al cambiar mes/año
+  useEffect(() => {
+    if (typeof selectedDay === 'number' && selectedDay > maxDayAllowed) {
+      setSelectedDay(maxDayAllowed)
+    }
+  }, [maxDayAllowed, selectedDay])
+
+  // Opciones de mes (actual y anterior)
+  const monthOptions = useMemo(() => {
+    const options = []
+    
+    // Mes actual
+    const currentLabel = new Date(currentYearNum, currentMonthNum - 1).toLocaleString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
+    options.push({
+      value: `${currentYearNum}-${currentMonthNum}`,
+      label: currentLabel.charAt(0).toUpperCase() + currentLabel.slice(1),
+      month: currentMonthNum,
+      year: currentYearNum
+    })
+    
+    // Mes anterior
+    const prevDate = new Date(currentYearNum, currentMonthNum - 2, 1)
+    const prevMonth = prevDate.getMonth() + 1
+    const prevYear = prevDate.getFullYear()
+    const prevLabel = prevDate.toLocaleString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
+    options.push({
+      value: `${prevYear}-${prevMonth}`,
+      label: prevLabel.charAt(0).toUpperCase() + prevLabel.slice(1),
+      month: prevMonth,
+      year: prevYear
+    })
+    
+    return options
+  }, [currentMonthNum, currentYearNum, language])
 
   // Obtener fecha actual y ejercicios completados
   const today = new Date().toISOString().split('T')[0]
@@ -380,7 +427,7 @@ export default function WorkoutForm({
         set: data.set,
         seconds: data.seconds,
         observations: data.observations,
-        date: `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${selectedDay.toString().padStart(2, '0')}`
+        date: `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}-${selectedDay.toString().padStart(2, '0')}`
       }
 
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
@@ -990,30 +1037,34 @@ export default function WorkoutForm({
                   setSelectedDay('')
                   return
                 }
-                if (!isNaN(val) && val >= 1 && val <= daysInMonth) {
+                if (!isNaN(val) && val >= 1 && val <= maxDayAllowed) {
                   setSelectedDay(val)
                 }
               }}
               inputProps={{ 
                 min: 1, 
-                max: daysInMonth,
+                max: maxDayAllowed,
                 inputMode: 'numeric'
               }}
               disabled={isLoading}
             />
-            <FormControl fullWidth size="small" disabled>
+            <FormControl fullWidth size="small" disabled={isLoading}>
               <InputLabel id="month-select-label">{t.month}</InputLabel>
               <Select
                 labelId="month-select-label"
                 label={t.month}
-                value={currentMonth}
+                value={`${selectedYear}-${selectedMonth}`}
+                onChange={(e) => {
+                  const [year, month] = (e.target.value as string).split('-').map(Number)
+                  setSelectedMonth(month)
+                  setSelectedYear(year)
+                }}
               >
-                <MenuItem value={currentMonth}>
-                  {(() => {
-                    const monthName = new Date(currentYear, currentMonth - 1).toLocaleString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' });
-                    return monthName.charAt(0).toUpperCase() + monthName.slice(1);
-                  })()}
-                </MenuItem>
+                {monthOptions.map((opt) => (
+                  <MenuItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl fullWidth size="small" disabled>
@@ -1021,9 +1072,9 @@ export default function WorkoutForm({
               <Select
                 labelId="year-select-label"
                 label={t.year}
-                value={currentYear}
+                value={selectedYear}
               >
-                <MenuItem value={currentYear}>{currentYear}</MenuItem>
+                <MenuItem value={selectedYear}>{selectedYear}</MenuItem>
               </Select>
             </FormControl>
           </Box>
