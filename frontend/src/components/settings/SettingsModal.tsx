@@ -469,15 +469,27 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                   {language === 'es' ? 'Descarga todos tus entrenamientos en formato CSV para análisis o respaldo' : 'Download all your workouts in CSV format for analysis or backup'}
                 </Typography>
 
-                <Button
-                  variant="outlined"
-                  startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
-                  onClick={handleDownloadWorkouts}
-                  disabled={downloading}
-                  sx={{ mb: 2 }}
-                >
-                  {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+                    onClick={handleDownloadWorkouts}
+                    disabled={downloading}
+                  >
+                    {downloading ? (language === 'es' ? 'Generando archivo...' : 'Generating file...') : (language === 'es' ? 'Descargar entrenamientos (CSV)' : 'Download workouts (CSV)')}
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    startIcon={<Box sx={{ mr: 1 }}>✉️</Box>}
+                    onClick={() => {
+                      const mailtoLink = `mailto:?subject=Mis Entrenamientos&body=Hola, te adjunto mis entrenamientos.`
+                      window.location.href = mailtoLink
+                    }}
+                  >
+                    {language === 'es' ? 'Enviar por mail' : 'Send by email'}
+                  </Button>
+                </Box>
               </>
             )}
           </Box>
@@ -495,14 +507,35 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
             </Typography>
 
             {/* Buscador de ejercicios */}
-            <TextField
-              placeholder={t.exercises.searchPlaceholder}
-              value={exerciseSearchTerm}
-              onChange={(e) => setExerciseSearchTerm(e.target.value)}
-              size="small"
-              fullWidth
-              sx={{ mb: 2 }}
-            />
+            {/* Buscador y botones de selección rápida */}
+            <Box sx={{ display: 'flex', gap: 1, mb: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+              <TextField
+                placeholder={t.exercises.searchPlaceholder}
+                value={exerciseSearchTerm}
+                onChange={(e) => setExerciseSearchTerm(e.target.value)}
+                size="small"
+                fullWidth
+              />
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  onClick={() => setTempSettings(prev => ({ ...prev, favoriteExercises: availableExercises.map(ex => ex.id) }))}
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  {language === 'es' ? 'Todos' : 'All'}
+                </Button>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  color="inherit"
+                  onClick={() => setTempSettings(prev => ({ ...prev, favoriteExercises: [] }))}
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  {language === 'es' ? 'Ninguno' : 'None'}
+                </Button>
+              </Box>
+            </Box>
 
             {availableExercises.length > 0 ? (
               <Box>

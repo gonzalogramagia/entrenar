@@ -30,8 +30,6 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   const [hasChanges, setHasChanges] = useState(false)
   const [favoriteExercises, setFavoriteExercises] = useState<number[]>([])
   const [tempFavoriteExercises, setTempFavoriteExercises] = useState<number[]>([])
-  const [hideRestSeconds, setHideRestSeconds] = useState(false)
-  const [tempHideRestSeconds, setTempHideRestSeconds] = useState(false)
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -52,8 +50,6 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
           const parsed = JSON.parse(savedSettings)
           setFavoriteExercises(parsed.favoriteExercises || [])
           setTempFavoriteExercises(parsed.favoriteExercises || [])
-          setHideRestSeconds(parsed.hideRestSeconds || false)
-          setTempHideRestSeconds(parsed.hideRestSeconds || false)
         } else {
           // Si no hay configuraciones guardadas, inicializar solo con ejercicios no-deportes
           const nonSportExerciseIds = (response as Exercise[])?.filter((ex: Exercise) => !ex.is_sport).map((ex: Exercise) => ex.id) || []
@@ -80,15 +76,13 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
     setTempFavoriteExercises(favoriteExercises)
-    setTempHideRestSeconds(hideRestSeconds)
-  }, [favoriteExercises, hideRestSeconds])
+  }, [favoriteExercises])
 
   // Verificar si hay cambios en ejercicios favoritos o configuraciones
   useEffect(() => {
     const hasFavoriteChanges = JSON.stringify(tempFavoriteExercises) !== JSON.stringify(favoriteExercises)
-    const hasSettingChanges = tempHideRestSeconds !== hideRestSeconds
-    setHasChanges(hasFavoriteChanges || hasSettingChanges)
-  }, [tempFavoriteExercises, favoriteExercises, tempHideRestSeconds, hideRestSeconds])
+    setHasChanges(hasFavoriteChanges)
+  }, [tempFavoriteExercises, favoriteExercises])
 
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempFavoriteExercises.includes(exerciseId)
@@ -107,7 +101,6 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
       // Guardar en localStorage
       const settingsToSave = {
         favoriteExercises: tempFavoriteExercises,
-        hideRestSeconds: tempHideRestSeconds,
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
@@ -115,7 +108,6 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
 
       // Actualizar el estado
       setFavoriteExercises(tempFavoriteExercises)
-      setHideRestSeconds(tempHideRestSeconds)
       setHasChanges(false)
       setShowSuccessMessage(true)
 
@@ -134,7 +126,6 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
 
   const handleCancel = () => {
     setTempFavoriteExercises(favoriteExercises)
-    setTempHideRestSeconds(hideRestSeconds)
     setHasChanges(false)
     setExerciseSearchTerm('')
   }
@@ -297,38 +288,28 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
             Descarga todos tus entrenamientos en formato CSV para análisis o respaldo
           </Typography>
 
-          <Button
-            variant="outlined"
-            startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
-            onClick={handleDownloadWorkouts}
-            disabled={downloading}
-            sx={{ mb: 2 }}
-          >
-            {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+              onClick={handleDownloadWorkouts}
+              disabled={downloading}
+            >
+              {downloading ? 'Generando archivo...' : 'Descargar entrenamientos (CSV)'}
+            </Button>
 
-          <Box sx={{ mt: 1 }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={tempHideRestSeconds}
-                  onChange={(e) => setTempHideRestSeconds(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Ocultar segundos de descanso
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    No mostrar el campo de segundos de descanso en el registro
-                  </Typography>
-                </Box>
-              }
-              sx={{ m: 0 }}
-            />
+            <Button
+              variant="outlined"
+              startIcon={<Box sx={{ mr: 1 }}>✉️</Box>}
+              onClick={() => {
+                const mailtoLink = `mailto:?subject=Mis Entrenamientos&body=Hola, te adjunto mis entrenamientos.`
+                window.location.href = mailtoLink
+              }}
+            >
+              Enviar por mail
+            </Button>
           </Box>
+
         </Box>
 
         {/* Sección EJERCICIOS FAVORITOS */}
@@ -341,15 +322,35 @@ export function AdminSettings({ onClose }: AdminSettingsProps) {
             Configura qué ejercicios aparecen en tu selector del registro de entrenamiento
           </Typography>
 
-          {/* Buscador de ejercicios */}
-          <TextField
-            placeholder="Buscar ejercicios..."
-            value={exerciseSearchTerm}
-            onChange={(e) => setExerciseSearchTerm(e.target.value)}
-            size="small"
-            fullWidth
-            sx={{ mb: 2 }}
-          />
+          {/* Buscador y botones de selección rápida */}
+          <Box sx={{ display: 'flex', gap: 1, mb: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <TextField
+              placeholder="Buscar ejercicios..."
+              value={exerciseSearchTerm}
+              onChange={(e) => setExerciseSearchTerm(e.target.value)}
+              size="small"
+              fullWidth
+            />
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={() => setTempFavoriteExercises(exercises.map(ex => ex.id))}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                Seleccionar todos
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                color="inherit"
+                onClick={() => setTempFavoriteExercises([])}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                Deseleccionar
+              </Button>
+            </Box>
+          </Box>
 
           {exercises.length > 0 ? (
             <Box>

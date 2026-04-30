@@ -68,7 +68,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			wd.id as session_id,
 			wd.user_id,
 			COALESCE(up.name, 'Usuario') as user_name,
-			COALESCE((SELECT raw_user_meta_data->>'avatar_url' FROM auth.users WHERE id = wd.user_id), '') as user_avatar_url,
+			'' as user_avatar_url,
 			wd.date as workout_date,
 			wd.created_at as workout_created_at,
 			(SELECT COUNT(DISTINCT w2.exercise_id) FROM workouts w2 WHERE w2.workout_day_id = wd.id) as total_exercises,
