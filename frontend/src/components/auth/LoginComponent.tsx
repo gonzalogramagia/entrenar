@@ -192,7 +192,7 @@ export default function LoginComponent() {
             flexDirection: 'column',
             alignItems: 'center',
             gap: 2,
-            marginTop: '-60px' // Mover más arriba
+            marginTop: '-100px' // Mover más arriba
           }}
         >
           <CircularProgress

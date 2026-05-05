@@ -46,7 +46,7 @@ function AppContentInner() {
           flexDirection: 'column', 
           alignItems: 'center', 
           gap: 2,
-          marginTop: '-60px'
+          marginTop: '-100px'
         }}>
           <CircularProgress 
             size={48}

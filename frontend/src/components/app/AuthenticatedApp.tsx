@@ -1053,7 +1053,7 @@ function AuthenticatedAppContent() {
             flexDirection: 'column',
             alignItems: 'center',
             gap: 2,
-            marginTop: '-60px' // Posicionar más arriba como en el login
+            marginTop: '-100px' // Posicionar más arriba como en el login
           }}
         >
           <CircularProgress
