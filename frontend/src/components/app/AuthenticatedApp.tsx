@@ -1068,7 +1068,7 @@ function AuthenticatedAppContent() {
             }}
           />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-            {isLoggingOut ? (language === 'es' ? 'Cerrando sesión...' : 'Logging out...') : isSigningIn ? t.login.signingInProgress : (language === 'es' ? 'Cargando...' : 'Loading...')}
+            {isLoggingOut ? (language === 'es' ? 'Cerrando sesión...' : 'Logging out...') : isSigningIn ? t.login.authenticating : (language === 'es' ? 'Cargando...' : 'Loading...')}
           </Typography>
         </Box>
       </Backdrop>

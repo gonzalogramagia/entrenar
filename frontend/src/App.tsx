@@ -1,7 +1,9 @@
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TabProvider } from './contexts/TabContext'
 import { LanguageProvider } from './contexts/LanguageContext'
-import { Box, CircularProgress } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
+import { useLanguage } from './contexts/LanguageContext'
+import { translations } from './i18n/translations'
 import LoginComponent from './components/auth/LoginComponent'
 import AuthenticatedApp from './components/app/AuthenticatedApp'
 import AppLayout from './components/layout/AppLayout'
@@ -22,6 +24,8 @@ function AppContent() {
 
 function AppContentInner() {
   const { isAuthenticated, isLoading } = useAuth()
+  const { language } = useLanguage()
+  const t = translations[language].login
 
   // Mientras se está cargando la sesión inicial de Supabase, 
   // mostramos una pantalla de carga para evitar que parpadee el login
@@ -29,13 +33,27 @@ function AppContentInner() {
     return (
       <Box sx={{ 
         display: 'flex', 
+        flexDirection: 'column',
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh', 
         width: '100vw',
-        bgcolor: '#FFD700' 
+        bgcolor: '#FFD700',
+        gap: 2
       }}>
-        <CircularProgress sx={{ color: 'white' }} />
+        <CircularProgress 
+          size={48}
+          thickness={4}
+          sx={{ 
+            color: 'white',
+            '& .MuiCircularProgress-circle': {
+              strokeLinecap: 'round'
+            }
+          }} 
+        />
+        <Typography variant="h6" sx={{ fontWeight: 600, color: 'white', marginTop: '-10px' }}>
+          {t.authenticating}
+        </Typography>
       </Box>
     )
   }

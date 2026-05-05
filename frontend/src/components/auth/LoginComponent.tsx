@@ -207,7 +207,7 @@ export default function LoginComponent() {
             }}
           />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-            {t.signingInProgress}
+            {t.authenticating}
           </Typography>
         </Box>
       </Backdrop>
