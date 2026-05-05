@@ -30,7 +30,7 @@ export const translations = {
             continueWithGoogle: 'Continuar con Google',
             signingIn: 'Iniciando...',
             signingInProgress: 'Iniciando sesión...',
-            authenticating: 'Ingresando...',
+            authenticating: 'Entrando...',
             errorGoogle: 'Error al iniciar sesión con Google. Inténtalo de nuevo.',
             errorUnexpected: 'Error inesperado. Inténtalo de nuevo.',
         },
