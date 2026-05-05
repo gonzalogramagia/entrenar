@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/goalritmo/gym/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/database"
 )
 
 // UpdateLastSignInHandler actualiza el last_sign_in_at del usuario

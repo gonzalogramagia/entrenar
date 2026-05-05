@@ -10,9 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 
-	"github.com/goalritmo/gym/backend/database"
-	"github.com/goalritmo/gym/backend/handlers"
-	"github.com/goalritmo/gym/backend/middleware"
+	"github.com/gonzalogramagia/entrenar/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/handlers"
+	"github.com/gonzalogramagia/entrenar/backend/middleware"
 )
 
 func main() {
@@ -42,13 +42,6 @@ func main() {
 	// Health check
 	api.HandleFunc("/health", handlers.HealthHandler).Methods("GET")
 	
-	// Test endpoint for debugging
-	api.HandleFunc("/test-export", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Test endpoint working", "method": "` + r.Method + `", "path": "` + r.URL.Path + `"}`))
-	}).Methods("POST")
-
 	// Workouts endpoints
 	api.HandleFunc("/workouts", handlers.GetWorkoutsHandler).Methods("GET")
 	api.HandleFunc("/workouts", handlers.CreateWorkoutHandler).Methods("POST")
@@ -87,16 +80,6 @@ func main() {
 	api.HandleFunc("/welcome-notification", handlers.CreateWelcomeNotificationHandler).Methods("POST")
 	api.HandleFunc("/welcome-notification", handlers.GetWelcomeNotificationHandler).Methods("GET")
 
-
-	// Debug endpoint (temporal)
-	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")
-	api.HandleFunc("/debug-simple", handlers.DebugSimpleHandler).Methods("GET")
-	
-	// Fix triggers endpoint (temporal)
-	api.HandleFunc("/fix-triggers", handlers.FixTriggersHandler).Methods("POST")
-	
-	// Debug endpoint (temporal)
-	api.HandleFunc("/debug/user-registration", handlers.DebugUserRegistrationHandler).Methods("POST")
 
 	// Admin endpoints (requieren permisos de administrador)
 	api.HandleFunc("/admin/notifications", handlers.AdminStaffOrTeacherMiddleware(handlers.GetAdminNotificationsHandler)).Methods("GET")
@@ -154,7 +137,7 @@ func main() {
 		ExposedHeaders:   []string{"Content-Length", "Content-Type"},
 		AllowCredentials: true,
 		MaxAge:           86400, // 24 horas
-		Debug:            true,  // Habilitado temporalmente para diagnosticar problemas de CORS en producción
+		Debug:            false, // Deshabilitado para producción
 	})
 
 	handler := c.Handler(r)

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/goalritmo/gym/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/database"
 	"github.com/joho/godotenv"
 )
 

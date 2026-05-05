@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goalritmo/gym/backend/models"
-	"github.com/goalritmo/gym/backend/testutils"
+	"github.com/gonzalogramagia/entrenar/backend/models"
+	"github.com/gonzalogramagia/entrenar/backend/testutils"
 )
 
 // TestSupabaseIntegration prueba el flujo completo con Supabase real

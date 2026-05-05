@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goalritmo/gym/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/database"
 )
 
 // UserSetupRequest representa la solicitud para configurar un usuario

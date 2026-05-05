@@ -9,8 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/goalritmo/gym/backend/database"
-	"github.com/goalritmo/gym/backend/models"
+	"github.com/gonzalogramagia/entrenar/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/models"
 )
 
 // MockDB simula una base de datos para testing

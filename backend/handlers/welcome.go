@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/goalritmo/gym/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/database"
 )
 
 // CreateWelcomeNotificationHandler crea una notificación de bienvenida para un nuevo usuario

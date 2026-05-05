@@ -41,7 +41,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3210,http://localhost:5173,https://entrena
 
 ### 4. Configurar Dominio Custom (Opcional)
 - En Railway dashboard → Settings → Domains
-- Agrega tu dominio personalizado (ej: `api.goalritmo.com`)
+- Agrega tu dominio personalizado (ej: `api.entrenar.app`)
 
 ---
 

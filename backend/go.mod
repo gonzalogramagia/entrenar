@@ -1,4 +1,4 @@
-module github.com/goalritmo/gym/backend
+module github.com/gonzalogramagia/entrenar/backend
 
 go 1.21
 

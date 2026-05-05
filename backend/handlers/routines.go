@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/goalritmo/gym/backend/database"
-	"github.com/goalritmo/gym/backend/models"
+	"github.com/gonzalogramagia/entrenar/backend/database"
+	"github.com/gonzalogramagia/entrenar/backend/models"
 )
 
 // GetUserRoutinesHandler obtiene todas las rutinas del usuario actual
