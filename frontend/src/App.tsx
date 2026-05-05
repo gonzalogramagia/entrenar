@@ -41,19 +41,27 @@ function AppContentInner() {
         bgcolor: '#FFD700',
         gap: 2
       }}>
-        <CircularProgress 
-          size={48}
-          thickness={4}
-          sx={{ 
-            color: 'white',
-            '& .MuiCircularProgress-circle': {
-              strokeLinecap: 'round'
-            }
-          }} 
-        />
-        <Typography variant="h6" sx={{ fontWeight: 600, color: 'white', marginTop: '-10px' }}>
-          {t.authenticating}
-        </Typography>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          gap: 2,
+          marginTop: '-60px'
+        }}>
+          <CircularProgress 
+            size={48}
+            thickness={4}
+            sx={{ 
+              color: 'white',
+              '& .MuiCircularProgress-circle': {
+                strokeLinecap: 'round'
+              }
+            }} 
+          />
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
+            {t.authenticating}
+          </Typography>
+        </Box>
       </Box>
     )
   }
