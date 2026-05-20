@@ -13,6 +13,8 @@ if (!supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
+    // Prevent login loops in strict browsers (like IG in-app browser)
+    flowType: 'implicit',
     // Persist auth state across sessions
     persistSession: true,
     // Auto refresh tokens
