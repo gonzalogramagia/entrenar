@@ -218,10 +218,10 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           </ListItemText>
         </MenuItem>
 
-        {/* Opción de Puntá en Github */}
+        {/* Opción de Sugerencias */}
         <MenuItem onClick={() => {
           handleClose();
-          window.open('https://github.com/gonzalogramagia/entrenar', '_blank');
+          window.open('https://forms.gle/YNYpKr7Chw6UBcTT7', '_blank');
         }}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <StarIcon fontSize="small" sx={{ color: '#ffb400' }} />
