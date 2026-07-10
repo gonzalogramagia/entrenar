@@ -7,9 +7,8 @@ export const normalizeDate = (dateStr: string): string => {
   return dateStr.split('T')[0].split(' ')[0];
 }
 
-export const getDateString = (date: any): string => {
+export const getDateString = (date: Date): string => {
   if (!date) return '';
-  // Handle both Date and potentially other objects if MUI Adapter changes
   const d = date instanceof Date ? date : new Date(date);
   if (isNaN(d.getTime())) return '';
   
@@ -20,19 +19,39 @@ export const getDateString = (date: any): string => {
 }
 
 export const parseDate = (dateStr: string): Date => {
+  if (!dateStr) {
+    console.error('Error parseando fecha: string vacío');
+    return new Date(NaN);
+  }
+
   try {
     const normalized = normalizeDate(dateStr);
-    const [year, month, day] = normalized.split('-').map(Number);
-    return new Date(year, month - 1, day);
+    if (!normalized) return new Date(NaN);
+
+    const parts = normalized.split('-').map(Number);
+    if (parts.length !== 3) return new Date(NaN);
+
+    const [year, month, day] = parts;
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return new Date(NaN);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return new Date(NaN);
+
+    const date = new Date(year, month - 1, day);
+    // Validate no overflow (e.g., Feb 30 → Mar 2)
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+      return new Date(NaN);
+    }
+
+    return date;
   } catch (e) {
     console.error('Error parseando fecha:', dateStr, e);
-    return new Date(dateStr);
+    return new Date(NaN);
   }
 }
 
 export const formatDate = (dateString: string, language: string): string => {
   try {
     const date = parseDate(dateString);
+    if (isNaN(date.getTime())) return dateString;
 
     const weekday = date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { weekday: 'long' })
     const day = date.getDate()

@@ -134,13 +134,13 @@ export default function WorkoutHistoryDialogs({
           borderBottom: '1px solid',
           borderColor: 'divider'
         }}>
-          Editar nombre
+          {language === 'es' ? 'Editar nombre' : 'Edit name'}
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
           <TextField
             autoFocus
             fullWidth
-            placeholder="Nombre del entrenamiento"
+            placeholder={language === 'es' ? 'Nombre del entrenamiento' : 'Workout name'}
             value={editNameModal.newName}
             onChange={(e) => setEditNameModal({ ...editNameModal, newName: e.target.value })}
             variant="outlined"
@@ -175,7 +175,7 @@ export default function WorkoutHistoryDialogs({
               }
             }}
           >
-            Cancelar
+            {language === 'es' ? 'Cancelar' : 'Cancel'}
           </Button>
           <Button
             onClick={handleSaveSessionName}
@@ -194,7 +194,7 @@ export default function WorkoutHistoryDialogs({
               }
             }}
           >
-            Guardar
+            {language === 'es' ? 'Guardar' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -391,15 +391,14 @@ export default function WorkoutHistoryDialogs({
         }}
         maxWidth="md"
         fullWidth
-        BackdropProps={{
-          sx: {
-            backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
+            }
           }
         }}
         sx={{
-          '& .MuiBackdrop-root': {
-            backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
-          },
           '& .MuiDialog-paper': {
             backgroundColor: 'background.paper',
             boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
@@ -666,7 +665,6 @@ export default function WorkoutHistoryDialogs({
 
                       <IconButton
                         onClick={(e) => {
-                          console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
                           e.stopPropagation();
                           setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null });
                           setDeleteConfirmation({ show: true, workoutId: workout.id });
@@ -705,7 +703,7 @@ export default function WorkoutHistoryDialogs({
               }
             }}
           >
-            Cerrar
+            {language === 'es' ? 'Cerrar' : 'Close'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -10,7 +10,7 @@ export const getSportEmoji = (exerciseName: string): string | null => {
   if (name.includes('pádel')) return '🎾'
   if (name.includes('voley')) return '🏐'
   if (name.includes('bici')) return '🚴'
-  if (name.includes('handball')) return '⚾'
+  if (name.includes('handball')) return '🤾‍♂️'
   if (name.includes('hockey')) return '🏑'
   if (name.includes('natación')) return '🏊‍♂️'
   if (name.includes('running')) return '🏃‍♂️'
@@ -26,7 +26,7 @@ export const cleanExerciseName = (exerciseName: string): string => {
     .replace(/🏀\s*/g, '') // Básquet
     .replace(/🎾\s*/g, '') // Pádel
     .replace(/🏐\s*/g, '') // Voley
-    .replace(/⚾\s*/g, '') // Handball
+    .replace(/🤾‍♂️\s*/g, '') // Handball
     .replace(/🏑\s*/g, '') // Hockey
     .replace(/🏊‍♂️\s*/g, '') // Natación
     .trim()

@@ -26,7 +26,7 @@ import { apiClient } from '../../lib/api'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { translations } from '../../i18n/translations'
-import { normalizeDate, getDateString, parseDate, formatDate as formatDateUtil } from '../../lib/dateUtils'
+import { normalizeDate, getDateString, formatDate as formatDateUtil } from '../../lib/dateUtils'
 import { getSportEmoji, cleanExerciseName } from '../../lib/exerciseUtils'
 import { getGuestMockData } from '../../lib/guestMockData'
 import WorkoutDayCard from './WorkoutDayCard'
@@ -238,14 +238,15 @@ export default function WorkoutHistory() {
       });
     }
 
-    filtered.sort((a, b) => {
+    // Ordenar por fecha (shallow copy para no mutar el memoized array)
+    const sorted = [...filtered].sort((a, b) => {
       const dateA = new Date(a.workoutDay.date).getTime();
       const dateB = new Date(b.workoutDay.date).getTime();
       return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
-    return filtered;
-  }, [workoutDaysWithExercises, searchTerm, sortOrder]);
+    return sorted;
+  }, [workoutDaysWithExercises, searchTerm, sortOrder, isCalendarSearch]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
