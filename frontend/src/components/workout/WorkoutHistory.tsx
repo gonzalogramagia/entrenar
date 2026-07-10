@@ -3,14 +3,8 @@ import {
   Box,
   Typography,
   Card,
-  CardContent,
   Stack,
-  Chip,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   IconButton,
   TextField,
   CircularProgress,
@@ -21,8 +15,6 @@ import {
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  Delete as DeleteIcon,
-  ModeEdit as ModeEditIcon,
   Close as CloseIcon
 } from '@mui/icons-material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -34,38 +26,12 @@ import { apiClient } from '../../lib/api'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { translations } from '../../i18n/translations'
+import { normalizeDate, getDateString, formatDate as formatDateUtil } from '../../lib/dateUtils'
+import { getSportEmoji, cleanExerciseName } from '../../lib/exerciseUtils'
+import { getGuestMockData } from '../../lib/guestMockData'
+import WorkoutDayCard from './WorkoutDayCard'
+import WorkoutHistoryDialogs from './WorkoutHistoryDialogs'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
-
-/**
- * Utilidades de fecha compartidas
- */
-const normalizeDate = (dateStr: string) => {
-  if (!dateStr) return '';
-  return dateStr.split('T')[0].split(' ')[0];
-}
-
-const getDateString = (date: any) => {
-  if (!date) return '';
-  // Handle both Date and potentially other objects if MUI Adapter changes
-  const d = date instanceof Date ? date : new Date(date);
-  if (isNaN(d.getTime())) return '';
-  
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-const parseDate = (dateStr: string) => {
-  try {
-    const normalized = normalizeDate(dateStr);
-    const [year, month, day] = normalized.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  } catch (e) {
-    console.error('Error parseando fecha:', dateStr, e);
-    return new Date(dateStr);
-  }
-}
 
 /**
  * Componente personalizado para renderizar los días del calendario
@@ -147,8 +113,24 @@ export default function WorkoutHistory() {
     currentValue: ''
   });
 
+  const [editNameModal, setEditNameModal] = useState<{
+    show: boolean;
+    dayId: number | null;
+    currentName: string;
+    newName: string;
+  }>({
+    show: false,
+    dayId: null,
+    currentName: '',
+    newName: ''
+  });
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  // Wrapper que inyecta el language actual
+  const formatDate = useCallback((dateString: string) => {
+    return formatDateUtil(dateString, language);
+  }, [language]);
 
   // Auto-hide success message after 3 seconds
   useEffect(() => {
@@ -161,80 +143,13 @@ export default function WorkoutHistory() {
     }
   }, [successMessage])
 
-
-
-  const formatDate = (dateString: string) => {
-    try {
-      const date = parseDate(dateString);
-
-      const weekday = date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { weekday: 'long' })
-      const day = date.getDate()
-      const month = date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
-
-      const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1)
-      const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1)
-
-      return language === 'es'
-        ? `${capitalizedWeekday} ${day} de ${capitalizedMonth} del ${date.getFullYear()}`
-        : `${capitalizedWeekday}, ${capitalizedMonth} ${day}, ${date.getFullYear()}`
-    } catch (error) {
-      console.error('Error formateando fecha:', error);
-      return dateString;
-    }
-  }
-
-  // Función para formatear tiempo de deportes en formato legible
-  const formatTimeForSport = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`
-    } else {
-      return `${minutes}m`
-    }
-  }
-
-  // Función para obtener el emoji del deporte
-  const getSportEmoji = (exerciseName: string) => {
-    const name = exerciseName.toLowerCase()
-    if (name.includes('fútbol')) return '⚽'
-    if (name.includes('básquet') || name.includes('baloncesto')) return '🏀'
-    if (name.includes('pádel')) return '🎾'
-    if (name.includes('voley')) return '🏐'
-    if (name.includes('bici')) return '🚴'
-    if (name.includes('handball')) return '⚾'
-    if (name.includes('hockey')) return '🏑'
-    if (name.includes('natación')) return '🏊‍♂️'
-    if (name.includes('running')) return '🏃‍♂️'
-    return null
-  }
-
-  // Función para limpiar el nombre del ejercicio (quitar emojis)
-  const cleanExerciseName = (exerciseName: string) => {
-    // Remover emojis comunes de ejercicios
-    return exerciseName
-      .replace(/🚴\s*/g, '') // Bici
-      .replace(/🏃‍♂️\s*/g, '') // Running
-      .replace(/⚽\s*/g, '') // Fútbol
-      .replace(/🏀\s*/g, '') // Básquet
-      .replace(/🎾\s*/g, '') // Pádel
-      .replace(/🏐\s*/g, '') // Voley
-      .replace(/⚾\s*/g, '') // Handball
-      .replace(/🏑\s*/g, '') // Hockey
-      .replace(/🏊‍♂️\s*/g, '') // Natación
-      .trim()
-  }
-
   // Agrupar workouts por día y crear días con ejercicios
   const workoutDaysWithExercises = useMemo(() => {
     const days: WorkoutDayWithExercises[] = [];
 
-    // Verificar que los arrays no sean null/undefined
     const safeWorkoutDays = workoutDays || [];
     const safeWorkouts = workouts || [];
 
-    // Agrupar workouts por workout_day_id
     const workoutsByDay = new Map<number, Workout[]>();
     safeWorkouts.forEach(workout => {
       const dayId = workout.workout_day_id;
@@ -245,10 +160,8 @@ export default function WorkoutHistory() {
     });
 
     safeWorkoutDays.forEach(day => {
-      // Filtrar workouts por workout_day_id
       const dayWorkouts = workoutsByDay.get(day.id) || [];
 
-      // Agrupar ejercicios por nombre
       const exerciseGroups: ExerciseGroup[] = [];
       const exerciseMap = new Map<string, Workout[]>();
 
@@ -267,12 +180,11 @@ export default function WorkoutHistory() {
         });
       });
 
-      // Solo agregar días que tengan workouts
       if (dayWorkouts.length > 0) {
         days.push({
           workoutDay: day,
           exerciseGroups,
-          totalWorkouts: exerciseGroups.length // Usar número de grupos de ejercicios únicos, no total de series
+          totalWorkouts: exerciseGroups.length
         });
       }
     });
@@ -289,39 +201,31 @@ export default function WorkoutHistory() {
   const filteredWorkoutDays = useMemo(() => {
     let filtered = workoutDaysWithExercises;
 
-    // Filtrar por término de búsqueda
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(day => {
-        // Buscar en fecha formateada (ej: "Lunes 12 de Agosto")
         const formattedDate = formatDate(day.workoutDay.date).toLowerCase();
         
         let dateMatch = false;
         if (isCalendarSearch) {
-          // Si viene del calendario, buscamos coincidencia exacta de día y mes para no mezclar 8 con 18
           dateMatch = formattedDate.startsWith(searchLower) || 
                      formattedDate.includes(` ${searchLower}`);
         } else {
-          // Si el usuario escribe manualmente, permitimos búsqueda parcial normal
           dateMatch = formattedDate.includes(searchLower);
         }
 
-        // Buscar en nombre del entrenamiento
         const workoutNameMatch = day.workoutDay.name?.toLowerCase().includes(searchLower) || false;
 
-        // Buscar en nombre de ejercicios
         const exerciseMatch = day.exerciseGroups.some(group =>
           group.exerciseName.toLowerCase().includes(searchLower)
         );
 
-        // Buscar en observaciones de workouts
         const observationMatch = day.exerciseGroups.some(group =>
           group.workouts.some(workout =>
             workout.observations && workout.observations.toLowerCase().includes(searchLower)
           )
         );
 
-        // Buscador
         const workoutDataMatch = day.exerciseGroups.some(group =>
           group.workouts.some(workout =>
             workout.weight.toString().includes(searchLower) ||
@@ -334,15 +238,15 @@ export default function WorkoutHistory() {
       });
     }
 
-    // Ordenar por fecha
-    filtered.sort((a, b) => {
+    // Ordenar por fecha (shallow copy para no mutar el memoized array)
+    const sorted = [...filtered].sort((a, b) => {
       const dateA = new Date(a.workoutDay.date).getTime();
       const dateB = new Date(b.workoutDay.date).getTime();
       return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
-    return filtered;
-  }, [workoutDaysWithExercises, searchTerm, sortOrder]);
+    return sorted;
+  }, [workoutDaysWithExercises, searchTerm, sortOrder, isCalendarSearch]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -350,263 +254,8 @@ export default function WorkoutHistory() {
 
     try {
       if (isGuest) {
-        // Sesiones del 20, 22 y 24 de abril
-        const april24 = '2026-04-24'
-        const april22 = '2026-04-22'
-        const april20 = '2026-04-20'
-        
-        const mockWorkoutDays: WorkoutDay[] = [
-          {
-            id: 1000,
-            user_id: 'guest',
-            date: april24,
-            name: 'Brazos (Bíceps y Tríceps)',
-            created_at: april24,
-            updated_at: april24,
-            effort: 3,
-            mood: 5
-          },
-          {
-            id: 999,
-            user_id: 'guest',
-            date: april22,
-            name: 'Pecho y Espalda',
-            created_at: april22,
-            updated_at: april22,
-            effort: 4,
-            mood: 4
-          },
-          {
-            id: 998,
-            user_id: 'guest',
-            date: april20,
-            name: 'Piernas y Glúteos',
-            created_at: april20,
-            updated_at: april20,
-            effort: 5,
-            mood: 3
-          }
-        ]
-        
-        const mockWorkouts: Workout[] = [
-          // Brazos - 24 Abril
-          {
-            id: 10000,
-            user_id: 'guest',
-            workout_day_id: 1000,
-            exercise_id: 100,
-            exercise_name: language === 'es' ? 'Calentamiento' : 'Warm Up',
-            reps: 1,
-            weight: 0,
-            seconds: 300,
-            set: 1,
-            created_at: april24,
-            observations: ''
-          },
-          {
-            id: 10001,
-            user_id: 'guest',
-            workout_day_id: 1000,
-            exercise_id: 5,
-            exercise_name: 'Curl de Bíceps',
-            reps: 12,
-            weight: 15,
-            set: 1,
-            created_at: april24,
-            observations: 'Buen pump'
-          },
-          {
-            id: 10002,
-            user_id: 'guest',
-            workout_day_id: 1000,
-            exercise_id: 5,
-            exercise_name: 'Curl de Bíceps',
-            reps: 10,
-            weight: 15,
-            set: 2,
-            created_at: april24,
-            observations: ''
-          },
-          {
-            id: 10003,
-            user_id: 'guest',
-            workout_day_id: 1000,
-            exercise_id: 6,
-            exercise_name: 'Extensiones de Tríceps',
-            reps: 15,
-            weight: 20,
-            set: 1,
-            created_at: april24,
-            observations: ''
-          },
-          {
-            id: 10010,
-            user_id: 'guest',
-            workout_day_id: 1000,
-            exercise_id: 9,
-            exercise_name: 'Martillo',
-            reps: 12,
-            weight: 12,
-            set: 1,
-            created_at: april24,
-            observations: ''
-          },
-          {
-            id: 10013,
-            user_id: 'guest',
-            workout_day_id: 1000,
-            exercise_id: 101,
-            exercise_name: language === 'es' ? 'Estiramiento' : 'Stretching',
-            reps: 1,
-            weight: 0,
-            seconds: 300,
-            set: 1,
-            created_at: april24,
-            observations: ''
-          },
-          
-          // Pecho y Espalda - 22 Abril
-          {
-            id: 10014,
-            user_id: 'guest',
-            workout_day_id: 999,
-            exercise_id: 100,
-            exercise_name: language === 'es' ? 'Calentamiento' : 'Warm Up',
-            reps: 1,
-            weight: 0,
-            seconds: 300,
-            set: 1,
-            created_at: april22,
-            observations: ''
-          },
-          {
-            id: 10004,
-            user_id: 'guest',
-            workout_day_id: 999,
-            exercise_id: 1,
-            exercise_name: 'Press de Banca',
-            reps: 10,
-            weight: 70,
-            set: 1,
-            created_at: april22,
-            observations: 'Récord personal'
-          },
-          {
-            id: 10005,
-            user_id: 'guest',
-            workout_day_id: 999,
-            exercise_id: 7,
-            exercise_name: 'Remo con Barra',
-            reps: 12,
-            weight: 50,
-            set: 1,
-            created_at: april22,
-            observations: ''
-          },
-          {
-            id: 10011,
-            user_id: 'guest',
-            workout_day_id: 999,
-            exercise_id: 10,
-            exercise_name: 'Dominadas',
-            reps: 10,
-            weight: 0,
-            set: 1,
-            created_at: april22,
-            observations: ''
-          },
-          {
-            id: 10015,
-            user_id: 'guest',
-            workout_day_id: 999,
-            exercise_id: 101,
-            exercise_name: language === 'es' ? 'Estiramiento' : 'Stretching',
-            reps: 1,
-            weight: 0,
-            seconds: 300,
-            set: 1,
-            created_at: april22,
-            observations: ''
-          },
-          
-          // Piernas - 20 Abril
-          {
-            id: 10016,
-            user_id: 'guest',
-            workout_day_id: 998,
-            exercise_id: 100,
-            exercise_name: language === 'es' ? 'Calentamiento' : 'Warm Up',
-            reps: 1,
-            weight: 0,
-            seconds: 300,
-            set: 1,
-            created_at: april20,
-            observations: ''
-          },
-          {
-            id: 10006,
-            user_id: 'guest',
-            workout_day_id: 998,
-            exercise_id: 2,
-            exercise_name: 'Sentadilla',
-            reps: 12,
-            weight: 90,
-            set: 1,
-            created_at: april20,
-            observations: 'Muy pesado pero bien'
-          },
-          {
-            id: 10007,
-            user_id: 'guest',
-            workout_day_id: 998,
-            exercise_id: 2,
-            exercise_name: 'Sentadilla',
-            reps: 10,
-            weight: 90,
-            set: 2,
-            created_at: april20,
-            observations: ''
-          },
-          {
-            id: 10008,
-            user_id: 'guest',
-            workout_day_id: 998,
-            exercise_id: 8,
-            exercise_name: 'Prensa',
-            reps: 15,
-            weight: 120,
-            set: 1,
-            created_at: april20,
-            observations: ''
-          },
-          {
-            id: 10012,
-            user_id: 'guest',
-            workout_day_id: 998,
-            exercise_id: 11,
-            exercise_name: 'Gemelos en Máquina',
-            reps: 20,
-            weight: 40,
-            set: 1,
-            created_at: april20,
-            observations: ''
-          },
-          {
-            id: 10017,
-            user_id: 'guest',
-            workout_day_id: 998,
-            exercise_id: 101,
-            exercise_name: language === 'es' ? 'Estiramiento' : 'Stretching',
-            reps: 1,
-            weight: 0,
-            seconds: 300,
-            set: 1,
-            created_at: april20,
-            observations: ''
-          }
-        ]
-        
-        setWorkoutDays(mockWorkoutDays);
+        const { workoutDays: mockDays, workouts: mockWorkouts } = getGuestMockData(language);
+        setWorkoutDays(mockDays);
         setWorkouts(mockWorkouts);
         setLoading(false);
         return;
@@ -645,7 +294,6 @@ export default function WorkoutHistory() {
     
     setExpandedDays(newExpanded);
 
-    // Si se está expandiendo, asegurarse de que el elemento siga visible después del cambio de altura
     if (isExpanding) {
       setTimeout(() => {
         const element = document.querySelector(`[data-date="${date}"]`);
@@ -660,11 +308,8 @@ export default function WorkoutHistory() {
     setLoadingWorkoutId(workoutId)
     try {
       await apiClient.deleteWorkout(workoutId)
-      // Recargar datos después de eliminar
       await loadData()
       setSuccessMessage(language === 'es' ? 'Ejercicio eliminado exitosamente' : 'Exercise deleted successfully')
-
-      // Disparar evento para actualizar el feed social
       window.dispatchEvent(new CustomEvent('socialFeedRefresh'))
     } catch (error) {
       console.error('❌ Error eliminando workout:', error)
@@ -680,18 +325,6 @@ export default function WorkoutHistory() {
       handleDeleteWorkout(deleteConfirmation.workoutId)
     }
   }
-
-  const [editNameModal, setEditNameModal] = useState<{
-    show: boolean;
-    dayId: number | null;
-    currentName: string;
-    newName: string;
-  }>({
-    show: false,
-    dayId: null,
-    currentName: '',
-    newName: ''
-  });
 
   const handleEditSessionName = (dayId: number, currentName: string) => {
     setEditNameModal({
@@ -710,7 +343,6 @@ export default function WorkoutHistory() {
     try {
       await apiClient.updateWorkoutDayName(editNameModal.dayId, editNameModal.newName.trim());
 
-      // Actualizar el estado local
       setWorkoutDays(prevDays =>
         prevDays.map(day =>
           day.id === editNameModal.dayId
@@ -730,24 +362,13 @@ export default function WorkoutHistory() {
     if (!editObservationModal.workoutId) return;
 
     try {
-      // Si la observación está vacía, no la enviamos para evitar sobrescribir (o la enviamos vacía si esa es la intención del usuario al editar)
-      // Pero el requerimiento dice: "que las observaciones vacias de una serie no sobreescriban existentes"
-      // Si el usuario borra la observación en el modal, asumimos que quiere borrarla de ESA serie.
-      // La lógica de visualización (buscar la última NO vacía) se encargará de mostrar la anterior si esta queda vacía.
-
       await apiClient.updateWorkout(editObservationModal.workoutId, {
         observations: editObservationModal.currentObservation.trim()
       });
 
-      // Recargar datos para reflejar cambios
       await loadData();
 
-      // Actualizar el modal de ejercicios si está abierto
       if (exerciseModal.show && exerciseModal.exerciseGroup) {
-        // Necesitamos actualizar el grupo de ejercicios actual con los nuevos datos
-        // Esto se hace indirectamente al recargar loadData, pero exerciseModal tiene una copia del estado.
-        // Lo ideal sería cerrar el modal o actualizar su estado.
-        // Vamos a intentar actualizar la observación en el estado local del modal para feedback inmediato
         const updatedGroup = { ...exerciseModal.exerciseGroup };
         const workoutIndex = updatedGroup.workouts.findIndex(w => w.id === editObservationModal.workoutId);
         if (workoutIndex !== -1) {
@@ -841,7 +462,7 @@ export default function WorkoutHistory() {
         <Stack spacing={3} sx={{
           height: '100%',
           overflowY: 'auto',
-          pr: 0.5, // Pequeño padding para que no se pegue el contenido al borde si hay scroll lateral invisible
+          pr: 0.5,
           '&::-webkit-scrollbar': {
             display: 'none'
           },
@@ -960,7 +581,6 @@ export default function WorkoutHistory() {
                 setSearchTerm(searchString)
                 setIsCalendarSearch(true)
 
-                // Hacer scroll al primer resultado
                 setTimeout(() => {
                   resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
@@ -998,135 +618,19 @@ export default function WorkoutHistory() {
         {/* Cards de entrenamientos */}
         <Box ref={resultsRef} sx={{ mx: 0.5, pb: filteredWorkoutDays.length > 0 ? 40 : 0 }}>
           {filteredWorkoutDays.map((day) => (
-            <Box 
-              key={day.workoutDay.date} 
-              data-date={day.workoutDay.date}
-              sx={{ position: 'relative', mb: 2 }}
-            >
-              <Card sx={{
-                boxShadow: 2,
-                width: '100%',
-                cursor: 'pointer',
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                filter: loadingWorkoutId === day.workoutDay.id ? 'blur(1px)' : 'none',
-                transition: 'filter 0.2s ease-in-out',
-                '&:hover': {
-                  boxShadow: 4,
-                  transform: 'translateY(-2px)',
-                  transition: 'all 0.2s ease-in-out'
-                }
-              }}
-                onClick={() => toggleDayExpansion(day.workoutDay.date)}
-              >
-                <CardContent sx={{ pl: 2.5, pr: 2, pt: 2, pb: 0 }}>
-                  {/* Header del día */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Box sx={{ pl: 0, ml: 0.5, pb: '2 !important', mt: 0.5 }}>
-                      <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left', fontSize: '1rem' }}>
-                        {formatDate(day.workoutDay.date)}
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                          {day.workoutDay.name}
-                        </Typography>
-                        <ModeEditIcon
-                          sx={{
-                            ml: 1,
-                            fontSize: '1rem',
-                            color: 'text.secondary',
-                            opacity: 0.6,
-                            cursor: 'pointer',
-                            borderRadius: 1,
-                            p: 0.5,
-                            transition: 'background-color 0.2s',
-                            '&:hover': {
-                              backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                              opacity: 1
-                            }
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditSessionName(day.workoutDay.id, day.workoutDay.name);
-                          }}
-                        />
-                      </Box>
-                      {!expandedDays.has(day.workoutDay.date) && (
-                        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left', mt: 0.5 }}>
-                          {day.totalWorkouts} {day.totalWorkouts === 1 ? (language === 'es' ? 'ejercicio' : 'exercise') : (language === 'es' ? 'ejercicios' : 'exercises')}
-                          {day.exerciseGroups.length > 0 && (
-                            <span> ({day.exerciseGroups.reduce((total, group) => total + group.workouts.length, 0)} {language === 'es' ? 'series en total' : 'total sets'})</span>
-                          )}
-                        </Typography>
-                      )}
-                    </Box>
-
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleDayExpansion(day.workoutDay.date);
-                      }}
-                      size="small"
-                    >
-                      {expandedDays.has(day.workoutDay.date) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    </IconButton>
-                  </Box>
-
-                  {/* Resumen de ejercicios */}
-                  {expandedDays.has(day.workoutDay.date) && (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
-                      {day.exerciseGroups.map((group, index) => (
-                        <Card
-                          key={index}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setExerciseModal({ show: true, exerciseGroup: group, workoutDay: day.workoutDay })
-                          }}
-                          sx={{
-                            boxShadow: 1,
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            width: '100%',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease-in-out',
-                            '&:hover': {
-                              boxShadow: 3,
-                              transform: 'translateY(-2px)',
-                              borderColor: 'primary.main'
-                            }
-                          }}
-                        >
-                          <CardContent sx={{
-                            p: 2,
-                            pb: 1.5,
-                            '&:last-child': {
-                              paddingBottom: '16px !important'
-                            }
-                          }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body1" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left', fontSize: '0.88rem' }}>
-                                {cleanExerciseName(group.exerciseName)}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                                {(group.workouts.every(workout => workout.is_sport) ||
-                                  group.exerciseName.toLowerCase().includes('running') ||
-                                  group.exerciseName.toLowerCase().includes('bici')) ?
-                                  getSportEmoji(group.exerciseName) || group.workouts.length :
-                                  group.workouts.length
-                                }
-                              </Typography>
-                            </Box>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-
-
-            </Box>
+            <WorkoutDayCard
+              key={day.workoutDay.date}
+              day={day}
+              expandedDays={expandedDays}
+              toggleDayExpansion={toggleDayExpansion}
+              formatDate={formatDate}
+              cleanExerciseName={cleanExerciseName}
+              getSportEmoji={getSportEmoji}
+              loadingWorkoutId={loadingWorkoutId}
+              language={language}
+              onExerciseClick={(group, workoutDay) => setExerciseModal({ show: true, exerciseGroup: group, workoutDay })}
+              onEditSessionName={handleEditSessionName}
+            />
           ))}
         </Box>
 
@@ -1135,7 +639,7 @@ export default function WorkoutHistory() {
             p: 6, 
             textAlign: 'center', 
             mx: 0.5,
-            mb: 15,  // Mucho más espaciado abajo
+            mb: 15,
             bgcolor: 'rgba(0,0,0,0.02)', 
             borderRadius: 4,
             border: '2px dashed',
@@ -1146,8 +650,8 @@ export default function WorkoutHistory() {
             </Typography>
             <Typography color="text.secondary" sx={{ opacity: 0.8 }}>
               {searchTerm 
-                ? (language === 'es' ? 'No se encontraron entrenamientos que coincidan con tu búsqueda.' : 'We couldn’t find any workouts matching your search.')
-                : (language === 'es' ? 'Aún no tienes entrenamientos registrados.' : 'You don’t have any workouts recorded yet.')
+                ? (language === 'es' ? 'No se encontraron entrenamientos que coincidan con tu búsqueda.' : 'We couldn\'t find any workouts matching your search.')
+                : (language === 'es' ? 'Aún no tienes entrenamientos registrados.' : 'You don\'t have any workouts recorded yet.')
               }
             </Typography>
             {searchTerm && (
@@ -1214,685 +718,27 @@ export default function WorkoutHistory() {
           </Box>
         )}
 
-        {/* Modal de edición de nombre */}
-        <Dialog
-          open={editNameModal.show}
-          onClose={(_, reason) => {
-            if (reason !== 'backdropClick') setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' })
-          }}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              border: '1px solid',
-              borderColor: 'divider'
-            }
-          }}
-        >
-          <DialogTitle sx={{
-            pb: 1,
-            fontWeight: 600,
-            fontSize: '1.2rem',
-            color: 'primary.main',
-            borderBottom: '1px solid',
-            borderColor: 'divider'
-          }}>
-            Editar nombre
-          </DialogTitle>
-          <DialogContent sx={{ pt: 3 }}>
-            <TextField
-              autoFocus
-              fullWidth
-              placeholder="Nombre del entrenamiento"
-              value={editNameModal.newName}
-              onChange={(e) => setEditNameModal(prev => ({ ...prev, newName: e.target.value }))}
-              variant="outlined"
-              sx={{
-                mt: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  '&:hover': {
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'primary.main'
-                    }
-                  }
-                }
-              }}
-            />
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 1 }}>
-            <Button
-              onClick={() => setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' })}
-              sx={{
-                px: 3,
-                py: 1,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                color: 'text.secondary',
-                border: '1px solid',
-                borderColor: 'divider',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                }
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleSaveSessionName}
-              disabled={!editNameModal.newName.trim() || editNameModal.newName.trim() === editNameModal.currentName}
-              variant="contained"
-              sx={{
-                px: 4,
-                py: 1,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                backgroundColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#1565c0'
-                }
-              }}
-            >
-              Guardar
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Modal de confirmación de eliminación */}
-        <Dialog
-          open={deleteConfirmation.show}
-          onClose={(_, reason) => {
-            if (reason !== 'backdropClick') {
-              setDeleteConfirmation({ show: false, workoutId: null });
-              // Mantener cerrada la sección expandida
-              setExpandedDays(new Set());
-            }
-          }}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              border: '1px solid',
-              borderColor: 'divider'
-            }
-          }}
-        >
-          <DialogTitle sx={{
-            pb: 2,
-            textAlign: 'center',
-            fontWeight: 600,
-            color: 'error.main'
-          }}>
-            ⚠️ {language === 'es' ? 'Confirmar eliminación' : 'Confirm deletion'}
-          </DialogTitle>
-          <DialogContent sx={{ py: 2, px: 3 }}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body1" color="text.secondary" sx={{ pb: 1 }}>
-                {language === 'es' ? 'Esta acción no se puede deshacer. El ejercicio será eliminado permanentemente.' : 'This action cannot be undone. The exercise will be permanently deleted.'}
-              </Typography>
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 1, gap: 2, justifyContent: 'center' }}>
-            <Button
-              onClick={() => {
-                setDeleteConfirmation({ show: false, workoutId: null });
-                // Mantener cerrada la sección expandida
-                setExpandedDays(new Set());
-              }}
-              variant="outlined"
-              sx={{
-                px: 4,
-                py: 1.5,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                borderColor: 'grey.400',
-                color: 'text.primary',
-                '&:hover': {
-                  borderColor: 'grey.600',
-                  backgroundColor: 'grey.50'
-                }
-              }}
-            >
-              {translations[language].common.cancel}
-            </Button>
-            <Button
-              onClick={handleConfirmDelete}
-              color="error"
-              variant="contained"
-              disabled={loadingWorkoutId !== null}
-              sx={{
-                px: 4,
-                py: 1.5,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                backgroundColor: '#d32f2f',
-                '&:hover': {
-                  backgroundColor: '#c62828'
-                },
-                '&:disabled': {
-                  backgroundColor: '#ffcdd2',
-                  color: '#c62828'
-                }
-              }}
-            >
-              {loadingWorkoutId !== null ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <CircularProgress size={16} color="inherit" />
-                  {language === 'es' ? 'Eliminando...' : 'Deleting...'}
-                </Box>
-              ) : (
-                translations[language].common.delete
-              )}
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Modal de edición de observación */}
-        <Dialog
-          open={editObservationModal.show}
-          onClose={(_, reason) => {
-            if (reason !== 'backdropClick') setEditObservationModal({ show: false, workoutId: null, currentObservation: '' })
-          }}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              border: '1px solid',
-              borderColor: 'divider'
-            }
-          }}
-        >
-          <DialogTitle sx={{
-            pb: 1,
-            fontWeight: 600,
-            fontSize: '1.2rem',
-            color: 'primary.main',
-            borderBottom: '1px solid',
-            borderColor: 'divider'
-          }}>
-            {language === 'es' ? 'Editar observación' : 'Edit observation'}
-          </DialogTitle>
-          <DialogContent sx={{ pt: 3 }}>
-            <TextField
-              autoFocus
-              fullWidth
-              multiline
-              rows={4}
-              placeholder={language === 'es' ? 'Escribe una observación...' : 'Write an observation...'}
-              value={editObservationModal.currentObservation}
-              onChange={(e) => setEditObservationModal(prev => ({ ...prev, currentObservation: e.target.value }))}
-              variant="outlined"
-              sx={{
-                mt: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  '&:hover': {
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'primary.main'
-                    }
-                  }
-                }
-              }}
-            />
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 1 }}>
-            <Button
-              onClick={() => setEditObservationModal({ show: false, workoutId: null, currentObservation: '' })}
-              sx={{
-                px: 3,
-                py: 1,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                color: 'text.secondary',
-                border: '1px solid',
-                borderColor: 'divider',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                }
-              }}
-            >
-              {language === 'es' ? 'Cancelar' : 'Cancel'}
-            </Button>
-            <Button
-              onClick={handleSaveObservation}
-              variant="contained"
-              sx={{
-                px: 4,
-                py: 1,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                backgroundColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#1565c0'
-                }
-              }}
-            >
-              {language === 'es' ? 'Guardar' : 'Save'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Modal de ejercicio individual */}
-        <Dialog
-          open={exerciseModal.show}
-          onClose={(_, reason) => {
-            if (reason !== 'backdropClick') setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })
-          }}
-          maxWidth="md"
-          fullWidth
-          BackdropProps={{
-            sx: {
-              backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
-            }
-          }}
-          sx={{
-            '& .MuiBackdrop-root': {
-              backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
-            },
-            '& .MuiDialog-paper': {
-              backgroundColor: 'background.paper',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              border: '1px solid',
-              borderColor: 'divider',
-              width: { xs: '98%', sm: '100%' },
-              maxWidth: { xs: '98%', sm: '900px' },
-              margin: { xs: '8px', sm: 'auto' }
-            }
-          }}
-        >
-          <DialogTitle sx={{
-            pb: 1,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-              {exerciseModal.exerciseGroup?.exerciseName}
-            </Typography>
-            <IconButton
-              onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
-              size="small"
-            >
-              <ExpandLessIcon />
-            </IconButton>
-          </DialogTitle>
-
-          <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ margin: '8px 0px -16px' }}>
-                {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
-              </Typography>
-            </Box>
-
-            {/* Observación general de la serie */}
-            {(() => {
-              const workouts = exerciseModal.exerciseGroup?.workouts || [];
-              const sortedWorkouts = [...workouts].sort((a, b) => b.id - a.id); // Más recientes primero
-
-              // Workout más reciente (para adjuntar nueva observación si no existe, o editar la última)
-              const latestWorkout = sortedWorkouts[0];
-
-              // Observación más reciente no vacía
-              const latestObsWorkout = sortedWorkouts.find(w => w.observations);
-              const latestObs = latestObsWorkout?.observations;
-
-              return (
-                <Box sx={{ mb: 3 }}>
-                  {latestObs ? (
-                    <Box sx={{
-                      p: 2,
-                      backgroundColor: 'rgba(25, 118, 210, 0.05)',
-                      borderRadius: 2,
-                      borderLeft: '4px solid',
-                      borderColor: 'primary.main',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                      position: 'relative'
-                    }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                          📝 {language === 'es' ? 'Observación general' : 'General observation'}
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            // Al editar, usamos el workout más reciente para guardar la observación,
-                            // pero pre-llenamos con la observación visible actual.
-                            setEditObservationModal({
-                              show: true,
-                              workoutId: latestWorkout?.id || null,
-                              currentObservation: latestObs
-                            });
-                          }}
-                          sx={{ mt: -1, mr: -1, color: 'primary.main', opacity: 0.7 }}
-                        >
-                          <ModeEditIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.95rem' }}>
-                        "{latestObs}"
-                      </Typography>
-                    </Box>
-                  ) : (
-                    latestWorkout && (
-                      <Button
-                        startIcon={<ModeEditIcon />}
-                        size="small"
-                        onClick={() => {
-                          setEditObservationModal({
-                            show: true,
-                            workoutId: latestWorkout.id,
-                            currentObservation: ''
-                          });
-                        }}
-                        sx={{
-                          textTransform: 'none',
-                          color: 'text.secondary',
-                          borderColor: 'divider',
-                          py: 1.2,
-                          borderRadius: 2
-                        }}
-                        variant="outlined"
-                        fullWidth
-                      >
-                        {language === 'es' ? 'Agregar observación general' : 'Add general observation'}
-                      </Button>
-                    )
-                  )}
-                </Box>
-              );
-            })()}
-
-            <Stack spacing={2}>
-              {exerciseModal.exerciseGroup?.workouts && [...exerciseModal.exerciseGroup.workouts]
-                .sort((a, b) => a.set - b.set) // Ordenar por número de serie ascendente
-                .map((workout, workoutIndex) => (
-                  <Card key={workoutIndex} sx={{
-                    boxShadow: 1,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    position: 'relative',
-                    filter: loadingWorkoutId === workout.id ? 'blur(2px)' : 'none',
-                    transition: 'all 0.3s ease-in-out'
-                  }}>
-                    {/* Loader overlay cuando se está eliminando */}
-                    {loadingWorkoutId === workout.id && (
-                      <Box sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: 1,
-                        zIndex: 10
-                      }}>
-                        <CircularProgress size={40} sx={{ color: 'primary.main' }} />
-                      </Box>
-                    )}
-                    <CardContent sx={{
-                      p: 2,
-                      '&:last-child': { pb: 2 }
-                    }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                            {workout.is_sport || workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ?
-                              getSportEmoji(workout.exercise_name) || (language === 'es' ? `Serie nº${workout.set}` : `Set #${workout.set}`) :
-                              (language === 'es' ? `Serie nº${workout.set}` : `Set #${workout.set}`)
-                            }
-                          </Typography>
-
-                          <Stack direction="row" spacing={1} alignItems="center">
-                            {/* Para deportes, mostrar solo el tiempo formateado */}
-                            {workout.is_sport ? (
-                              workout.seconds && workout.seconds > 0 && (
-                                <Chip
-                                  label={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-                                      {formatTimeForSport(workout.seconds)}
-                                      <ModeEditIcon className="edit-icon" sx={{ fontSize: '0.9rem', opacity: 0, transition: 'opacity 0.2s' }} />
-                                    </Box>
-                                  }
-                                  variant="outlined"
-                                  size="small"
-                                  sx={{
-                                    fontWeight: 'bold',
-                                    borderColor: '#ff9800',
-                                    color: '#ff9800',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(255, 152, 0, 0.08)',
-                                      cursor: 'pointer',
-                                      '& .edit-icon': { opacity: 1, width: 'auto', ml: 0.5 }
-                                    },
-                                    '& .edit-icon': { width: 0, overflow: 'hidden' }
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditValueModal({
-                                      show: true,
-                                      workoutId: workout.id,
-                                      field: 'seconds',
-                                      currentValue: Math.floor((workout.seconds || 0) / 60).toString(),
-                                      unit: 'min'
-                                    });
-                                  }}
-                                />
-                              )
-                            ) : (
-                              /* Para ejercicios normales, mostrar solo peso y reps */
-                              <>
-                                <Chip
-                                  label={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-                                      {workout.weight === 0 ? (language === 'es' ? 'Peso corporal' : 'Bodyweight') : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`}
-                                      <ModeEditIcon className="edit-icon" sx={{ fontSize: '0.9rem', opacity: 0, transition: 'opacity 0.2s' }} />
-                                    </Box>
-                                  }
-                                  variant="outlined"
-                                  size="small"
-                                  sx={{
-                                    fontWeight: 'bold',
-                                    borderColor: '#2196f3',
-                                    color: '#2196f3',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(33, 150, 243, 0.08)',
-                                      cursor: 'pointer',
-                                      '& .edit-icon': { opacity: 1, width: 'auto', ml: 0.5 }
-                                    },
-                                    '& .edit-icon': { width: 0, overflow: 'hidden' }
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditValueModal({
-                                      show: true,
-                                      workoutId: workout.id,
-                                      field: 'weight',
-                                      currentValue: workout.weight.toString(),
-                                      unit: workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'
-                                    });
-                                  }}
-                                />
-                                {!workout.exercise_name.toLowerCase().includes('running') && !workout.exercise_name.toLowerCase().includes('bici') && (
-                                  <Chip
-                                    label={
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-                                        {`${workout.reps} reps`}
-                                        <ModeEditIcon className="edit-icon" sx={{ fontSize: '0.9rem', opacity: 0, transition: 'opacity 0.2s' }} />
-                                      </Box>
-                                    }
-                                    variant="outlined"
-                                    size="small"
-                                    sx={{
-                                      fontWeight: 'bold',
-                                      borderColor: '#4caf50',
-                                      color: '#4caf50',
-                                      transition: 'all 0.2s',
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(76, 175, 80, 0.08)',
-                                        cursor: 'pointer',
-                                        '& .edit-icon': { opacity: 1, width: 'auto', ml: 0.5 }
-                                      },
-                                      '& .edit-icon': { width: 0, overflow: 'hidden' }
-                                    }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setEditValueModal({
-                                        show: true,
-                                        workoutId: workout.id,
-                                        field: 'reps',
-                                        currentValue: workout.reps.toString(),
-                                        unit: 'reps'
-                                      });
-                                    }}
-                                  />
-                                )}
-                              </>
-                            )}
-                          </Stack>
-                        </Box>
-
-                        <IconButton
-                          onClick={(e) => {
-                            console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
-                            e.stopPropagation();
-                            setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null });
-                            setDeleteConfirmation({ show: true, workoutId: workout.id });
-                          }}
-                          size="small"
-                          sx={{
-                            color: 'error.main',
-                            opacity: 0.7,
-                            '&:hover': { opacity: 1 }
-                          }}
-                          disabled={loadingWorkoutId === workout.id}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                ))}
-            </Stack>
-          </DialogContent>
-
-          <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
-            <Button
-              onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
-              variant="contained"
-              sx={{
-                px: 4,
-                py: 1,
-                borderRadius: 2,
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.95rem',
-                backgroundColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#1565c0'
-                }
-              }}
-            >
-              Cerrar
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Modal de edición de valor (peso/reps) */}
-        <Dialog
-          open={editValueModal.show}
-          onClose={(_, reason) => {
-            if (reason !== 'backdropClick') setEditValueModal({ show: false, workoutId: null, field: null, currentValue: '' })
-          }}
-          maxWidth="xs"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              border: '1px solid',
-              borderColor: 'divider'
-            }
-          }}
-        >
-          <DialogTitle sx={{
-            pb: 1,
-            fontWeight: 600,
-            fontSize: '1.2rem',
-            color: 'primary.main',
-            borderBottom: '1px solid',
-            borderColor: 'divider'
-          }}>
-            {language === 'es' ? 'Editar valor' : 'Edit value'}
-          </DialogTitle>
-          <DialogContent sx={{ pt: 3 }}>
-            <TextField
-              autoFocus
-              fullWidth
-              type="number"
-              label={editValueModal.unit}
-              value={editValueModal.currentValue}
-              onChange={(e) => setEditValueModal(prev => ({ ...prev, currentValue: e.target.value }))}
-              variant="outlined"
-              sx={{
-                mt: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2
-                }
-              }}
-              onFocus={(e) => e.target.select()}
-            />
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 1 }}>
-            <Button
-              onClick={() => setEditValueModal({ show: false, workoutId: null, field: null, currentValue: '' })}
-              sx={{
-                px: 3,
-                py: 1,
-                borderRadius: 2,
-                color: 'text.secondary'
-              }}
-            >
-              {language === 'es' ? 'Cancelar' : 'Cancel'}
-            </Button>
-            <Button
-              onClick={handleSaveValue}
-              variant="contained"
-              sx={{
-                px: 4,
-                py: 1,
-                borderRadius: 2,
-                backgroundColor: '#1976d2'
-              }}
-            >
-              {language === 'es' ? 'Guardar' : 'Save'}
-            </Button>
-          </DialogActions>
-        </Dialog>
+        {/* Dialogs */}
+        <WorkoutHistoryDialogs
+          language={language}
+          loadingWorkoutId={loadingWorkoutId}
+          formatDate={formatDate}
+          editNameModal={editNameModal}
+          setEditNameModal={setEditNameModal}
+          handleSaveSessionName={handleSaveSessionName}
+          deleteConfirmation={deleteConfirmation}
+          setDeleteConfirmation={setDeleteConfirmation}
+          handleConfirmDelete={handleConfirmDelete}
+          setExpandedDays={setExpandedDays}
+          editObservationModal={editObservationModal}
+          setEditObservationModal={setEditObservationModal}
+          handleSaveObservation={handleSaveObservation}
+          editValueModal={editValueModal}
+          setEditValueModal={setEditValueModal}
+          handleSaveValue={handleSaveValue}
+          exerciseModal={exerciseModal}
+          setExerciseModal={setExerciseModal}
+        />
 
         <Snackbar
           open={!!error}
