@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gonzalogramagia/entrenar/backend/database"
-	"github.com/gonzalogramagia/entrenar/backend/models"
+	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/models"
 	"github.com/gorilla/mux"
 )
 

@@ -10,9 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 
-	"github.com/gonzalogramagia/entrenar/backend/database"
-	"github.com/gonzalogramagia/entrenar/backend/handlers"
-	"github.com/gonzalogramagia/entrenar/backend/middleware"
+	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/handlers"
+	"github.com/gonzagramaglia/entrenar/backend/middleware"
 )
 
 func main() {

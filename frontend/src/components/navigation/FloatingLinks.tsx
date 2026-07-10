@@ -89,7 +89,7 @@ const FloatingLinks: React.FC = () => {
             >
                 <IconButton
                     component="a"
-                    href="https://github.com/gonzalogramagia/entrenar"
+                    href="https://github.com/gonzagramaglia/entrenar"
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{

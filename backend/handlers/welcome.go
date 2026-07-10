@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gonzalogramagia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // CreateWelcomeNotificationHandler crea una notificación de bienvenida para un nuevo usuario

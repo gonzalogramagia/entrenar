@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gonzalogramagia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // HealthResponse representa la respuesta del health check

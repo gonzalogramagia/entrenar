@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gonzalogramagia/entrenar/backend/database"
-	"github.com/gonzalogramagia/entrenar/backend/models"
+	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/models"
 )
 
 // TestEndToEndWorkoutFlow prueba el flujo completo de un workout
