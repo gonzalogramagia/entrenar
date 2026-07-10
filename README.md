@@ -42,6 +42,18 @@
 
 ---
 
+## 📚 Documentation
+
+- [`context/project-overview.md`](context/project-overview.md) — What the project is and who it's for.
+- [`context/architecture.md`](context/architecture.md) — Stack, folder structure, data flows, and invariants.
+- [`context/code-standards.md`](context/code-standards.md) — Coding conventions and engineering rules.
+- [`context/build-plan.md`](context/build-plan.md) — Feature phases and implementation order.
+- [`context/progress-tracker.md`](context/progress-tracker.md) — Living completion tracker.
+- [`docs/project-report.md`](docs/project-report.md) — Full project report (summary, architecture, testing, security).
+- [`PR_STANDARDS.md`](PR_STANDARDS.md) — Pull request format and conventions.
+
+---
+
 ## 📄 License
 
 This project is created for personal use and is shared as-is. Feel free to explore and modify it!
