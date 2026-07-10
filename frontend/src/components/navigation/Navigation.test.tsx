@@ -1,91 +1,65 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render } from '@testing-library/react'
+import { render } from '../../test/test-utils'
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import Navigation from './Navigation'
+import { TABS } from '../../constants/tabs'
+
+// Mock UserAvatar since it has its own complex dependencies
+vi.mock('../user/UserAvatar', () => ({
+  default: () => <div data-testid="user-avatar">Avatar</div>
+}))
 
 describe('Navigation', () => {
   const mockOnTabChange = vi.fn()
-  const mockOnLogout = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('renderiza el menú hamburguesa y el título', async () => {
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
-    
-    // Esperar a que aparezcan los elementos
-    await screen.findByLabelText('abrir menú')
-    await screen.findByText('Entrenar.app')
-    await screen.findByLabelText('cerrar sesión')
-    
-    expect(screen.getByLabelText('abrir menú')).toBeInTheDocument()
-    expect(screen.getByText('Entrenar.app')).toBeInTheDocument()
-    expect(screen.getByLabelText('cerrar sesión')).toBeInTheDocument()
+    render(<Navigation activeTab={TABS.WORKOUT} onTabChange={mockOnTabChange} />)
+
+    const menuButton = await screen.findByLabelText('abrir menú')
+    expect(menuButton).toBeInTheDocument()
+
+    const title = await screen.findByText('Entrenar.app')
+    expect(title).toBeInTheDocument()
   })
 
   it('abre el drawer al hacer clic en el menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
-    
+    render(<Navigation activeTab={TABS.WORKOUT} onTabChange={mockOnTabChange} />)
+
     const menuButton = await screen.findByLabelText('abrir menú')
-    
-    // El drawer no debería estar visible inicialmente
-    expect(screen.queryByText('Registrar')).not.toBeInTheDocument()
-    
-    // Abrir el drawer
     await user.click(menuButton)
-    expect(screen.getByText('Registrar')).toBeInTheDocument()
-    expect(screen.getByText('Ejercicios')).toBeInTheDocument()
-    expect(screen.getByText('Equipamiento')).toBeInTheDocument()
-    expect(screen.getByText('Historial')).toBeInTheDocument()
+
+    expect(await screen.findByText('Registrar')).toBeInTheDocument()
+    expect(await screen.findByText('Entrenamientos')).toBeInTheDocument()
+    expect(await screen.findByText('Mis Rutinas')).toBeInTheDocument()
   })
 
   it('cambia de tab al hacer clic en un elemento del menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
-    
+    render(<Navigation activeTab={TABS.WORKOUT} onTabChange={mockOnTabChange} />)
+
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
-    
-    const ejerciciosButton = screen.getByText('Ejercicios')
-    await user.click(ejerciciosButton)
-    
-    expect(mockOnTabChange).toHaveBeenCalledWith(1)
-  })
 
-  it('cambia de tab y cierra el drawer después de seleccionar una opción', async () => {
-    const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
-    
-    const menuButton = await screen.findByLabelText('abrir menú')
-    await user.click(menuButton)
-    
-    const equipamientoButton = screen.getByText('Equipamiento')
-    await user.click(equipamientoButton)
-    
-    expect(mockOnTabChange).toHaveBeenCalledWith(2)
-  })
+    const entrenamientosButton = await screen.findByText('Entrenamientos')
+    await user.click(entrenamientosButton)
 
-  it('ejecuta logout al hacer clic en el botón de cerrar sesión', async () => {
-    const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
-    
-    const logoutButton = await screen.findByLabelText('cerrar sesión')
-    await user.click(logoutButton)
-    
-    expect(mockOnLogout).toHaveBeenCalled()
+    expect(mockOnTabChange).toHaveBeenCalledWith(TABS.HISTORY)
   })
 
   it('muestra la opción activa en el menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={1} onTabChange={mockOnTabChange}  />)
-    
-    const menuButton = screen.getByLabelText('abrir menú')
+    render(<Navigation activeTab={TABS.HISTORY} onTabChange={mockOnTabChange} />)
+
+    const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
-    
-    const ejerciciosButton = screen.getByText('Ejercicios')
-    expect(ejerciciosButton).toBeInTheDocument()
+
+    const entrenamientosButton = await screen.findByText('Entrenamientos')
+    expect(entrenamientosButton).toBeInTheDocument()
   })
 })

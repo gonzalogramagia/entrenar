@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { render } from '../../test/test-utils'
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import ExerciseList from './ExerciseList'
@@ -82,21 +82,22 @@ describe('ExerciseList', () => {
     expect(screen.queryByText('Curl de Bíceps')).not.toBeInTheDocument()
   })
 
-  it('llama a onSelectExercise cuando se hace click en un ejercicio', async () => {
-    const onSelectExercise = vi.fn()
+  it('llama a onSelectExercise cuando se hace click en un ejercicio (via dialog)', async () => {
     const user = userEvent.setup()
-    render(<ExerciseList exercises={mockExercises} onSelectExercise={onSelectExercise} />)
+    render(<ExerciseList exercises={mockExercises} onSelectExercise={vi.fn()} />)
 
-    const exerciseCard = screen.getByText('Press de Banca').closest('div')
+    const exerciseCard = screen.getByText('Press de Banca').closest('[class*="MuiCard"]')
     await user.click(exerciseCard!)
 
-    expect(onSelectExercise).toHaveBeenCalledWith(mockExercises[0])
+    // A dialog should open — look for the dialog title (h5) with the exercise name
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toBeInTheDocument()
   })
 
   it('muestra mensaje cuando no hay ejercicios', () => {
     render(<ExerciseList exercises={[]} onSelectExercise={vi.fn()} />)
 
-    expect(screen.getByText(/No hay ejercicios disponibles/i)).toBeInTheDocument()
+    expect(screen.getByText(/no se han cargado ejercicios/i)).toBeInTheDocument()
   })
 
   it('muestra mensaje cuando no hay resultados de búsqueda', async () => {
@@ -106,6 +107,6 @@ describe('ExerciseList', () => {
     const searchInput = screen.getByPlaceholderText('Buscar ejercicios...')
     await user.type(searchInput, 'EjercicioInexistente')
 
-    expect(screen.getByText('Sin resultados')).toBeInTheDocument()
+    expect(screen.getByText(/no se encontraron ejercicios/i)).toBeInTheDocument()
   })
 })

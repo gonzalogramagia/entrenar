@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
+import { render } from '../../test/test-utils'
 import { screen } from '@testing-library/dom'
 import AppLayout from './AppLayout'
 
@@ -10,7 +10,7 @@ describe('AppLayout', () => {
         <div data-testid="test-content">Contenido de prueba</div>
       </AppLayout>
     )
-    
+
     expect(screen.getByTestId('test-content')).toBeInTheDocument()
     expect(screen.getByText('Contenido de prueba')).toBeInTheDocument()
   })
@@ -21,8 +21,7 @@ describe('AppLayout', () => {
         <div>Contenido</div>
       </AppLayout>
     )
-    
-    // Verificar que el componente se renderiza sin errores
+
     expect(screen.getByText('Contenido')).toBeInTheDocument()
   })
 
@@ -32,8 +31,7 @@ describe('AppLayout', () => {
         <div>Contenido</div>
       </AppLayout>
     )
-    
-    // El layout debería tener las clases CSS correctas para dimensiones fijas
+
     const container = screen.getByText('Contenido').closest('div')
     expect(container).toBeInTheDocument()
   })

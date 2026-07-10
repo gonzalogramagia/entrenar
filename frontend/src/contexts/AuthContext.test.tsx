@@ -1,12 +1,34 @@
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
-import { screen, fireEvent } from '@testing-library/dom'
+import { describe, it, expect, vi } from 'vitest'
+import { render } from '../test/test-utils'
+import { screen, fireEvent, waitFor } from '@testing-library/dom'
 import { AuthProvider, useAuth } from './AuthContext'
 
-// Componente de prueba para usar el contexto
+const { mockSignOut } = vi.hoisted(() => ({
+  mockSignOut: vi.fn().mockResolvedValue({}),
+}))
+
+// Mock supabase
+vi.mock('../lib/supabase', () => ({
+  auth: {
+    getSession: vi.fn().mockResolvedValue({ session: null, error: null }),
+    onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+    signOut: mockSignOut,
+    signInWithGoogle: vi.fn().mockResolvedValue({ error: null }),
+  }
+}))
+
+// Mock api client
+vi.mock('../lib/api', () => ({
+  apiClient: {
+    getCurrentUser: vi.fn().mockResolvedValue({ is_admin: false, role: 'user' }),
+    updateLastSignIn: vi.fn().mockResolvedValue({}),
+    setupUser: vi.fn().mockResolvedValue({}),
+  }
+}))
+
 function TestComponent() {
   const { isAuthenticated, logout } = useAuth()
-  
+
   return (
     <div>
       <div data-testid="auth-status">
@@ -26,21 +48,22 @@ describe('AuthContext', () => {
         <TestComponent />
       </AuthProvider>
     )
-    
+
     expect(screen.getByTestId('auth-status')).toHaveTextContent('No autenticado')
   })
 
-  it('permite logout', () => {
+  it('permite logout', async () => {
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
     )
-    
-    // Test logout functionality
+
     const logoutButton = screen.getByTestId('logout')
     fireEvent.click(logoutButton)
-    
-    expect(screen.getByTestId('auth-status')).toHaveTextContent('No autenticado')
+
+    await waitFor(() => {
+      expect(mockSignOut).toHaveBeenCalled()
+    })
   })
 })
