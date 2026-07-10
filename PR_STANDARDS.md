@@ -9,7 +9,7 @@ Follow this template exactly so every PR is consistent, professional, and easy t
 
 Follows Conventional Commits. Must be under 50 characters to avoid GitHub truncation.
 
-```
+```text
 <type>(<scope>): <short description>
 ```
 
@@ -27,7 +27,7 @@ Follows Conventional Commits. Must be under 50 characters to avoid GitHub trunca
 **Examples:**
 - `feat(workouts): add workout history filtering`
 - `fix(auth): resolve Google OAuth redirect loop`
-- `ci(coverage): enforce 80% unit test threshold`
+- `ci(coverage): add coverage reporting to CI`
 - `refactor(handlers): extract validation logic`
 - `docs(readme): update technology stack section`
 
@@ -55,8 +55,8 @@ Copy and paste this into the GitHub PR description box every time.
 ## ✅ Checklist
 
 - [ ] Frontend builds successfully (`yarn build`)
-- [ ] Frontend tests pass with ≥80% coverage (`yarn test:coverage`)
-- [ ] Backend tests pass with ≥80% coverage (`make test-coverage`)
+- [ ] Frontend tests pass with coverage report (`yarn test:coverage`)
+- [ ] Backend tests pass with coverage report (`go test -short -coverprofile=coverage.out ./...`)
 - [ ] Conventional Commits applied
 - [ ] CodeRabbit review addressed (if applicable)
 ```
@@ -77,7 +77,7 @@ When GitHub asks for the Extended Description during the merge, use this bullet 
 ```text
 - CI: GitHub Actions workflow with lint, test, and coverage checks.
 - CodeRabbit: Assertive auto-review config on PRs to main.
-- Coverage: 80% threshold enforced on frontend (Vitest) and backend (Go).
+- Coverage: Coverage reports generated for frontend (Vitest) and backend (Go).
 ```
 
 ---
@@ -96,7 +96,7 @@ When GitHub asks for the Extended Description during the merge, use this bullet 
 
 Branches follow the pattern:
 
-```
+```text
 <type>/<short-kebab-description>
 ```
 
@@ -112,6 +112,6 @@ Branches follow the pattern:
 
 | PR | Branch | Description | Status |
 |----|--------|-------------|--------|
-| #1 | `feat/coderabbit-and-coverage` | CodeRabbit config & 80% coverage enforcement | 🟡 Open |
+| #1 | `feat/coderabbit-and-coverage` | CodeRabbit config, CI pipeline & coverage reporting | ✅ Merged |
 
 *(Update this table every time a PR is opened or merged.)*

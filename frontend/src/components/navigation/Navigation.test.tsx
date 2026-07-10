@@ -3,6 +3,7 @@ import { render } from '../../test/test-utils'
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import Navigation from './Navigation'
+import { TABS } from '../../constants/tabs'
 
 // Mock UserAvatar since it has its own complex dependencies
 vi.mock('../user/UserAvatar', () => ({
@@ -17,9 +18,8 @@ describe('Navigation', () => {
   })
 
   it('renderiza el menú hamburguesa y el título', async () => {
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={vi.fn()} />)
+    render(<Navigation activeTab={TABS.WORKOUT} onTabChange={mockOnTabChange} />)
 
-    // Wait for toolbar elements to appear (they have a 50ms delay)
     const menuButton = await screen.findByLabelText('abrir menú')
     expect(menuButton).toBeInTheDocument()
 
@@ -29,12 +29,11 @@ describe('Navigation', () => {
 
   it('abre el drawer al hacer clic en el menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={vi.fn()} />)
+    render(<Navigation activeTab={TABS.WORKOUT} onTabChange={mockOnTabChange} />)
 
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    // Items should appear with staggered animation
     expect(await screen.findByText('Registrar')).toBeInTheDocument()
     expect(await screen.findByText('Entrenamientos')).toBeInTheDocument()
     expect(await screen.findByText('Mis Rutinas')).toBeInTheDocument()
@@ -42,7 +41,7 @@ describe('Navigation', () => {
 
   it('cambia de tab al hacer clic en un elemento del menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={vi.fn()} />)
+    render(<Navigation activeTab={TABS.WORKOUT} onTabChange={mockOnTabChange} />)
 
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
@@ -50,12 +49,12 @@ describe('Navigation', () => {
     const entrenamientosButton = await screen.findByText('Entrenamientos')
     await user.click(entrenamientosButton)
 
-    expect(mockOnTabChange).toHaveBeenCalledWith(1)
+    expect(mockOnTabChange).toHaveBeenCalledWith(TABS.HISTORY)
   })
 
   it('muestra la opción activa en el menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={1} onTabChange={mockOnTabChange} onLogout={vi.fn()} />)
+    render(<Navigation activeTab={TABS.HISTORY} onTabChange={mockOnTabChange} />)
 
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)

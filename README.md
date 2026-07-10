@@ -9,7 +9,7 @@
 ## 🧪 Testing & Code Quality
 
 - **Code Reviews**: Automated PR reviews via [**CodeRabbit**](https://coderabbit.ai/) (assertive profile, auto-review on PRs to `main`).
-- **Unit Test Coverage**: Minimum **80%** coverage enforced on both frontend and backend via CI.
+- **Unit Test Coverage**: Coverage reports generated for both frontend and backend via CI.
 - **CI Pipeline**: GitHub Actions runs linting, tests, and coverage checks on every push/PR to `main`.
 
 ---
@@ -31,7 +31,7 @@
 ## 🛠️ Technology Stack
 
 - **Frontend**: [**React**](https://react.dev/) + [Vite](https://vitejs.dev/) + [**TypeScript**](https://www.typescriptlang.org/)
-- **Styling**: [**Material UI (MUI**)](https://mui.com/) + [**Vanilla CSS**](https://developer.mozilla.org/en-US/docs/Web/CSS)
+- **Styling**: [**Material UI (MUI)**](https://mui.com/) + [**Vanilla CSS**](https://developer.mozilla.org/en-US/docs/Web/CSS)
 - **Backend**: [**Go**](https://go.dev/) (High-performance API)
 - **Database & Auth**: [**Supabase**](https://supabase.com/) (PostgreSQL & OAuth)
 - **Package Manager**: [**Yarn 4**](https://yarnpkg.com/) (with Zero-Installs for optimized Dev Containers)

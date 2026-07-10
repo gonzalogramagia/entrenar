@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"math"
 	"strconv"
 	"testing"
 
@@ -69,7 +70,7 @@ func TestSupabaseIntegration(t *testing.T) {
 		suite.AssertJSON(rr, &workout)
 
 		// Verificar datos del workout creado
-		if workout.Weight != *workoutData.Weight {
+		if math.Abs(workout.Weight-*workoutData.Weight) > 0.001 {
 			t.Errorf("Expected weight %f, got %f", *workoutData.Weight, workout.Weight)
 		}
 		if workout.Reps != *workoutData.Reps {
@@ -138,13 +139,13 @@ func TestSupabaseIntegration(t *testing.T) {
 			UserID: testUserID,
 		})
 
-		if rr.Code == 200 {
-			var workout models.Workout
-			suite.AssertJSON(rr, &workout)
+		suite.AssertStatus(rr, 200)
 
-			if workout.Weight != *updateData.Weight {
-				t.Errorf("Expected updated weight %f, got %f", *updateData.Weight, workout.Weight)
-			}
+		var workout models.Workout
+		suite.AssertJSON(rr, &workout)
+
+		if math.Abs(workout.Weight-*updateData.Weight) > 0.001 {
+			t.Errorf("Expected updated weight %f, got %f", *updateData.Weight, workout.Weight)
 		}
 
 		t.Logf("✅ Update test completed with status: %d", rr.Code)
@@ -161,11 +162,8 @@ func TestSupabaseIntegration(t *testing.T) {
 			UserID: testUserID,
 		})
 
-		if rr.Code == 204 {
-			t.Logf("✅ Workout eliminado exitosamente")
-		} else {
-			t.Logf("Delete status: %d - %s", rr.Code, rr.Body.String())
-		}
+		suite.AssertStatus(rr, 204)
+		t.Logf("✅ Workout eliminado exitosamente")
 
 		// Verificar que ya no existe
 		rr2 := suite.MakeRequest(testutils.TestRequest{
@@ -174,24 +172,15 @@ func TestSupabaseIntegration(t *testing.T) {
 			UserID: testUserID,
 		})
 
-		if rr2.Code == 200 {
-			var workouts []models.Workout
-			suite.AssertJSON(rr2, &workouts)
+		suite.AssertStatus(rr2, 200)
 
-			for _, w := range workouts {
-				if w.ID == createdWorkoutID {
-					t.Error("Workout should have been deleted but still exists")
-				}
+		var workouts []models.Workout
+		suite.AssertJSON(rr2, &workouts)
+
+		for _, w := range workouts {
+			if w.ID == createdWorkoutID {
+				t.Error("Workout should have been deleted but still exists")
 			}
 		}
 	})
-}
-
-// Helpers para punteros
-func intPtr(i int) *int {
-	return &i
-}
-
-func stringPtr(s string) *string {
-	return &s
 }

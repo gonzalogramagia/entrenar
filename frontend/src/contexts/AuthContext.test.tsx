@@ -1,14 +1,18 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '../test/test-utils'
-import { screen, fireEvent } from '@testing-library/dom'
+import { screen, fireEvent, waitFor } from '@testing-library/dom'
 import { AuthProvider, useAuth } from './AuthContext'
+
+const { mockSignOut } = vi.hoisted(() => ({
+  mockSignOut: vi.fn().mockResolvedValue({}),
+}))
 
 // Mock supabase
 vi.mock('../lib/supabase', () => ({
   auth: {
     getSession: vi.fn().mockResolvedValue({ session: null, error: null }),
     onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
-    signOut: vi.fn().mockResolvedValue({}),
+    signOut: mockSignOut,
     signInWithGoogle: vi.fn().mockResolvedValue({ error: null }),
   }
 }))
@@ -48,7 +52,7 @@ describe('AuthContext', () => {
     expect(screen.getByTestId('auth-status')).toHaveTextContent('No autenticado')
   })
 
-  it('permite logout', () => {
+  it('permite logout', async () => {
     render(
       <AuthProvider>
         <TestComponent />
@@ -58,6 +62,8 @@ describe('AuthContext', () => {
     const logoutButton = screen.getByTestId('logout')
     fireEvent.click(logoutButton)
 
-    expect(screen.getByTestId('auth-status')).toHaveTextContent('No autenticado')
+    await waitFor(() => {
+      expect(mockSignOut).toHaveBeenCalled()
+    })
   })
 })
