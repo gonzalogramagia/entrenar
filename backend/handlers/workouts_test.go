@@ -37,14 +37,22 @@ func mockRequest(method, url string, body interface{}) (*http.Request, error) {
 }
 
 func TestCreateWorkoutHandler_ValidInput(t *testing.T) {
-	// Datos de prueba válidos
+	if testing.Short() {
+		t.Skip("Skipping test that requires database")
+	}
+
+	weight := 80.5
+	reps := 10
+	set := 1
+	seconds := 45
+
 	workoutData := models.CreateWorkoutRequest{
 		ExerciseID:   1,
-		Weight:       80.5,
-		Reps:         10,
-		Serie:        &[]int{1}[0],
-		Seconds:      &[]int{45}[0],
-		Observations: &[]string{"Buena ejecución"}[0],
+		Weight:       &weight,
+		Reps:         &reps,
+		Set:          &set,
+		Seconds:      &seconds,
+		Observations: "Buena ejecución",
 	}
 
 	req, err := mockRequest("POST", "/api/workouts", workoutData)
@@ -56,7 +64,6 @@ func TestCreateWorkoutHandler_ValidInput(t *testing.T) {
 	handler := http.HandlerFunc(CreateWorkoutHandler)
 
 	// Nota: Este test fallará sin una conexión real a la DB
-	// En un entorno de testing real usarías una DB de prueba o mocks
 	handler.ServeHTTP(rr, req)
 
 	// Verificar que no haya errores de parseo JSON
@@ -69,11 +76,13 @@ func TestCreateWorkoutHandler_ValidInput(t *testing.T) {
 }
 
 func TestCreateWorkoutHandler_InvalidWeight(t *testing.T) {
-	// Datos con peso inválido
+	negativeWeight := -10.0
+	reps := 10
+
 	workoutData := models.CreateWorkoutRequest{
 		ExerciseID: 1,
-		Weight:     -10, // Peso negativo inválido
-		Reps:       10,
+		Weight:     &negativeWeight,
+		Reps:       &reps,
 	}
 
 	req, err := mockRequest("POST", "/api/workouts", workoutData)
@@ -91,16 +100,19 @@ func TestCreateWorkoutHandler_InvalidWeight(t *testing.T) {
 		t.Errorf("Expected status 400, got %d", rr.Code)
 	}
 
-	if !strings.Contains(rr.Body.String(), "peso") {
+	if !strings.Contains(rr.Body.String(), "Peso") {
 		t.Error("El error debería mencionar el peso")
 	}
 }
 
 func TestCreateWorkoutHandler_InvalidReps(t *testing.T) {
+	weight := 80.5
+	reps := -1
+
 	workoutData := models.CreateWorkoutRequest{
 		ExerciseID: 1,
-		Weight:     80.5,
-		Reps:       0, // Reps inválidas
+		Weight:     &weight,
+		Reps:       &reps,
 	}
 
 	req, err := mockRequest("POST", "/api/workouts", workoutData)
@@ -117,13 +129,12 @@ func TestCreateWorkoutHandler_InvalidReps(t *testing.T) {
 		t.Errorf("Expected status 400, got %d", rr.Code)
 	}
 
-	if !strings.Contains(rr.Body.String(), "repeticiones") {
+	if !strings.Contains(rr.Body.String(), "Repeticiones") {
 		t.Error("El error debería mencionar las repeticiones")
 	}
 }
 
 func TestCreateWorkoutHandler_InvalidJSON(t *testing.T) {
-	// JSON malformado
 	req, err := http.NewRequest("POST", "/api/workouts", strings.NewReader(`{"invalid": json}`))
 	if err != nil {
 		t.Fatal(err)
@@ -148,10 +159,17 @@ func TestCreateWorkoutHandler_InvalidJSON(t *testing.T) {
 }
 
 func TestUpdateWorkoutHandler_ValidInput(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test that requires database")
+	}
+
+	weight := 85.0
+	reps := 12
+
 	workoutData := models.CreateWorkoutRequest{
 		ExerciseID: 1,
-		Weight:     85.0,
-		Reps:       12,
+		Weight:     &weight,
+		Reps:       &reps,
 	}
 
 	req, err := mockRequest("PUT", "/api/workouts/1", workoutData)
@@ -161,7 +179,6 @@ func TestUpdateWorkoutHandler_ValidInput(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	// Usar gorilla mux para simular parámetros de URL
 	router := mux.NewRouter()
 	router.HandleFunc("/api/workouts/{id}", UpdateWorkoutHandler).Methods("PUT")
 
@@ -177,10 +194,13 @@ func TestUpdateWorkoutHandler_ValidInput(t *testing.T) {
 }
 
 func TestUpdateWorkoutHandler_InvalidID(t *testing.T) {
+	weight := 85.0
+	reps := 12
+
 	workoutData := models.CreateWorkoutRequest{
 		ExerciseID: 1,
-		Weight:     85.0,
-		Reps:       12,
+		Weight:     &weight,
+		Reps:       &reps,
 	}
 
 	req, err := mockRequest("PUT", "/api/workouts/invalid_id", workoutData)
@@ -201,6 +221,10 @@ func TestUpdateWorkoutHandler_InvalidID(t *testing.T) {
 }
 
 func TestDeleteWorkoutHandler_ValidID(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test that requires database")
+	}
+
 	req, err := mockRequest("DELETE", "/api/workouts/1", nil)
 	if err != nil {
 		t.Fatal(err)

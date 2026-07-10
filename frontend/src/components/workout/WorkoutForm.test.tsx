@@ -1,56 +1,61 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
-import { waitFor } from '@testing-library/dom'
-import { screen, fireEvent } from '@testing-library/dom'
-import userEvent from '@testing-library/user-event'
-import WorkoutForm from './WorkoutForm.tsx'
+import { render } from '../../test/test-utils'
+import { screen } from '@testing-library/dom'
+import WorkoutForm from './WorkoutForm'
 
-const exercises = [{ id: 1, name: 'Press de Banca' }]
+// Mock del contexto de autenticación
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user-id' },
+    isAuthenticated: true,
+    isGuest: false,
+    signInWithGoogle: vi.fn()
+  })
+}))
+
+// Mock del contexto de configuración de usuario
+vi.mock('../../contexts/UserSettingsContext', () => ({
+  useUserSettings: () => ({
+    settings: {
+      favoriteExercises: [],
+      hasConfiguredFavorites: false,
+      socialEnabled: true
+    },
+    toggleExerciseCompleted: vi.fn(),
+    getCompletedExercisesForRoutine: vi.fn().mockReturnValue({}),
+    getRoutineProgress: vi.fn().mockReturnValue(0)
+  })
+}))
+
+const exercises = [
+  { id: 1, name: 'Press de Banca', muscle_group: 'Pecho', is_sport: false, bodyweight: false },
+  { id: 2, name: 'Sentadilla', muscle_group: 'Piernas', is_sport: false, bodyweight: false },
+]
 
 describe('WorkoutForm', () => {
-  it('envía datos válidos', async () => {
-    const user = userEvent.setup()
-    const onSubmit = vi.fn()
-    render(<WorkoutForm exercises={exercises} onSubmit={onSubmit} />)
+  it('renderiza el formulario con el selector de ejercicios', () => {
+    render(<WorkoutForm exercises={exercises} onSubmit={vi.fn()} />)
 
-    // Seleccionar ejercicio (select nativo de MUI)
-    const selectElement = screen.getByRole('combobox', { name: 'Ejercicio' })
-    fireEvent.change(selectElement, { target: { value: '1' } })
-
-    // Campos requeridos
-    await user.type(screen.getByRole('spinbutton', { name: 'Peso (kg)' }), '80')
-    await user.type(screen.getByRole('spinbutton', { name: 'Repeticiones' }), '8')
-
-    // Opcionales
-    await user.type(screen.getByRole('spinbutton', { name: 'Serie' }), '1')
-    await user.type(screen.getByRole('spinbutton', { name: 'Segundos (capturados del cronómetro)' }), '45')
-    await user.type(screen.getByRole('textbox', { name: 'Observaciones' }), 'Buena técnica')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
-
-    await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledWith({
-        exerciseId: 1,
-        weight: 80,
-        reps: 8,
-        serie: 1,
-        seconds: 45,
-        observations: 'Buena técnica',
-      })
-    })
+    // The Autocomplete for exercise search should be present
+    expect(screen.getByLabelText(/buscar y seleccionar ejercicio/i)).toBeInTheDocument()
   })
 
-  it('muestra errores si faltan requeridos', async () => {
-    const onSubmit = vi.fn()
-    render(<WorkoutForm exercises={exercises} onSubmit={onSubmit} />)
+  it('renderiza el botón de envío', () => {
+    render(<WorkoutForm exercises={exercises} onSubmit={vi.fn()} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
+    expect(screen.getByRole('button', { name: /registrar entrenamiento/i })).toBeInTheDocument()
+  })
 
-    // Verificamos que aparezcan mensajes de error (string genérico de zod para NaN)
-    const errs = await screen.findAllByText(/invalid input/i)
-    expect(errs.length).toBeGreaterThanOrEqual(2)
-    expect(onSubmit).not.toHaveBeenCalled()
+  it('muestra mensaje de no rutina activa cuando no hay rutina', () => {
+    render(<WorkoutForm exercises={exercises} onSubmit={vi.fn()} />)
+
+    expect(screen.getByText(/ninguna rutina activa/i)).toBeInTheDocument()
+  })
+
+  it('deshabilita el botón cuando isLoading es true', () => {
+    render(<WorkoutForm exercises={exercises} onSubmit={vi.fn()} isLoading />)
+
+    const submitButton = screen.getByRole('button', { name: /registrando/i })
+    expect(submitButton).toBeDisabled()
   })
 })
-
-

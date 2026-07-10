@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -13,44 +12,8 @@ import (
 	"github.com/gonzalogramagia/entrenar/backend/models"
 )
 
-// MockDB simula una base de datos para testing
-type MockDB struct {
-	workouts []models.Workout
-	nextID   int
-}
-
-func (m *MockDB) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	// Implementación simplificada para tests
-	return nil, sql.ErrNoRows
-}
-
-func (m *MockDB) QueryRow(query string, args ...interface{}) *sql.Row {
-	// Para tests, retornamos una implementación que simula datos
-	return nil
-}
-
-func (m *MockDB) Exec(query string, args ...interface{}) (sql.Result, error) {
-	// Simular una ejecución exitosa
-	return &mockResult{rowsAffected: 1}, nil
-}
-
-type mockResult struct {
-	rowsAffected int64
-}
-
-func (m *mockResult) LastInsertId() (int64, error) {
-	return 1, nil
-}
-
-func (m *mockResult) RowsAffected() (int64, error) {
-	return m.rowsAffected, nil
-}
-
 // TestEndToEndWorkoutFlow prueba el flujo completo de un workout
 func TestEndToEndWorkoutFlow(t *testing.T) {
-	// Nota: Este test requiere una base de datos de prueba real
-	// En producción usarías Docker con PostgreSQL o una DB en memoria
-
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -60,19 +23,23 @@ func TestEndToEndWorkoutFlow(t *testing.T) {
 		t.Skip("Database not configured for tests")
 	}
 
+	weight := 80.5
+	reps := 10
+	set := 1
+
 	t.Run("Create workout", func(t *testing.T) {
 		workoutData := models.CreateWorkoutRequest{
 			ExerciseID:   1,
-			Weight:       80.5,
-			Reps:         10,
-			Serie:        intPtr(1),
-			Observations: stringPtr("Test workout"),
+			Weight:       &weight,
+			Reps:         &reps,
+			Set:          &set,
+			Observations: "Test workout",
 		}
 
 		body, _ := json.Marshal(workoutData)
 		req, _ := http.NewRequest("POST", "/api/workouts", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
-		
+
 		// Agregar contexto de usuario
 		ctx := context.WithValue(req.Context(), "user_id", "test_user_integration")
 		req = req.WithContext(ctx)
@@ -82,7 +49,6 @@ func TestEndToEndWorkoutFlow(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 
-		// En un test real, verificarías que se creó correctamente
 		t.Logf("Create workout response: %d - %s", rr.Code, rr.Body.String())
 	})
 
@@ -102,10 +68,13 @@ func TestEndToEndWorkoutFlow(t *testing.T) {
 
 // BenchmarkCreateWorkout mide la performance del endpoint
 func BenchmarkCreateWorkout(b *testing.B) {
+	weight := 80.5
+	reps := 10
+
 	workoutData := models.CreateWorkoutRequest{
 		ExerciseID: 1,
-		Weight:     80.5,
-		Reps:       10,
+		Weight:     &weight,
+		Reps:       &reps,
 	}
 
 	body, _ := json.Marshal(workoutData)
@@ -148,7 +117,6 @@ func TestConcurrentRequests(t *testing.T) {
 		}(i)
 	}
 
-	// Esperar que todas las requests terminen
 	for i := 0; i < numRequests; i++ {
 		<-done
 	}

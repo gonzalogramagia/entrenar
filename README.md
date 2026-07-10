@@ -6,7 +6,7 @@
 
 ---
 
-## 🤖 Code Quality
+## 🧪 Testing & Code Quality
 
 - **Code Reviews**: Automated PR reviews via [**CodeRabbit**](https://coderabbit.ai/) (assertive profile, auto-review on PRs to `main`).
 - **Unit Test Coverage**: Minimum **80%** coverage enforced on both frontend and backend via CI.
