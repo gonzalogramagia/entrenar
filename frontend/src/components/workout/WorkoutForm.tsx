@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -29,30 +28,11 @@ import {
 } from '@mui/material'
 import {
   FitnessCenter as FitnessCenterIcon,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  PlayArrow as PlayArrowIcon,
-  Stop as StopIcon,
-  Close as CloseIcon
+  PlayArrow as PlayArrowIcon
 } from '@mui/icons-material'
 import { useState, useEffect, useMemo } from 'react'
-
-// Esquema de validación con Zod
-const workoutFormSchema = z.object({
-  exercise_id: z.coerce.number().refine(val => val > 0, 'Debe seleccionar un ejercicio'),
-  weight: z.string().transform((val) => {
-    if (val === '' || val === '0') return undefined
-    const num = parseFloat(val)
-    return isNaN(num) ? undefined : num
-  }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
-  reps: z.coerce.number().int().refine(val => val === 0 || (val > 0 && val <= 100), ' ').optional(), // Máximo 100 reps, opcional
-  set: z.coerce.number().int().min(1, ' '),
-  seconds: z.coerce.number().min(0).max(28800).optional(), // Máximo 8 horas (28800 segundos) para deportes
-  restSeconds: z.coerce.number().min(0).max(3600).optional(), // Mantener en esquema por compatibilidad si es necesario, pero oculto
-  observations: z.string().default('')
-})
-
-type WorkoutFormData = z.infer<typeof workoutFormSchema>
+import { workoutFormSchema, type WorkoutFormData } from './workoutFormSchema'
+import ActiveRoutineBox from './ActiveRoutineBox'
 
 type WorkoutFormProps = {
   exercises: Exercise[]
@@ -82,10 +62,7 @@ export default function WorkoutForm({
   const { language } = useLanguage()
   const t = translations[language].workout
   const {
-    settings,
-    toggleExerciseCompleted,
-    getCompletedExercisesForRoutine,
-    getRoutineProgress
+    settings
   } = useUserSettings()
 
   // Estado para forzar re-render cuando cambien las configuraciones
@@ -172,7 +149,7 @@ export default function WorkoutForm({
   const [lastRegisteredExercise, setLastRegisteredExercise] = useState('')
 
   // Estado para controlar la expansión de la box de rutina
-  const [showRoutineExercises, setShowRoutineExercises] = useState(false)
+  // (moved to ActiveRoutineBox)
 
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
@@ -232,20 +209,6 @@ export default function WorkoutForm({
     
     return options
   }, [currentMonthNum, currentYearNum, language])
-
-  // Obtener fecha actual y ejercicios completados
-  const today = new Date().toISOString().split('T')[0]
-  const completedExercises = activeRoutine
-    ? getCompletedExercisesForRoutine(today, activeRoutine.id)
-    : {}
-
-  // Calcular progreso real de la rutina
-  const realRoutineProgress = activeRoutine
-    ? getRoutineProgress(today, activeRoutine.id, activeRoutine)
-    : 0
-
-  // Detectar si la rutina está completa
-  const isRoutineComplete = realRoutineProgress === 100
 
   // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici
   const selectedExerciseId = watch('exercise_id')
@@ -500,263 +463,21 @@ export default function WorkoutForm({
 
       {/* Box de rutina activa o mensaje de no rutina */}
       {activeRoutine ? (
-        <Box sx={{
-          mb: 3,
-          p: 2,
-          backgroundColor: isRoutineComplete ? 'success.main' : (isRoutinePaused ? 'primary.main' : '#FFB732'),
-          borderRadius: 2,
-          color: 'white',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          position: 'relative'
-        }}>
-
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                textAlign: 'left',
-                cursor: 'pointer',
-                '&:hover': {
-                  opacity: 0.8
-                }
-              }}
-              onClick={onNavigateToRoutines}
-            >
-              🏋️ {isRoutinePaused ? t.restTime : activeRoutine.name}
-            </Typography>
-
-            <IconButton
-              size="small"
-              onClick={onStopRoutine}
-              sx={{
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.1)'
-                }
-              }}
-            >
-              {isRoutineComplete ? <CloseIcon /> : <StopIcon />}
-            </IconButton>
-          </Box>
-
-          <Box sx={{
-            width: '100%',
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            borderRadius: 1,
-            height: 8,
-            mb: 1
-          }}>
-            <Box sx={{
-              width: `${realRoutineProgress}%`,
-              backgroundColor: 'white',
-              borderRadius: 1,
-              height: '100%',
-              transition: 'width 0.3s ease'
-            }} />
-          </Box>
-
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
-              {realRoutineProgress}% {t.routineCompleteLabel}
-            </Typography>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {!showRoutineExercises && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      opacity: 0.8
-                    }
-                  }}
-                  onClick={() => {
-                    // Expandir/contraer la lista de ejercicios
-                    setShowRoutineExercises(!showRoutineExercises)
-                  }}
-                >
-                  {isRoutineComplete ? (language === 'es' ? '¡Felicitaciones!' : 'Congratulations!') : (isRoutinePaused ? t.chooseRoutine : t.viewRoutine)}
-                </Typography>
-              )}
-
-              <IconButton
-                size="small"
-                onClick={() => setShowRoutineExercises(!showRoutineExercises)}
-                sx={{
-                  color: 'white',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.2)'
-                  }
-                }}
-              >
-                {showRoutineExercises ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-              </IconButton>
-            </Box>
-          </Box>
-
-          {/* Lista expandible de ejercicios de la rutina */}
-          {showRoutineExercises && activeRoutine?.exercises && (
-            <Box sx={{
-              mt: 2,
-              p: 2,
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              borderRadius: 2,
-              overflow: 'visible'
-            }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: 'white' }}>
-                {t.remainingExercises}
-              </Typography>
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {activeRoutine.exercises.map((exercise: any, index: number) => {
-                  const completedSets = completedExercises[exercise.exercise_id] || []
-
-                  return (
-                    <Box
-                      key={`${exercise.exercise_id}-${index}`}
-                      sx={{
-                        p: 1.5,
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: 1,
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'white', flex: 1, textAlign: 'left', pl: 2 }}>
-                          {exercise.exercise_name}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          {Array.from({ length: exercise.sets }, (_, setIndex) => {
-                            const setNumber = setIndex + 1
-                            const isCompleted = completedSets.includes(setNumber)
-
-                            return (
-                              <Box
-                                key={setNumber}
-                                sx={{
-                                  width: 24,
-                                  height: 24,
-                                  borderRadius: '50%',
-                                  border: '2px solid',
-                                  borderColor: isCompleted ? 'warning.main' : 'rgba(255,255,255,0.5)',
-                                  backgroundColor: isCompleted ? 'warning.main' : 'transparent',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all 0.2s ease',
-                                  '&:hover': {
-                                    borderColor: isCompleted ? 'warning.dark' : 'warning.main',
-                                    backgroundColor: isCompleted ? 'warning.dark' : 'rgba(255,152,0,0.2)'
-                                  }
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  toggleExerciseCompleted(today, activeRoutine.id, exercise.exercise_id, setNumber, activeRoutine)
-                                }}
-                              >
-                                {isCompleted && (
-                                  <Typography variant="caption" sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                                    ✓
-                                  </Typography>
-                                )}
-                              </Box>
-                            )
-                          })}
-                        </Box>
-                      </Box>
-
-                      <Box sx={{ display: 'flex', gap: 1, mb: 1, justifyContent: 'center' }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
-                            {exercise.sets}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                            {exercise.sets === 1 ? (language === 'es' ? 'serie' : 'set') : (language === 'es' ? 'series' : 'sets')}
-                          </Typography>
-                        </Box>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          •
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
-                            {exercise.reps}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                            {exercise.reps === 1 ? (language === 'es' ? 'rep' : 'rep') : (language === 'es' ? 'reps' : 'reps')}
-                          </Typography>
-                        </Box>
-                        {exercise.weight && (
-                          <>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                              •
-                            </Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
-                                {exercise.weight}
-                              </Typography>
-                              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                                kg
-                              </Typography>
-                            </Box>
-                          </>
-                        )}
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          •
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
-                            {Math.floor(exercise.rest_time_seconds / 60)}:{(exercise.rest_time_seconds % 60).toString().padStart(2, '0')}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
-                            {language === 'es' ? 'descanso' : 'rest'}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                          color: 'white',
-                          borderColor: 'rgba(255,255,255,0.5)',
-                          '&:hover': {
-                            borderColor: '#FFB732',
-                            backgroundColor: 'rgba(255,183,50,0.1)'
-                          }
-                        }}
-                        onClick={() => {
-                          // Pre-cargar el ejercicio en el formulario
-                          setValue('exercise_id', exercise.exercise_id)
-                          setValue('weight', exercise.weight?.toString() || '')
-                          setValue('reps', exercise.reps || '')
-                          setValue('set', 1)
-                          setValue('seconds', exercise.rest_time_seconds?.toString() || '')
-                          setValue('observations', exercise.notes || '')
-
-                          // Cerrar la lista expandible
-                          setShowRoutineExercises(false)
-                        }}
-                      >
-                        {t.loadInForm}
-                      </Button>
-                    </Box>
-                  )
-                })}
-              </Box>
-            </Box>
-          )}
-        </Box>
+        <ActiveRoutineBox
+          activeRoutine={activeRoutine}
+          isRoutinePaused={isRoutinePaused}
+          onStopRoutine={onStopRoutine}
+          onNavigateToRoutines={onNavigateToRoutines}
+          onLoadExercise={(exercise) => {
+            setValue('exercise_id', exercise.exercise_id)
+            setValue('weight', exercise.weight?.toString() || '')
+            setValue('reps', exercise.reps || '')
+            setValue('set', 1)
+            setValue('seconds', exercise.rest_time_seconds?.toString() || '')
+            setValue('observations', exercise.notes || '')
+          }}
+        />
       ) : (
-        // Box cuando no hay rutina activa
         <Box sx={{
           mb: 3,
           p: 2,
@@ -780,38 +501,15 @@ export default function WorkoutForm({
             </Typography>
           </Box>
 
-          <Box sx={{
-            width: '100%',
-            backgroundColor: 'rgba(0,0,0,0.1)',
-            borderRadius: 1,
-            height: 8,
-            mb: 1
-          }}>
-            <Box sx={{
-              width: '0%',
-              backgroundColor: 'grey.500',
-              borderRadius: 1,
-              height: '100%',
-              transition: 'width 0.3s ease'
-            }} />
+          <Box sx={{ width: '100%', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 1, height: 8, mb: 1 }}>
+            <Box sx={{ width: '0%', backgroundColor: 'grey.500', borderRadius: 1, height: '100%', transition: 'width 0.3s ease' }} />
           </Box>
 
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
               0% completa
             </Typography>
-
-            <Typography variant="body2" sx={{
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.8
-              }
-            }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', cursor: 'pointer', '&:hover': { opacity: 0.8 } }}>
               {t.goToRoutines}
             </Typography>
           </Box>
