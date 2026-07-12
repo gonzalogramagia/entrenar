@@ -108,10 +108,21 @@ Branches follow the pattern:
 
 ---
 
+
+## PR Draft Generation
+
+Whenever a PR is prepared, the AI assistant must generate a local markdown file containing both the **Description Template** and the **Extended Description** for the user to review or copy.
+- **Path:** `docs/prs/pr-[number]-[slug].md`
+- **Note:** The `docs/prs/` directory is git-ignored, so these drafts won't be pushed.
+
+
 ## PR History Reference
 
 | PR | Branch | Description | Status |
 |----|--------|-------------|--------|
 | #1 | `feat/coderabbit-and-coverage` | CodeRabbit config, CI pipeline & coverage reporting | ✅ Merged |
+| #2 | `docs/project-documentation` | Initial project documentation structure | ✅ Merged |
+| #3 | `refactor/workout-history` | Extracted utilities, mock data, and sub-components | ✅ Merged |
+| #4 | `refactor/workout-form` | Extract routine box, form schema, subcomponents and hooks | ✅ Merged |
 
 *(Update this table every time a PR is opened or merged.)*

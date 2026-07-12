@@ -3,12 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { useAuth } from '../../contexts/AuthContext'
 
-type Exercise = {
-  id: number
-  name: string
-  bodyweight?: boolean
-  is_sport?: boolean
-}
+
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
 import {
@@ -21,27 +16,27 @@ import {
   Stack,
   TextField,
   Typography,
-  IconButton,
-  Dialog,
-  DialogContent,
   Autocomplete
 } from '@mui/material'
 import {
-  FitnessCenter as FitnessCenterIcon,
-  PlayArrow as PlayArrowIcon
+  FitnessCenter as FitnessCenterIcon
 } from '@mui/icons-material'
 import { useState, useEffect, useMemo } from 'react'
 import { workoutFormSchema, type WorkoutFormData } from './workoutFormSchema'
 import ActiveRoutineBox from './ActiveRoutineBox'
+import { useFilteredExercises } from '../../hooks/useFilteredExercises'
+import RestModal from './RestModal'
+import WorkoutDateSelector from './WorkoutDateSelector'
+import type { Routine, RoutineExercise, Exercise } from '../../types/workout'
 
 type WorkoutFormProps = {
   exercises: Exercise[]
   onSubmit: (data: WorkoutFormData) => Promise<void>
   isLoading?: boolean
-  activeRoutine?: any
+  activeRoutine?: Routine
   isRoutinePaused?: boolean
   onStopRoutine?: () => void
-  preloadedExercise?: any
+  preloadedExercise?: RoutineExercise
   onNavigateToRoutines?: () => void
   userRole?: string
   isAdmin?: boolean
@@ -66,67 +61,7 @@ export default function WorkoutForm({
   } = useUserSettings()
 
   // Estado para forzar re-render cuando cambien las configuraciones
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
-
-  // Escuchar cambios en localStorage para actualizar ejercicios instantáneamente
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setRefreshTrigger(prev => prev + 1)
-    }
-
-    // Escuchar cambios desde otras pestañas
-    window.addEventListener('storage', handleStorageChange)
-
-    // Escuchar cambios desde la misma pestaña
-    const originalSetItem = localStorage.setItem
-    localStorage.setItem = function (key, value) {
-      originalSetItem.apply(this, [key, value])
-      if (key === 'admin-exercise-settings') {
-        // Pequeño delay para asegurar que el localStorage se actualizó
-        setTimeout(handleStorageChange, 10)
-      }
-    }
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      localStorage.setItem = originalSetItem
-    }
-  }, [])
-
-  // Filtrar ejercicios favoritos según configuraciones
-  const filteredExercises = useMemo(() => {
-    let filtered = exercises
-    // Usar configuraciones de localStorage (admin-exercise-settings es el nuevo estándar para todos)
-    try {
-      const adminSettings = localStorage.getItem('admin-exercise-settings')
-      if (adminSettings) {
-        const parsed = JSON.parse(adminSettings)
-        // Si el usuario ha configurado sus favoritos (aunque la lista esté vacía), respetamos su elección
-        if (parsed.hasConfigured) {
-          filtered = filtered.filter(exercise => (parsed.favoriteExercises || []).includes(exercise.id))
-        } else if (parsed.favoriteExercises && parsed.favoriteExercises.length > 0) {
-          // Fallback para versiones anteriores sin hasConfigured
-          filtered = filtered.filter(exercise => parsed.favoriteExercises.includes(exercise.id))
-        } else {
-          // Si no ha configurado nada explícitamente, excluir deportes por defecto
-          filtered = exercises.filter(exercise => !exercise.is_sport)
-        }
-      } else {
-        // Fallback: si no hay settings guardados, intentar usar los del contexto (legacy) o excluir deportes
-        if (settings.hasConfiguredFavorites) {
-          filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
-        } else {
-          filtered = exercises.filter(exercise => !exercise.is_sport)
-        }
-      }
-    } catch (error) {
-      console.error('Error loading exercise settings:', error)
-      filtered = exercises.filter(exercise => !exercise.is_sport)
-    }
-
-    return filtered
-  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises, userRole, isAdmin, refreshTrigger])
-
+  const { filteredExercises, isLoadingExercises } = useFilteredExercises(exercises, settings, userRole, isAdmin)
 
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
@@ -144,71 +79,17 @@ export default function WorkoutForm({
 
   // Estado para el modal de descanso
   const [showRestModal, setShowRestModal] = useState(false)
-  const [restTime, setRestTime] = useState(0)
-  const [isRestRunning, setIsRestRunning] = useState(false)
+  const [initialRestTime, setInitialRestTime] = useState(0)
   const [lastRegisteredExercise, setLastRegisteredExercise] = useState('')
 
   // Estado para controlar la expansión de la box de rutina
   // (moved to ActiveRoutineBox)
 
-  // Estado para detectar si los ejercicios están cargando
-  const isLoadingExercises = filteredExercises.length === 0
-
   // Estado para la fecha seleccionada
   const now = useMemo(() => new Date(), [])
-  const currentDay = now.getDate()
-  const currentMonthNum = now.getMonth() + 1
-  const currentYearNum = now.getFullYear()
-
-  const [selectedDay, setSelectedDay] = useState<number | string>(currentDay)
-  const [selectedMonth, setSelectedMonth] = useState<number>(currentMonthNum)
-  const [selectedYear, setSelectedYear] = useState<number>(currentYearNum)
-
-  // Calcular días del mes seleccionado
-  const daysInMonth = useMemo(() => new Date(selectedYear, selectedMonth, 0).getDate(), [selectedYear, selectedMonth])
-
-  // Límite máximo para el día (no permitir fechas futuras)
-  const maxDayAllowed = useMemo(() => {
-    if (selectedYear === currentYearNum && selectedMonth === currentMonthNum) {
-      return currentDay
-    }
-    return daysInMonth
-  }, [selectedYear, selectedMonth, currentYearNum, currentMonthNum, currentDay, daysInMonth])
-
-  // Ajustar el día si queda fuera de los límites al cambiar mes/año
-  useEffect(() => {
-    if (typeof selectedDay === 'number' && selectedDay > maxDayAllowed) {
-      setSelectedDay(maxDayAllowed)
-    }
-  }, [maxDayAllowed, selectedDay])
-
-  // Opciones de mes (actual y anterior)
-  const monthOptions = useMemo(() => {
-    const options = []
-    
-    // Mes actual
-    const currentLabel = new Date(currentYearNum, currentMonthNum - 1).toLocaleString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
-    options.push({
-      value: `${currentYearNum}-${currentMonthNum}`,
-      label: currentLabel.charAt(0).toUpperCase() + currentLabel.slice(1),
-      month: currentMonthNum,
-      year: currentYearNum
-    })
-    
-    // Mes anterior
-    const prevDate = new Date(currentYearNum, currentMonthNum - 2, 1)
-    const prevMonth = prevDate.getMonth() + 1
-    const prevYear = prevDate.getFullYear()
-    const prevLabel = prevDate.toLocaleString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
-    options.push({
-      value: `${prevYear}-${prevMonth}`,
-      label: prevLabel.charAt(0).toUpperCase() + prevLabel.slice(1),
-      month: prevMonth,
-      year: prevYear
-    })
-    
-    return options
-  }, [currentMonthNum, currentYearNum, language])
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`
+  })
 
   // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici
   const selectedExerciseId = watch('exercise_id')
@@ -279,29 +160,7 @@ export default function WorkoutForm({
   }, [preloadedExercise, setValue, watch])
 
   // Timer para el modal de descanso
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null
 
-    if (showRestModal && isRestRunning) {
-      interval = setInterval(() => {
-        setRestTime(prev => {
-          if (prev <= 1) {
-            // Detener el timer y cerrar el modal cuando llegue a 0
-            setIsRestRunning(false)
-            setShowRestModal(false)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval)
-      }
-    }
-  }, [showRestModal, isRestRunning])
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
@@ -391,7 +250,7 @@ export default function WorkoutForm({
         set: data.set,
         seconds: data.seconds,
         observations: data.observations,
-        date: `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}-${selectedDay.toString().padStart(2, '0')}`
+        date: selectedDate
       }
 
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
@@ -422,8 +281,7 @@ export default function WorkoutForm({
       // Solo abrir el modal de descanso si hay un tiempo de descanso configurado
       if (data.restSeconds && data.restSeconds > 0) {
         setLastRegisteredExercise(exerciseName)
-        setRestTime(data.restSeconds)
-        setIsRestRunning(true)
+        setInitialRestTime(data.restSeconds)
         setShowRestModal(true)
       }
 
@@ -723,67 +581,17 @@ export default function WorkoutForm({
             />
           )}
           {/* Selección de Fecha */}
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              label={t.day}
-              type="number"
-              size="small"
-              fullWidth
-              value={selectedDay}
-              onChange={(e) => {
-                const val = parseInt(e.target.value)
-                if (e.target.value === '') {
-                  setSelectedDay('')
-                  return
-                }
-                if (!isNaN(val) && val >= 1 && val <= maxDayAllowed) {
-                  setSelectedDay(val)
-                }
-              }}
-              inputProps={{ 
-                min: 1, 
-                max: maxDayAllowed,
-                inputMode: 'numeric'
-              }}
-              disabled={isLoading}
-            />
-            <FormControl fullWidth size="small" disabled={isLoading}>
-              <InputLabel id="month-select-label">{t.month}</InputLabel>
-              <Select
-                labelId="month-select-label"
-                label={t.month}
-                value={`${selectedYear}-${selectedMonth}`}
-                onChange={(e) => {
-                  const [year, month] = (e.target.value as string).split('-').map(Number)
-                  setSelectedMonth(month)
-                  setSelectedYear(year)
-                }}
-              >
-                {monthOptions.map((opt) => (
-                  <MenuItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth size="small" disabled>
-              <InputLabel id="year-select-label">{t.year}</InputLabel>
-              <Select
-                labelId="year-select-label"
-                label={t.year}
-                value={selectedYear}
-              >
-                <MenuItem value={selectedYear}>{selectedYear}</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+          <WorkoutDateSelector 
+            isLoading={isLoading} 
+            onChange={(date) => setSelectedDate(date)} 
+          />
 
           {/* Botón de envío */}
           <Button
             type="submit"
             variant="contained"
             size="large"
-            disabled={isLoading || isLoadingExercises}
+            disabled={isLoading || isLoadingExercises || !selectedDate}
             startIcon={<FitnessCenterIcon />}
             sx={{
               py: 1.5,
@@ -803,55 +611,12 @@ export default function WorkoutForm({
       </form>
 
       {/* Modal de descanso */}
-      <Dialog
+      <RestModal 
         open={showRestModal}
-        onClose={(_, reason) => {
-          if (reason !== 'backdropClick') setShowRestModal(false)
-        }}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            backgroundColor: 'primary.main',
-            color: 'white'
-          }
-        }}
-      >
-        <DialogContent sx={{ textAlign: 'center', py: 3 }}>
-          <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
-            {t.restingAfter}
-          </Typography>
-
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
-            {lastRegisteredExercise}
-          </Typography>
-
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 3
-          }}>
-            <Typography variant="h2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>
-              {Math.floor(restTime / 60)}:{(restTime % 60).toString().padStart(2, '0')}
-            </Typography>
-
-            <IconButton
-              onClick={() => setShowRestModal(false)}
-              sx={{
-                color: 'white',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.2)'
-                }
-              }}
-            >
-              <PlayArrowIcon />
-            </IconButton>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        onClose={() => setShowRestModal(false)}
+        initialRestTime={initialRestTime}
+        lastRegisteredExercise={lastRegisteredExercise}
+      />
 
     </Box>
   )

@@ -90,6 +90,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           lastUpdated: new Date().toISOString()
         }
         localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
+        window.dispatchEvent(new Event('admin-exercise-settings-updated'))
       }
     } catch (error) {
       console.error('Error loading exercise settings:', error)
@@ -160,6 +161,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         lastUpdated: new Date().toISOString()
       }
       localStorage.setItem('admin-exercise-settings', JSON.stringify(settingsToSave))
+      window.dispatchEvent(new Event('admin-exercise-settings-updated'))
 
 
       setHasChanges(false)

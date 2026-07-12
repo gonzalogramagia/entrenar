@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { apiClient } from '../lib/api'
+import type { Routine } from '../types/workout'
 
 
-interface UserSettings {
+export interface UserSettings {
   favoriteExercises: number[]
   showOwnWorkoutsInSocial: boolean
   hasConfiguredFavorites: boolean
@@ -27,9 +28,9 @@ interface UserSettingsContextType {
   setOnSocialSettingsChange: (callback: () => void) => void
   // Funciones para ejercicios completados
   completedExercises: CompletedExercises
-  toggleExerciseCompleted: (date: string, routineId: number, exerciseId: number, setNumber: number, routine?: any) => void
+  toggleExerciseCompleted: (date: string, routineId: number, exerciseId: number, setNumber: number, routine?: Routine) => void
   getCompletedExercisesForRoutine: (date: string, routineId: number) => { [exerciseId: number]: number[] }
-  getRoutineProgress: (date: string, routineId: number, routine: any) => number
+  getRoutineProgress: (date: string, routineId: number, routine: Routine) => number
   resetCompletedExercisesForDate: (date: string) => void
 }
 
@@ -135,7 +136,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   }, [settings.favoriteExercises.length, settings.hasConfiguredFavorites])
 
   // Función para alternar el estado de completado de un ejercicio
-  const toggleExerciseCompleted = useCallback((date: string, routineId: number, exerciseId: number, setNumber: number, routine?: any) => {
+  const toggleExerciseCompleted = useCallback((date: string, routineId: number, exerciseId: number, setNumber: number, routine?: Routine) => {
     setCompletedExercises(prev => {
       const newState = { ...prev }
       
@@ -201,7 +202,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   }, [completedExercises])
 
   // Función para calcular el progreso de una rutina
-  const getRoutineProgress = useCallback((date: string, routineId: number, routine: any) => {
+  const getRoutineProgress = useCallback((date: string, routineId: number, routine: Routine) => {
     if (!routine || !routine.exercises) return 0
     
     const completedForRoutine = getCompletedExercisesForRoutine(date, routineId)

@@ -53,7 +53,7 @@ temp/
 *.tmp
 
 # PR description drafts
-docs/pr-*
+docs/prs/
 
 # OS
 Thumbs.db
