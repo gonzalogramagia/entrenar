@@ -11,6 +11,13 @@ export interface WorkoutDay {
   updated_at: string
 }
 
+export interface Exercise {
+  id: number
+  name: string
+  bodyweight?: boolean
+  is_sport?: boolean
+}
+
 export interface Workout {
   id: number
   user_id: string
@@ -24,6 +31,24 @@ export interface Workout {
   observations: string
   created_at: string
   is_sport?: boolean
+}
+
+export interface RoutineExercise {
+  exercise_id: number
+  exercise_name: string
+  sets: number
+  reps: number
+  weight?: number
+  rest_time_seconds?: number
+  notes?: string
+  is_sport?: boolean
+  bodyweight?: boolean
+}
+
+export interface Routine {
+  id: number
+  name: string
+  exercises: RoutineExercise[]
 }
 
 export interface CreateWorkoutRequest {
