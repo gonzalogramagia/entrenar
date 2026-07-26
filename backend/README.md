@@ -5,10 +5,12 @@ Go REST API for the gym workout tracking application.
 ## 🚀 Setup
 
 ### Prerequisites
+
 - Go 1.21+
 - PostgreSQL (via Supabase)
 
 ### Environment Variables
+
 Create a `.env` file based on `env.example`:
 
 ```bash
@@ -16,12 +18,14 @@ cp env.example .env
 ```
 
 Configure the following variables:
+
 ```env
 SUPABASE_DB_URL=postgresql://username:password@db.supabase.co:5432/postgres
 PORT=8080
 ```
 
 ### Installation
+
 ```bash
 # Install dependencies
 go mod tidy
@@ -35,12 +39,14 @@ The server will be available at `http://localhost:3210`
 ## 📡 API Endpoints
 
 ### Health Check
-```
+
+```http
 GET /api/health
 ```
 
 ### Workouts
-```
+
+```http
 GET    /api/workouts                 # List workouts
 POST   /api/workouts                 # Create workout
 PUT    /api/workouts/{id}            # Update workout
@@ -48,20 +54,23 @@ DELETE /api/workouts/{id}            # Delete workout
 ```
 
 ### Workout Sessions
-```
+
+```http
 GET    /api/workout-sessions         # List sessions
 POST   /api/workout-sessions         # Create session
 PUT    /api/workout-sessions/{id}    # Update session
 ```
 
 ### Exercises
-```
+
+```http
 GET    /api/exercises                # List exercises
 GET    /api/exercises/{id}           # Get exercise
 ```
 
 ### Users (Supabase Auth)
-```
+
+```http
 GET    /api/me                       # Current user
 GET    /api/me/stats                 # User statistics
 ```
@@ -69,7 +78,8 @@ GET    /api/me/stats                 # User statistics
 ## 🔐 Authentication
 
 ### Production (Google OAuth via Supabase)
-```
+
+```http
 Authorization: Bearer <jwt_token_from_supabase>
 ```
 
@@ -78,6 +88,7 @@ See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for complete setup.
 ## 📊 Data Structure
 
 ### Workout
+
 ```json
 {
   "id": 1,
@@ -95,6 +106,7 @@ See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for complete setup.
 ```
 
 ### Workout Session
+
 ```json
 {
   "id": 1,
@@ -113,12 +125,14 @@ See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for complete setup.
 ## 🧪 Testing
 
 ### Initial Setup
+
 ```bash
 # Setup testing with Supabase
 make test-setup
 ```
 
 ### Unit Tests (Without DB)
+
 ```bash
 # Fast tests for development
 make test-unit
@@ -128,6 +142,7 @@ make test-coverage
 ```
 
 ### Integration Tests (With Supabase)
+
 ```bash
 # Full tests with real database
 make test-supabase
@@ -140,6 +155,7 @@ make test
 ```
 
 ### Specific Tests
+
 ```bash
 # Specific test
 go test -v -run="TestSupabaseIntegration" ./handlers
@@ -155,7 +171,7 @@ See [SUPABASE_TESTING.md](SUPABASE_TESTING.md) for the complete testing guide.
 
 ## 🏗️ Architecture
 
-```
+```text
 backend/
 ├── main.go                              # Entry point
 ├── database/
@@ -179,10 +195,12 @@ backend/
 ## 🔄 Filters and Parameters
 
 ### Workouts
+
 - `?date=2024-01-01` - Filter by date
 - `?exercise_session_id=uuid` - Filter by workout session
 
 ### Exercises
+
 - `?muscle_group=chest` - Filter by muscle group
 - `?search=press` - Search by name
 
@@ -199,6 +217,7 @@ backend/
 ## 📝 Logs
 
 The server logs all HTTP requests with:
+
 - HTTP Method
 - Path
 - Status code
@@ -206,6 +225,7 @@ The server logs all HTTP requests with:
 - Client IP
 
 Example:
-```
+
+```text
 GET /api/workouts 200 15.2ms 127.0.0.1
 ```

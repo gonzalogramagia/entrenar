@@ -14,6 +14,7 @@ Frontend for the Entrenate.net application - Personal workout management system.
 ## Commands
 
 ### Development
+
 ```bash
 yarn dev          # Start development server
 yarn build        # Build for production
@@ -21,6 +22,7 @@ yarn preview      # Preview production build
 ```
 
 ### Testing
+
 ```bash
 yarn test         # Run tests
 yarn test:watch   # Run tests in watch mode
@@ -29,6 +31,7 @@ yarn test:coverage # Run tests with coverage
 ```
 
 ### Linting
+
 ```bash
 yarn lint         # Run ESLint
 ```

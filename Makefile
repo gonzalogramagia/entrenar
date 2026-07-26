@@ -4,7 +4,7 @@
 
 # Default target
 help:
-	@echo "🏋️ Entrenate App - Available Commands:"
+	@echo "🏋️ Entrenate.net - Available Commands:"
 	@echo ""
 	@echo "Development:"
 	@echo "  dev              - Start both frontend and backend in development mode"

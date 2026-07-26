@@ -2,7 +2,7 @@
 
 **A comprehensive, multi-language workout logging and tracking application designed for a premium training experience.**
 
-"Entrenate.net" is your digital partner for tracking progress and managing routines. Built with performance and aesthetics in mind, it provides a professional trial through Guest Mode and full interactive features for registered users.
+"Entrenate.net" is your digital partner for tracking progress and managing routines. Built with performance and aesthetics in mind, it provides a professional experience through Guest Mode and full interactive features for registered users.
 
 ---
 
