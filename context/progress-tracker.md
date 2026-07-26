@@ -1,6 +1,6 @@
 # Progress Tracker
 
-Living document tracking the completion of Entrenate App's phases as defined in `build-plan.md`.
+Living document tracking the completion of Entrenate.net's phases as defined in `build-plan.md`.
 
 ## Phase 1 — Foundation & Auth
 

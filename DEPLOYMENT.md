@@ -1,4 +1,4 @@
-# 🚀 Deployment Guide - Entrenate App
+# 🚀 Deployment Guide - Entrenate.net
 
 Esta guía te ayudará a desplegar tanto el frontend como el backend en producción.
 
@@ -41,7 +41,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3210,http://localhost:5173,https://entrena
 
 ### 4. Configurar Dominio Custom (Opcional)
 - En Railway dashboard → Settings → Domains
-- Agrega tu dominio personalizado (ej: `api.entrenate.app`)
+- Agrega tu dominio personalizado (ej: `api.entrenate.net`)
 
 ---
 
@@ -72,7 +72,7 @@ VITE_API_BASE_URL=https://entrenate.up.railway.app
 
 ### 4. Configurar Dominio Custom (Opcional)
 - En Vercel dashboard → Settings → Domains
-- Agrega tu dominio personalizado (ej: `www.entrenate.app`)
+- Agrega tu dominio personalizado (ej: `www.entrenate.net`)
 
 ---
 

@@ -93,8 +93,8 @@ export default function LoginComponent() {
             }}
           >
             <img
-              src="/entrenate-emoji.png"
-              alt="Entrenate.app"
+              src="/entrenar-emoji.png"
+              alt="Entrenate.net"
               style={{
                 height: '240px',
                 width: 'auto',

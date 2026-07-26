@@ -1,4 +1,4 @@
-# Entrenate App Backend
+# Entrenate.net Backend
 
 API REST en Go para la aplicación de registro de entrenamientos de gimnasio.
 
