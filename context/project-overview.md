@@ -1,8 +1,8 @@
-# Project Overview: Entrenar App
+# Project Overview: Entrenate.net
 
 ## About the Project
 
-Entrenar App is a comprehensive, multi-language workout logging and tracking application designed for a premium training experience. It serves as a digital partner for tracking progress and managing routines, providing a professional trial through Guest Mode and full interactive features for registered users.
+Entrenate.net is a comprehensive, multi-language workout logging and tracking application designed for a premium training experience. It serves as a digital partner for tracking progress and managing routines, providing a professional trial through Guest Mode and full interactive features for registered users.
 
 ---
 

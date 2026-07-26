@@ -1,5 +1,5 @@
 {
-  "name": "entrenar-root",
+  "name": "entrenate",
   "private": true,
   "scripts": {
     "prepare": "husky"

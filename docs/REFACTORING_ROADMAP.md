@@ -1,4 +1,4 @@
-# Entrenar App - Refactoring Roadmap
+# Entrenate.net - Refactoring Roadmap
 
 This document outlines the proposed sequence of refactorings to decompose the largest React components in the `frontend` into maintainable, modular files. The changes are grouped into logical Pull Requests (PRs).
 

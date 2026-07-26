@@ -1,6 +1,6 @@
 # Pull Request Standards
 
-This document defines the standard PR format for every pull request in the Entrenar App project.
+This document defines the standard PR format for every pull request in the Entrenate.net project.
 Follow this template exactly so every PR is consistent, professional, and easy to review.
 
 ---
@@ -124,5 +124,7 @@ Whenever a PR is prepared, the AI assistant must generate a local markdown file 
 | #2 | `docs/project-documentation` | Initial project documentation structure | ✅ Merged |
 | #3 | `refactor/workout-history` | Extracted utilities, mock data, and sub-components | ✅ Merged |
 | #4 | `refactor/workout-form` | Extract routine box, form schema, subcomponents and hooks | ✅ Merged |
+| #5 | `refactor/authenticated-app` | Refactor AuthenticatedApp | ✅ Merged |
+| #6 | `feat/update-domain-and-name` | Update domain to entrenate.net and complete renaming | 🛠️ In Progress |
 
 *(Update this table every time a PR is opened or merged.)*

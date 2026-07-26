@@ -1,4 +1,4 @@
-# Entrenar App - Refactoring Backlog
+# Entrenate.net - Refactoring Backlog
 
 This document contains proposed refactorings that are currently lower priority or on hold. If the team decides to tackle them in the future, they can be moved back to the main roadmap.
 

@@ -339,8 +339,17 @@ export function useGlobalData() {
       console.error('Error cargando datos:', error)
 
       // Fallback a localStorage si el backend falla
-      const savedWorkouts = localStorage.getItem('entrenar-workouts')
-      const savedWorkoutDays = localStorage.getItem('entrenar-workout-days')
+      let savedWorkouts = localStorage.getItem('entrenate-workouts')
+      if (!savedWorkouts) {
+        savedWorkouts = localStorage.getItem('entrenar-workouts')
+        if (savedWorkouts) localStorage.setItem('entrenate-workouts', savedWorkouts)
+      }
+
+      let savedWorkoutDays = localStorage.getItem('entrenate-workout-days')
+      if (!savedWorkoutDays) {
+        savedWorkoutDays = localStorage.getItem('entrenar-workout-days')
+        if (savedWorkoutDays) localStorage.setItem('entrenate-workout-days', savedWorkoutDays)
+      }
 
       if (savedWorkouts) {
         setWorkouts(JSON.parse(savedWorkouts))
@@ -368,14 +377,14 @@ export function useGlobalData() {
   // Guardar workouts cuando cambien
   useEffect(() => {
     if (workouts.length > 0) {
-      localStorage.setItem('entrenar-workouts', JSON.stringify(workouts))
+      localStorage.setItem('entrenate-workouts', JSON.stringify(workouts))
     }
   }, [workouts])
 
   // Guardar workout days cuando cambien
   useEffect(() => {
     if (workoutDays.length > 0) {
-      localStorage.setItem('entrenar-workout-days', JSON.stringify(workoutDays))
+      localStorage.setItem('entrenate-workout-days', JSON.stringify(workoutDays))
     }
   }, [workoutDays])
 

@@ -1,10 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const BACKEND_URL = 'https://entrenar-backend.railway.app';
+const BACKEND_URL = 'https://entrenate-backend.railway.app';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Configurar CORS
-  res.setHeader('Access-Control-Allow-Origin', 'https://entrenar.app');
+  res.setHeader('Access-Control-Allow-Origin', 'https://entrenate.net');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.setHeader('Access-Control-Allow-Credentials', 'true');

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/gonzagramaglia/entrenar/backend/models"
+	"github.com/gonzagramaglia/entrenate/backend/models"
 )
 
 // mockRequest simula una request con autenticación

@@ -31,7 +31,7 @@ yarn-error.log*
 .DS_Store
 
 # Go
-backend/entrenar
+backend/entrenate-backend
 backend/tmp/
 *.exe
 *.exe~
