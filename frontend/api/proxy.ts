@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const BACKEND_URL = 'https://entrenate-backend.railway.app';
+const BACKEND_URL = 'https://entrenate-backend.up.railway.app';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Configurar CORS

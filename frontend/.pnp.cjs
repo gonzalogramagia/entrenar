@@ -11,7 +11,7 @@ const RAW_RUNTIME_STATE =
   ],\
   "dependencyTreeRoots": [\
     {\
-      "name": "frontend-entrenate-app",\
+      "name": "frontend-entrenar-app",\
       "reference": "workspace:."\
     }\
   ],\
@@ -19,7 +19,7 @@ const RAW_RUNTIME_STATE =
   "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
   "pnpZipBackend": "libzip",\
   "fallbackExclusionList": [\
-    ["frontend-entrenate-app", ["workspace:."]]\
+    ["frontend-entrenar-app", ["workspace:."]]\
   ],\
   "fallbackPool": [\
   ],\
@@ -48,7 +48,7 @@ const RAW_RUNTIME_STATE =
           ["eslint", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:9.37.0"],\
           ["eslint-plugin-react-hooks", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:5.2.0"],\
           ["eslint-plugin-react-refresh", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:0.4.23"],\
-          ["frontend-entrenate-app", "workspace:."],\
+          ["frontend-entrenar-app", "workspace:."],\
           ["globals", "npm:16.4.0"],\
           ["jsdom", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:26.1.0"],\
           ["react", "npm:19.2.0"],\
@@ -4336,7 +4336,7 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["frontend-entrenate-app", [\
+    ["frontend-entrenar-app", [\
       ["workspace:.", {\
         "packageLocation": "./",\
         "packageDependencies": [\
@@ -4360,7 +4360,7 @@ const RAW_RUNTIME_STATE =
           ["eslint", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:9.37.0"],\
           ["eslint-plugin-react-hooks", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:5.2.0"],\
           ["eslint-plugin-react-refresh", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:0.4.23"],\
-          ["frontend-entrenate-app", "workspace:."],\
+          ["frontend-entrenar-app", "workspace:."],\
           ["globals", "npm:16.4.0"],\
           ["jsdom", "virtual:5faee5bd744c8cd8db3a05ad7071af3a228630253b0948a5e2ed5a88c574aa0d46ab80b77944933e037f46ff2ebf22d30ded869c05babb412158ae3116f9fc13#npm:26.1.0"],\
           ["react", "npm:19.2.0"],\

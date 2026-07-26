@@ -1,4 +1,4 @@
-# Testing Guide - Entrenate API Backend
+# Testing Guide - Entrenate.net API Backend
 
 ## 📋 Tipos de Tests Implementados
 

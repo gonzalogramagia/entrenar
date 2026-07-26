@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://entrenate.up.railway.app'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://entrenar.up.railway.app/api'
 
 interface ApiResponse<T = any> {
   data: T | null

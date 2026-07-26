@@ -1,10 +1,10 @@
-# Entrenate App - Development and Deployment Commands
+# Entrenar App - Development and Deployment Commands
 
 .PHONY: help dev build deploy clean test docker-build docker-run
 
 # Default target
 help:
-	@echo "🏋️ Entrenate.net - Available Commands:"
+	@echo "🏋️ Entrenar App - Available Commands:"
 	@echo ""
 	@echo "Development:"
 	@echo "  dev              - Start both frontend and backend in development mode"
@@ -56,7 +56,7 @@ build-frontend:
 
 build-backend:
 	@echo "🏗️ Building backend for production..."
-	cd backend && go build -o entrenate-backend .
+	cd backend && go build -o entrenar-backend .
 
 # Testing
 test: test-frontend test-backend
@@ -96,7 +96,7 @@ clean:
 	@echo "🧹 Cleaning build artifacts..."
 	rm -rf frontend/dist
 	rm -rf frontend/node_modules/.vite
-	rm -f backend/entrenate-backend
+	rm -f backend/entrenar-backend
 	docker system prune -f
 
 install:

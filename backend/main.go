@@ -10,9 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 
-	"github.com/gonzagramaglia/entrenate/backend/database"
-	"github.com/gonzagramaglia/entrenate/backend/handlers"
-	"github.com/gonzagramaglia/entrenate/backend/middleware"
+	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/handlers"
+	"github.com/gonzagramaglia/entrenar/backend/middleware"
 )
 
 func main() {
@@ -106,7 +106,7 @@ func main() {
 	if corsOrigins == "" {
 		// Dominios permitidos por defecto (incluyendo localhost para desarrollo)
 		// Se añade soporte para el dominio oficial de la app y subdominios de Railway
-		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenate.net,https://entrenate.net,https://entrenate.up.railway.app"
+		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenate.net,https://www.entrenate.net,https://entrenar.up.railway.app"
 	}
 	
 	// Limpiar y validar orígenes

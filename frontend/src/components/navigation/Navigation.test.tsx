@@ -34,8 +34,8 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    expect(await screen.findByText('Registrar')).toBeInTheDocument()
-    expect(await screen.findByText('Entrenamientos')).toBeInTheDocument()
+    expect(await screen.findByText('Registrar día de hoy')).toBeInTheDocument()
+    expect(await screen.findByText('Mis Entrenamientos')).toBeInTheDocument()
     expect(await screen.findByText('Mis Rutinas')).toBeInTheDocument()
   })
 
@@ -46,7 +46,7 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    const entrenamientosButton = await screen.findByText('Entrenamientos')
+    const entrenamientosButton = await screen.findByText('Mis Entrenamientos')
     await user.click(entrenamientosButton)
 
     expect(mockOnTabChange).toHaveBeenCalledWith(TABS.HISTORY)
@@ -59,7 +59,7 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    const entrenamientosButton = await screen.findByText('Entrenamientos')
+    const entrenamientosButton = await screen.findByText('Mis Entrenamientos')
     expect(entrenamientosButton).toBeInTheDocument()
   })
 })

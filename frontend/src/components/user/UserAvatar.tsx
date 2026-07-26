@@ -9,7 +9,7 @@ import {
   IconButton,
   Badge
 } from '@mui/material'
-import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon, Star as StarIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translations } from '../../i18n/translations'
@@ -216,17 +216,6 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           <ListItemText>
             {t.navigation.notifications}
           </ListItemText>
-        </MenuItem>
-
-        {/* Opción de Sugerencias */}
-        <MenuItem onClick={() => {
-          handleClose();
-          window.open('https://forms.gle/YNYpKr7Chw6UBcTT7', '_blank');
-        }}>
-          <ListItemIcon sx={{ minWidth: 32 }}>
-            <StarIcon fontSize="small" sx={{ color: '#ffb400' }} />
-          </ListItemIcon>
-          <ListItemText>{t.navigation.rateOnGithub}</ListItemText>
         </MenuItem>
 
         {/* Opción de logout */}

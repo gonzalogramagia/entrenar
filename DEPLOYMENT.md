@@ -1,156 +1,140 @@
 # 🚀 Deployment Guide - Entrenate.net
 
-Esta guía te ayudará a desplegar tanto el frontend como el backend en producción.
+This guide will help you deploy both the frontend and backend to production.
 
-## 📋 Prerequisitos
+## 📋 Prerequisites
 
-1. ✅ **Backend Go funcionando** con JWKS authentication
-2. ✅ **Frontend React** con Supabase integration  
-3. ✅ **Base de datos Supabase** configurada
-4. ✅ **Google OAuth** configurado en Supabase
+1. ✅ **Go Backend working** with JWKS authentication
+2. ✅ **React Frontend** with Supabase integration  
+3. ✅ **Supabase database** configured
+4. ✅ **Google OAuth** configured in Supabase
 
 ## 🔧 Backend Deployment (Railway)
 
-### 1. Crear cuenta en Railway
+### 1. Create a Railway account
+- Go to [railway.app](https://railway.app)
+- Connect your GitHub account
 
-- Ve a [railway.app](https://railway.app)
-- Conecta tu cuenta de GitHub
-
-### 2. Deploy del Backend
-
+### 2. Deploy the Backend
 ```bash
-# 1. Instalar Railway CLI
+# 1. Install Railway CLI
 npm install -g @railway/cli
 
 # 2. Login
 railway login
 
-# 3. Deploy desde el directorio raíz del proyecto
+# 3. Deploy from the project root directory
 railway up
 ```
 
-### 3. Configurar Variables de Entorno en Railway
-
-En el dashboard de Railway, configura:
+### 3. Configure Environment Variables in Railway
+In the Railway dashboard, configure:
 
 ```env
 PORT=3210
 SUPABASE_DB_URL=postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres
 SUPABASE_URL=https://PROJECT.supabase.co
-SUPABASE_ANON_KEY=tu_publishable_key_aqui
+SUPABASE_ANON_KEY=your_publishable_key_here
 GO_VERSION=1.21
-CORS_ALLOWED_ORIGINS=http://localhost:3210,http://localhost:5173,https://entrenate.net,https://entrenate.net
+CORS_ALLOWED_ORIGINS=http://localhost:3210,http://localhost:5173,https://entrenate.net,https://www.entrenate.net
 ```
 
-### 4. Configurar Dominio Custom (Opcional)
-
-- En Railway dashboard → Settings → Domains
-- Agrega tu dominio personalizado (ej: `api.entrenate.net`)
+### 4. Configure Custom Domain (Optional)
+- In Railway dashboard → Settings → Domains
+- Add your custom domain (e.g., `api.entrenate.net`)
 
 ---
 
 ## 🌐 Frontend Deployment (Vercel)
 
-### 1. Crear cuenta en Vercel
+### 1. Create a Vercel account
+- Go to [vercel.com](https://vercel.com)
+- Connect your GitHub account
 
-- Ve a [vercel.com](https://vercel.com)
-- Conecta tu cuenta de GitHub
-
-### 2. Deploy del Frontend
-
+### 2. Deploy the Frontend
 ```bash
-# 1. Instalar Vercel CLI
+# 1. Install Vercel CLI
 npm install -g vercel
 
-# 2. Deploy desde el directorio frontend
+# 2. Deploy from the frontend directory
 cd frontend
 vercel --prod
 ```
 
-### 3. Configurar Variables de Entorno en Vercel
-
-En el dashboard de Vercel → Settings → Environment Variables:
+### 3. Configure Environment Variables in Vercel
+In the Vercel dashboard → Settings → Environment Variables:
 
 ```env
 VITE_SUPABASE_URL=https://PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=tu_publishable_key_aqui
-VITE_API_BASE_URL=https://entrenate.up.railway.app
+VITE_SUPABASE_ANON_KEY=your_publishable_key_here
+VITE_API_BASE_URL=https://entrenate-backend.up.railway.app
 ```
 
-### 4. Configurar Dominio Custom (Opcional)
-
-- En Vercel dashboard → Settings → Domains
-- Agrega tu dominio personalizado (ej: `www.entrenate.net`)
+### 4. Configure Custom Domain (Optional)
+- In Vercel dashboard → Settings → Domains
+- Add your custom domain (e.g., `www.entrenate.net`)
 
 ---
 
 ## 🔐 Google OAuth Production Setup
 
-### 1. Configurar OAuth en Google Cloud Console
-
-```text
-1. Ve a Google Cloud Console → APIs & Services → Credentials
-2. Edita tu OAuth 2.0 Client ID
-3. Agrega authorized redirect URIs:
+### 1. Configure OAuth in Google Cloud Console
+```
+1. Go to Google Cloud Console → APIs & Services → Credentials
+2. Edit your OAuth 2.0 Client ID
+3. Add authorized redirect URIs:
    - https://PROJECT.supabase.co/auth/v1/callback
-   - https://entrenate.net
+   - https://www.entrenate.net
 ```
 
-### 2. Actualizar Supabase
-
-```text
+### 2. Update Supabase
+```
 1. Supabase Dashboard → Authentication → Providers → Google
-2. Verifica que el Client ID y Secret estén correctos
-3. Agrega tu dominio de producción a "Site URL": https://entrenate.net
+2. Verify that the Client ID and Secret are correct
+3. Add your production domain to "Site URL": https://www.entrenate.net
 ```
 
 ---
 
-## 🧪 Testing Production
+## 🧪 Production Testing
 
-### 1. Health Check Backend
-
+### 1. Backend Health Check
 ```bash
-curl https://entrenate.up.railway.app/api/health
+curl https://entrenate-backend.up.railway.app/api/health
 ```
 
 ### 2. Frontend
-
-- Visita <https://entrenate.net>
-- Prueba Google OAuth
-- Verifica conexión con backend
+- Visit https://www.entrenate.net
+- Test Google OAuth
+- Verify connection with the backend
 
 ---
 
-## 📊 Monitoring y Logs
+## 📊 Monitoring and Logs
 
 ### Railway (Backend)
-
 - Dashboard → Deployments → Logs
-- Monitoring automático incluido
-- Health checks configurados
+- Automatic monitoring included
+- Health checks configured
 
 ### Vercel (Frontend)  
-
 - Dashboard → Functions → Logs
-- Analytics automático incluido
+- Automatic analytics included
 - Performance monitoring
 
 ---
 
-## 🔄 CI/CD Automático
+## 🔄 Automatic CI/CD
 
-### Configuración Automática
+### Automatic Configuration
+- **Railway**: Automatic deploy on push to `main`
+- **Vercel**: Automatic deploy on push to `main`
+- **Preview**: Branches automatically create previews
 
-- **Railway**: Deploy automático en push a `main`
-- **Vercel**: Deploy automático en push a `main`
-- **Preview**: Branches automáticamente crean previews
-
-### Variables por Ambiente
-
+### Environment Variables
 ```env
 # Production
-VITE_API_BASE_URL=https://entrenate.up.railway.app
+VITE_API_BASE_URL=https://entrenate-backend.up.railway.app
 
 # Development  
 VITE_API_BASE_URL=http://localhost:3210/api
@@ -161,84 +145,78 @@ VITE_API_BASE_URL=http://localhost:3210/api
 ## ⚡ Performance Optimizations
 
 ### Backend (Railway)
-
-- **Auto-scaling**: Configurado automáticamente
-- **Health checks**: Configurados en `railway.toml`
-- **Resource limits**: Ajustar según uso
+- **Auto-scaling**: Configured automatically
+- **Health checks**: Configured in `railway.toml`
+- **Resource limits**: Adjust according to usage
 - **Docker optimization**: Multi-stage build
 
 ### Frontend (Vercel)
-
-- **Edge Network**: CDN global automático
-- **Image optimization**: Habilitado por defecto
-- **Code splitting**: Configurado con Vite
-- **Bundle analysis**: Optimización automática
+- **Edge Network**: Automatic global CDN
+- **Image optimization**: Enabled by default
+- **Code splitting**: Configured with Vite
+- **Bundle analysis**: Automatic optimization
 
 ---
 
 ## 🆘 Troubleshooting
 
-### Errores Comunes
+### Common Errors
 
 **❌ CORS Error**
-
 ```go
-// En backend/main.go, verifica:
+// In backend/main.go, verify:
 c.AllowedOrigins = []string{
     "http://localhost:5173",
     "https://entrenate.net",
-    "https://entrenate.net"
+    "https://www.entrenate.net"
 }
 ```
 
-**❌ 404 en rutas**
-
+**❌ 404 on routes**
 ```json
-// En frontend/vercel.json
+// In frontend/vercel.json
 "rewrites": [
   { "source": "/(.*)", "destination": "/index.html" }
 ]
 ```
 
 **❌ Environment variables**
-
 ```bash
-# Verifica que las variables estén configuradas:
+# Verify that the variables are configured:
 vercel env ls
 railway variables
 ```
 
 **❌ Railway deployment issues**
-
 ```bash
-# Verificar logs del build
+# Verify build logs
 railway logs
 
-# Verificar estado del servicio
+# Verify service status
 railway status
 ```
 
 ---
 
-## 🎯 URLs de Producción (Actuales)
+## 🎯 Production URLs (Current)
 
-```text
-Frontend: https://entrenate.net
-Backend:  https://entrenate.up.railway.app/
-API:      https://entrenate.up.railway.app/api/health
+```
+Frontend: https://www.entrenate.net
+Backend:  https://entrenate-backend.up.railway.app/
+API:      https://entrenate-backend.up.railway.app/api/health
 ```
 
-## 📁 Estructura de Archivos Importantes
+## 📁 Important File Structure
 
-```text
-├── railway.toml              # Configuración Railway
+```
+├── railway.toml              # Railway Configuration
 ├── backend/
-│   ├── Dockerfile            # Build del backend
-│   ├── main.go               # Servidor Go
-│   └── nginx.conf            # Configuración nginx (opcional)
+│   ├── Dockerfile            # Backend build
+│   ├── main.go               # Go server
+│   └── nginx.conf            # nginx configuration (optional)
 └── frontend/
-    ├── vercel.json           # Configuración Vercel
-    └── src/lib/api.ts        # Cliente API
+    ├── vercel.json           # Vercel Configuration
+    └── src/lib/api.ts        # API Client
 ```
 
-¡Con esto tendrás tu app entrenate completamente desplegada en producción! 🚀
+With this, you will have your Entrenate.net app completely deployed in production! 🚀

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // Notification representa una notificación del usuario

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // HealthResponse representa la respuesta del health check
@@ -22,7 +22,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := HealthResponse{
 		Status:    "ok",
-		    Message:   "Entrenate API funcionando correctamente",
+		    Message:   "Entrenate.net API functioning correctly",
 		Timestamp: time.Now(),
 		Database:  "disconnected",
 	}
