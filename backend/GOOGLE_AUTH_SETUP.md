@@ -19,7 +19,7 @@
 4. Haz clic en **"Create Credentials"** → **"OAuth client ID"**
 5. Configura:
    - **Application type**: Web application
-   - **Name**: Entrenar App
+   - **Name**: Entrenate App
    - **Authorized redirect URIs**: 
      ```
      https://[tu-proyecto].supabase.co/auth/v1/callback

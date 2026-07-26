@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // SupabaseUser representa información básica del usuario de Supabase Auth

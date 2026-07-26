@@ -1,4 +1,4 @@
-# Testing Guide - Entrenar API Backend
+# Testing Guide - Entrenate API Backend
 
 ## 📋 Tipos de Tests Implementados
 

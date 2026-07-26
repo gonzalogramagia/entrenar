@@ -1,6 +1,6 @@
-# Entrenar Frontend
+# Entrenate Frontend
 
-Frontend de la aplicación Entrenar - Sistema de gestión de entrenamientos personales.
+Frontend de la aplicación Entrenate - Sistema de gestión de entrenamientos personales.
 
 ## Tecnologías
 

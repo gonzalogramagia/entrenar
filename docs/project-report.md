@@ -1,13 +1,13 @@
 # Project Report
 
-**Project Name:** Entrenar App
+**Project Name:** Entrenate App
 **Author:** Gonza
 
 ---
 
 ## 1. Executive Summary
 
-Entrenar App is a multi-language workout logging and tracking application built with a Go backend and React frontend. It provides detailed exercise tracking (weight, reps, sets, time), custom routine management, workout history with calendar visualization, and a complete admin panel. The app supports Guest Mode for exploration and Google OAuth for full access, delivering a premium mobile-optimized web experience.
+Entrenate App is a multi-language workout logging and tracking application built with a Go backend and React frontend. It provides detailed exercise tracking (weight, reps, sets, time), custom routine management, workout history with calendar visualization, and a complete admin panel. The app supports Guest Mode for exploration and Google OAuth for full access, delivering a premium mobile-optimized web experience.
 
 ---
 
@@ -15,7 +15,7 @@ Entrenar App is a multi-language workout logging and tracking application built 
 
 ### 2a. Why we're building this
 
-Tracking workouts consistently requires a tool that's fast, intuitive, and doesn't get in the way. Most existing apps are bloated with features that slow down the core workflow: logging a set. Entrenar App focuses on speed of entry, smart defaults (auto-increment sets, persist exercise/weight between sets), and a clean UI that works perfectly on mobile browsers.
+Tracking workouts consistently requires a tool that's fast, intuitive, and doesn't get in the way. Most existing apps are bloated with features that slow down the core workflow: logging a set. Entrenate App focuses on speed of entry, smart defaults (auto-increment sets, persist exercise/weight between sets), and a clean UI that works perfectly on mobile browsers.
 
 ### 2b. Target Audience
 

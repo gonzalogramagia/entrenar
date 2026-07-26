@@ -23,7 +23,7 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     expect(menuButton).toBeInTheDocument()
 
-    const title = await screen.findByText('Entrenar.app')
+    const title = await screen.findByText('Entrenate.app')
     expect(title).toBeInTheDocument()
   })
 

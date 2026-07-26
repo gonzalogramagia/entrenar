@@ -1,6 +1,6 @@
 # Pull Request Standards
 
-This document defines the standard PR format for every pull request in the Entrenar App project.
+This document defines the standard PR format for every pull request in the Entrenate App project.
 Follow this template exactly so every PR is consistent, professional, and easy to review.
 
 ---

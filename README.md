@@ -1,8 +1,8 @@
-# 🚀 Entrenar App
+# 🚀 Entrenate App
 
 **A comprehensive, multi-language workout logging and tracking application designed for a premium training experience.**
 
-"Entrenar App" is your digital partner for tracking progress and managing routines. Built with performance and aesthetics in mind, it provides a professional trial through Guest Mode and full interactive features for registered users.
+"Entrenate App" is your digital partner for tracking progress and managing routines. Built with performance and aesthetics in mind, it provides a professional trial through Guest Mode and full interactive features for registered users.
 
 ---
 
@@ -62,7 +62,7 @@ This project is created for personal use and is shared as-is. Feel free to explo
 
 ## ⭐ Support the Project
 
-If **Entrenar App** has helped you in your fitness journey, please consider giving this repository a **Star** as a token of appreciation. It helps the project reach more users! 🚀 
+If **Entrenate App** has helped you in your fitness journey, please consider giving this repository a **Star** as a token of appreciation. It helps the project reach more users! 🚀 
 
 ---
 

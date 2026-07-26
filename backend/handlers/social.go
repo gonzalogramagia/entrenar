@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // SocialWorkout represents a workout for the social view

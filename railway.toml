@@ -8,12 +8,12 @@ restartPolicyMaxRetries = 10
 serverless = true
 
 [[services]]
-name = "entrenar-backend"
+name = "entrenate-backend"
 source = "."
 
 [services.variables]
 GO_VERSION = "1.21"
-CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app,https://entrenar.up.railway.app"
+CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entrenate.net,https://entrenate.net,https://entrenate.up.railway.app"
 
 [services.healthcheck]
 path = "/api/health"

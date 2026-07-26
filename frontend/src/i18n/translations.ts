@@ -10,7 +10,7 @@ export const translations = {
             search: 'Buscar...',
         },
         navigation: {
-            appTitle: 'Entrenar.app',
+            appTitle: 'Entrenate.app',
             workout: 'Registrar',
             routines: 'Mis Rutinas',
             history: 'Entrenamientos',
@@ -26,7 +26,7 @@ export const translations = {
             viewWorkouts: 'Ver entrenamientos',
         },
         login: {
-            title: 'Entrenar.app',
+            title: 'Entrenate.app',
             continueWithGoogle: 'Continuar con Google',
             signingIn: 'Iniciando...',
             signingInProgress: 'Iniciando sesión...',
@@ -109,7 +109,7 @@ export const translations = {
             search: 'Search...',
         },
         navigation: {
-            appTitle: 'Entrenar.app',
+            appTitle: 'Entrenate.app',
             workout: 'Log',
             routines: 'My Routines',
             history: 'Workouts',
@@ -125,7 +125,7 @@ export const translations = {
             viewWorkouts: 'View workouts',
         },
         login: {
-            title: 'Entrenar.app',
+            title: 'Entrenate.app',
             continueWithGoogle: 'Continue with Google',
             signingIn: 'Signing in...',
             signingInProgress: 'Signing in...',
