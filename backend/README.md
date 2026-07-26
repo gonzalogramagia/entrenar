@@ -1,36 +1,36 @@
 # Entrenate.net Backend
 
-API REST en Go para la aplicación de registro de entrenamientos de gimnasio.
+Go REST API for the gym workout tracking application.
 
-## 🚀 Configuración
+## 🚀 Setup
 
-### Prerrequisitos
+### Prerequisites
 - Go 1.21+
 - PostgreSQL (via Supabase)
 
-### Variables de Entorno
-Crea un archivo `.env` basado en `env.example`:
+### Environment Variables
+Create a `.env` file based on `env.example`:
 
 ```bash
 cp env.example .env
 ```
 
-Configura las siguientes variables:
+Configure the following variables:
 ```env
 SUPABASE_DB_URL=postgresql://username:password@db.supabase.co:5432/postgres
 PORT=8080
 ```
 
-### Instalación
+### Installation
 ```bash
-# Instalar dependencias
+# Install dependencies
 go mod tidy
 
-# Ejecutar servidor
+# Run server
 go run main.go
 ```
 
-El servidor estará disponible en `http://localhost:3210`
+The server will be available at `http://localhost:3210`
 
 ## 📡 API Endpoints
 
@@ -41,41 +41,41 @@ GET /api/health
 
 ### Workouts
 ```
-GET    /api/workouts                 # Listar workouts
-POST   /api/workouts                 # Crear workout
-PUT    /api/workouts/{id}            # Actualizar workout
-DELETE /api/workouts/{id}            # Eliminar workout
+GET    /api/workouts                 # List workouts
+POST   /api/workouts                 # Create workout
+PUT    /api/workouts/{id}            # Update workout
+DELETE /api/workouts/{id}            # Delete workout
 ```
 
 ### Workout Sessions
 ```
-GET    /api/workout-sessions         # Listar sesiones
-POST   /api/workout-sessions         # Crear sesión
-PUT    /api/workout-sessions/{id}    # Actualizar sesión
+GET    /api/workout-sessions         # List sessions
+POST   /api/workout-sessions         # Create session
+PUT    /api/workout-sessions/{id}    # Update session
 ```
 
 ### Exercises
 ```
-GET    /api/exercises                # Listar ejercicios
-GET    /api/exercises/{id}           # Obtener ejercicio
+GET    /api/exercises                # List exercises
+GET    /api/exercises/{id}           # Get exercise
 ```
 
 ### Users (Supabase Auth)
 ```
-GET    /api/me                       # Usuario actual
-GET    /api/me/stats                 # Estadísticas del usuario
+GET    /api/me                       # Current user
+GET    /api/me/stats                 # User statistics
 ```
 
-## 🔐 Autenticación
+## 🔐 Authentication
 
-### Producción (Google OAuth via Supabase)
+### Production (Google OAuth via Supabase)
 ```
 Authorization: Bearer <jwt_token_from_supabase>
 ```
 
-Ver [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) para configuración completa.
+See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for complete setup.
 
-## 📊 Estructura de Datos
+## 📊 Data Structure
 
 ### Workout
 ```json
@@ -83,12 +83,12 @@ Ver [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) para configuración completa.
   "id": 1,
   "user_id": "user_mock_id",
   "exercise_id": 1,
-  "exercise_name": "Press de banca",
+  "exercise_name": "Bench Press",
   "weight": 80.5,
   "reps": 10,
   "serie": 1,
   "seconds": 45,
-  "observations": "Buena ejecución",
+  "observations": "Good execution",
   "exercise_session_id": "uuid",
   "created_at": "2024-01-01T10:00:00Z"
 }
@@ -100,11 +100,11 @@ Ver [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) para configuración completa.
   "id": 1,
   "user_id": "user_mock_id",
   "session_date": "2024-01-01",
-  "session_name": "Rutina de Fullbody",
+  "session_name": "Fullbody Routine",
   "total_exercises": 5,
   "effort": 3,
   "mood": 2,
-  "notes": "Excelente sesión",
+  "notes": "Excellent session",
   "created_at": "2024-01-01T10:00:00Z",
   "updated_at": "2024-01-01T10:00:00Z"
 }
@@ -112,81 +112,81 @@ Ver [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) para configuración completa.
 
 ## 🧪 Testing
 
-### Setup Inicial
+### Initial Setup
 ```bash
-# Configurar testing con Supabase
+# Setup testing with Supabase
 make test-setup
 ```
 
-### Tests Unitarios (Sin DB)
+### Unit Tests (Without DB)
 ```bash
-# Tests rápidos para desarrollo
+# Fast tests for development
 make test-unit
 
-# Con coverage
+# With coverage
 make test-coverage
 ```
 
-### Tests de Integración (Con Supabase)
+### Integration Tests (With Supabase)
 ```bash
-# Tests completos con base de datos real
+# Full tests with real database
 make test-supabase
 
-# Verificar solo la conexión
+# Verify connection only
 make test-db-connection
 
-# Todos los tests
+# All tests
 make test
 ```
 
-### Tests Específicos
+### Specific Tests
 ```bash
-# Test específico
+# Specific test
 go test -v -run="TestSupabaseIntegration" ./handlers
 
-# Con timeout extendido
+# With extended timeout
 go test -timeout 60s -v ./handlers
 
 # Benchmarks
 make benchmark
 ```
 
-Ver [SUPABASE_TESTING.md](SUPABASE_TESTING.md) para guía completa de testing.
+See [SUPABASE_TESTING.md](SUPABASE_TESTING.md) for the complete testing guide.
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
 
 ```
 backend/
-├── main.go                              # Punto de entrada
+├── main.go                              # Entry point
 ├── database/
-│   ├── connection.go                    # Conexión con Supabase
-│   └── supabase_auth_migrations.sql    # Migraciones para Auth
+│   ├── connection.go                    # Supabase connection
+│   └── supabase_auth_migrations.sql    # Auth migrations
 ├── handlers/
 │   ├── health.go                        # Health check
 │   ├── workouts.go                      # CRUD workouts + sessions
-│   ├── exercises.go                     # Endpoints ejercicios
-│   └── users.go                         # Usuario actual (desde JWT)
+│   ├── exercises.go                     # Exercise endpoints
+│   └── users.go                         # Current user (from JWT)
 ├── middleware/
-│   ├── logging.go                       # Logging de requests
+│   ├── logging.go                       # Request logging
 │   └── supabase_auth.go                 # JWT validation
 ├── testutils/
-│   ├── testing_helpers.go               # Utilities para tests
-│   └── database.go                      # Setup DB para tests
+│   ├── testing_helpers.go               # Test utilities
+│   └── database.go                      # DB setup for tests
 └── scripts/
-    └── test-setup.sh                    # Script de configuración
+    └── test-setup.sh                    # Setup script
 ```
 
-## 🔄 Filtros y Parámetros
+## 🔄 Filters and Parameters
 
 ### Workouts
-- `?date=2024-01-01` - Filtrar por fecha
-- `?exercise_session_id=uuid` - Filtrar por sesión de ejercicio
+- `?date=2024-01-01` - Filter by date
+- `?exercise_session_id=uuid` - Filter by workout session
 
 ### Exercises
-- `?muscle_group=pecho` - Filtrar por grupo muscular
-- `?search=press` - Búsqueda por nombre
+- `?muscle_group=chest` - Filter by muscle group
+- `?search=press` - Search by name
 
-## 🚦 Códigos de Estado HTTP
+## 🚦 HTTP Status Codes
 
 - `200` - OK
 - `201` - Created
@@ -198,14 +198,14 @@ backend/
 
 ## 📝 Logs
 
-El servidor registra todas las requests HTTP con:
-- Método HTTP
+The server logs all HTTP requests with:
+- HTTP Method
 - Path
-- Código de estado
-- Duración
-- IP del cliente
+- Status code
+- Duration
+- Client IP
 
-Ejemplo:
+Example:
 ```
 GET /api/workouts 200 15.2ms 127.0.0.1
 ```

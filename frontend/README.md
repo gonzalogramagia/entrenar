@@ -1,42 +1,41 @@
-# Entrenate Frontend
+# Entrenate.net Frontend
 
-Frontend de la aplicación Entrenate - Sistema de gestión de entrenamientos personales.
+Frontend for the Entrenate.net application - Personal workout management system.
 
-## Tecnologías
+## Technologies
 
 - React 19
 - TypeScript
 - Vite
 - Material-UI (MUI)
 - Supabase
-- Yarn (gestor de paquetes)
+- Yarn (package manager)
 
-## Comandos
+## Commands
 
-### Desarrollo
+### Development
 ```bash
-yarn dev          # Iniciar servidor de desarrollo
-yarn build        # Construir para producción
-yarn preview      # Previsualizar build de producción
+yarn dev          # Start development server
+yarn build        # Build for production
+yarn preview      # Preview production build
 ```
 
 ### Testing
 ```bash
-yarn test         # Ejecutar tests
-yarn test:watch   # Ejecutar tests en modo watch
-yarn test:ui      # Ejecutar tests con UI
-yarn test:coverage # Ejecutar tests con coverage
+yarn test         # Run tests
+yarn test:watch   # Run tests in watch mode
+yarn test:ui      # Run tests with UI
+yarn test:coverage # Run tests with coverage
 ```
 
 ### Linting
 ```bash
-yarn lint         # Ejecutar ESLint
+yarn lint         # Run ESLint
 ```
 
-## Configuración
+## Setup
 
-1. Copia `env.local.example` a `env.local`
-2. Configura las variables de entorno necesarias
-3. Ejecuta `yarn install` para instalar dependencias
-4. Ejecuta `yarn dev` para iniciar el servidor de desarrollo
-
+1. Copy `env.local.example` to `env.local`
+2. Configure the necessary environment variables
+3. Run `yarn install` to install dependencies
+4. Run `yarn dev` to start the development server
