@@ -100,7 +100,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	rows, err := database.DB.Query(query, limit, offset)
 	if err != nil {
 		fmt.Printf("❌ Error consultando entrenamientos sociales: %v\n", err)
-		http.Error(w, "Error consultando entrenamientos sociales: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error interno al consultar entrenamientos sociales", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()

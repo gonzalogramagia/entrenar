@@ -125,11 +125,13 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)
-		// No es crítico si falla la notificación
-	} else {
-		rowsAffected, _ := result.RowsAffected()
-		fmt.Printf("Notificación de bienvenida creada: %d filas afectadas\n", rowsAffected)
+		tx.Rollback()
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
 	}
+
+	rowsAffected, _ := result.RowsAffected()
+	fmt.Printf("Notificación de bienvenida creada: %d filas afectadas\n", rowsAffected)
 
 	// Confirmar transacción
 	if err = tx.Commit(); err != nil {

@@ -8,6 +8,7 @@ export const translations = {
             delete: 'Eliminar',
             close: 'Cerrar',
             search: 'Buscar...',
+            guestBanner: 'Estás en Modo Invitado. Inicia sesión para\nguardar tus datos en la Nube.',
         },
         navigation: {
             appTitle: 'Entrenate.net',
@@ -107,6 +108,7 @@ export const translations = {
             delete: 'Delete',
             close: 'Close',
             search: 'Search...',
+            guestBanner: 'You are in Guest Mode. Sign in to\nsave your data to the Cloud.',
         },
         navigation: {
             appTitle: 'Entrenate.net',

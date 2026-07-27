@@ -115,13 +115,10 @@ function AuthenticatedAppContent() {
             fontWeight: 600,
             fontSize: '0.85rem',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            zIndex: 999
+            zIndex: 999,
+            whiteSpace: 'pre-line'
           }}>
-          {language === 'es' ? (
-            <>Estás en Modo Invitado. Inicia sesión para<br />guardar tus datos en la Nube.</>
-          ) : (
-            <>You are in Guest Mode. Sign in to<br />save your data to the Cloud.</>
-          )}
+          {translations[language].common.guestBanner}
         </Box>
       )}
 

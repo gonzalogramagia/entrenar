@@ -184,7 +184,9 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		)
 
 		if err != nil {
-			continue // Saltar usuarios con errores
+			fmt.Printf("Error scanning admin user row: %v\n", err)
+			http.Error(w, "Error al leer datos de usuarios", http.StatusInternalServerError)
+			return
 		}
 
 		// Formatear last_login
