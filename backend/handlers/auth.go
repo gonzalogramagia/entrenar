@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // UpdateLastSignInHandler actualiza el last_sign_in_at del usuario
@@ -50,7 +50,7 @@ func createUserNotificationsWithTransaction(userID string) error {
 	defer tx.Rollback()
 
 	fmt.Printf("Debug: Buscando admin_notifications para usuario %s\n", userID)
-	
+
 	// Obtener admin_notifications de los últimos 10 días que no tienen notificaciones individuales para este usuario
 	query := `
 		SELECT an.id, an.title, an.message, an.type
@@ -75,13 +75,13 @@ func createUserNotificationsWithTransaction(userID string) error {
 	defer rows.Close()
 
 	fmt.Printf("Debug: Query ejecutada exitosamente, procesando resultados...\n")
-	
+
 	var createdCount int
 	var foundCount int
 	for rows.Next() {
 		foundCount++
 		fmt.Printf("Debug: Procesando fila %d\n", foundCount)
-		
+
 		var adminID int
 		var title, message, notificationType string
 
@@ -90,7 +90,7 @@ func createUserNotificationsWithTransaction(userID string) error {
 			fmt.Printf("Error escaneando admin_notification: %v\n", err)
 			continue
 		}
-		
+
 		fmt.Printf("Debug: Procesando admin_notification ID %d: %s\n", adminID, title)
 
 		// Preparar datos para la notificación
@@ -105,7 +105,7 @@ func createUserNotificationsWithTransaction(userID string) error {
 		}
 
 		fmt.Printf("Debug: Intentando insertar notificación para admin_notification %d\n", adminID)
-		
+
 		// Crear notificación individual dentro de la transacción
 		_, err = tx.Exec(`
 			INSERT INTO notifications (user_id, type, title, message, data, is_read)
@@ -139,7 +139,7 @@ func createUserNotificationsWithTransaction(userID string) error {
 // createUserNotifications crea notificaciones individuales para el usuario basadas en admin_notifications de los últimos 10 días
 func createUserNotifications(userID string) error {
 	fmt.Printf("Debug: Buscando admin_notifications para usuario %s\n", userID)
-	
+
 	// Obtener admin_notifications de los últimos 10 días que no tienen notificaciones individuales para este usuario
 	query := `
 		SELECT an.id, an.title, an.message, an.type
@@ -163,13 +163,13 @@ func createUserNotifications(userID string) error {
 	defer rows.Close()
 
 	fmt.Printf("Debug: Query ejecutada exitosamente, procesando resultados...\n")
-	
+
 	var createdCount int
 	var foundCount int
 	for rows.Next() {
 		foundCount++
 		fmt.Printf("Debug: Procesando fila %d\n", foundCount)
-		
+
 		var adminID int
 		var title, message, notificationType string
 
@@ -178,7 +178,7 @@ func createUserNotifications(userID string) error {
 			fmt.Printf("Error escaneando admin_notification: %v\n", err)
 			continue
 		}
-		
+
 		fmt.Printf("Debug: Procesando admin_notification ID %d: %s\n", adminID, title)
 
 		// Preparar datos para la notificación
@@ -193,7 +193,7 @@ func createUserNotifications(userID string) error {
 		}
 
 		fmt.Printf("Debug: Intentando insertar notificación para admin_notification %d\n", adminID)
-		
+
 		// Crear notificación individual
 		_, err = database.DB.Exec(`
 			INSERT INTO notifications (user_id, type, title, message, data, is_read)

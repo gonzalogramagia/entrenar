@@ -40,7 +40,7 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    expect(await screen.findByText('Registrar día de hoy')).toBeInTheDocument()
+    expect(await screen.findByText('Registrar Día de Hoy')).toBeInTheDocument()
     expect(await screen.findByText('Mis Entrenamientos')).toBeInTheDocument()
     expect(await screen.findByText('Mis Rutinas')).toBeInTheDocument()
   })

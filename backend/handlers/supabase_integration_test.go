@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/gonzagramaglia/entrenar/backend/models"
-	"github.com/gonzagramaglia/entrenar/backend/testutils"
+	"github.com/gonzagramaglia/entrenate/backend/models"
+	"github.com/gonzagramaglia/entrenate/backend/testutils"
 )
 
 // TestSupabaseIntegration prueba el flujo completo con Supabase real

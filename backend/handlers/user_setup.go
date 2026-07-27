@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // UserSetupRequest representa la solicitud para configurar un usuario
@@ -66,9 +66,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		FROM auth.users 
 		WHERE id = $2
 	`, req.Name, req.UserID).Scan(&fullName, &avatarURL)
-	
 
-	
 	if err != nil {
 		fmt.Printf("Error obteniendo nombre de Google: %v\n", err)
 		// Fallback al nombre proporcionado o email
@@ -92,7 +90,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 			avatar_url = EXCLUDED.avatar_url
 			-- No actualizar el rol para preservar roles existentes
 	`, req.UserID, userName, false, "user", avatarURL)
-	
+
 	if err == nil {
 		rowsAffected, _ := result.RowsAffected()
 		fmt.Printf("✅ Perfil creado/actualizado para %s: %d filas afectadas\n", req.UserID, rowsAffected)
@@ -104,14 +102,13 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	// 2. user_settings ya no se usa (se maneja con localStorage)
 
 	// 3. Crear notificación de bienvenida (solo si no existe)
 	fmt.Printf("Creando notificación de bienvenida para usuario %s\n", req.UserID)
 	title := "¡Te damos la bienvenida! 🎉"
 	message := "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, crear rutinas y ver tu progreso. ¡Buen entrenamiento!"
-	
+
 	if req.Language == "en" {
 		title = "Welcome! 🎉"
 		message = "We're excited to have you join our fitness community! Here you can register your workouts, create routines, and track your progress. Have a great workout!"
@@ -125,14 +122,16 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 			WHERE user_id = $1 AND type = 'welcome'
 		)
 	`, req.UserID, title, message, "welcome", time.Now())
-	
+
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)
-		// No es crítico si falla la notificación
-	} else {
-		rowsAffected, _ := result.RowsAffected()
-		fmt.Printf("Notificación de bienvenida creada: %d filas afectadas\n", rowsAffected)
+		tx.Rollback()
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
 	}
+
+	rowsAffected, _ := result.RowsAffected()
+	fmt.Printf("Notificación de bienvenida creada: %d filas afectadas\n", rowsAffected)
 
 	// Confirmar transacción
 	if err = tx.Commit(); err != nil {
@@ -140,8 +139,6 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
-
-
 
 	// Responder con éxito
 	json.NewEncoder(w).Encode(map[string]string{
@@ -166,21 +163,21 @@ func extractNameFromEmail(email string) string {
 func extractFirstName(fullName string) string {
 	// Limpiar espacios al inicio y final
 	fullName = strings.TrimSpace(fullName)
-	
+
 	// Si está vacío, devolver tal como está
 	if fullName == "" {
 		return fullName
 	}
-	
+
 	// Capitalizar la primera letra de cada palabra
 	words := strings.Fields(fullName)
 	var capitalizedWords []string
-	
+
 	for _, word := range words {
 		if len(word) > 0 {
 			capitalizedWords = append(capitalizedWords, strings.ToUpper(string(word[0]))+strings.ToLower(word[1:]))
 		}
 	}
-	
+
 	return strings.Join(capitalizedWords, " ")
 }

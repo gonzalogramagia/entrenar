@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
-	"github.com/gonzagramaglia/entrenar/backend/models"
+	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/models"
 	"github.com/gorilla/mux"
 	"github.com/lib/pq"
 )

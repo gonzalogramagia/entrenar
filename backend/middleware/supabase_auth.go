@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // SupabaseAuthMiddleware valida JWT tokens de Supabase
 func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("🔐 Auth Middleware - %s %s\n", r.Method, r.URL.Path)
-		
+
 		// Permitir preflight requests
 		if r.Method == "OPTIONS" {
 			fmt.Printf("✅ OPTIONS request permitida\n")
@@ -52,7 +52,7 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 		// Esto es necesario porque /me se llama para verificar si el usuario tiene perfil
 		// y /setup se llama para crearlo.
 		isMeEndpoint := strings.HasSuffix(r.URL.Path, "/me") || strings.Contains(r.URL.Path, "/me/")
-		
+
 		if isMeEndpoint {
 			fmt.Printf("👤 User endpoint detectado (%s) - validando JWT sin verificar DB\n", r.URL.Path)
 			// Validar JWT pero no verificar existencia en DB
@@ -247,14 +247,14 @@ func userExistsInDatabase(userID string) bool {
 		fmt.Printf("❌ Database connection is nil for user %s\n", userID)
 		return false
 	}
-	
+
 	var count int
 	err := database.DB.QueryRow("SELECT COUNT(*) FROM user_profiles WHERE user_id = $1", userID).Scan(&count)
 	if err != nil {
 		fmt.Printf("❌ Error verificando existencia de usuario %s: %v\n", userID, err)
 		return false
 	}
-	
+
 	exists := count > 0
 	fmt.Printf("🔍 Usuario %s existe en DB: %t (count: %d)\n", userID, exists, count)
 	return exists
