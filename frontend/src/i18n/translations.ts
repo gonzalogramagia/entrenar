@@ -11,7 +11,7 @@ export const translations = {
         },
         navigation: {
             appTitle: 'Entrenate.net',
-            workout: 'Registrar día de hoy',
+            workout: 'Registrar Día de Hoy',
             routines: 'Mis Rutinas',
             history: 'Mis Entrenamientos',
             social: 'Feed Social',
@@ -110,7 +110,7 @@ export const translations = {
         },
         navigation: {
             appTitle: 'Entrenate.net',
-            workout: 'Log today',
+            workout: 'Log Today',
             routines: 'My Routines',
             history: 'My Workouts',
             social: 'Social Feed',

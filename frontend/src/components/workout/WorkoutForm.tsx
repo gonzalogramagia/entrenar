@@ -318,21 +318,6 @@ export default function WorkoutForm({
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
-      <Box sx={{ mb: 3, mt: 1, textAlign: 'center' }}>
-        <Typography variant="h4" sx={{ 
-          fontWeight: 1000, 
-          color: 'primary.main', 
-          mb: 0.5,
-          letterSpacing: '-0.5px',
-          textTransform: 'uppercase'
-        }}>
-          Entrenate.net
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-          {translations[language].navigation.footer}
-        </Typography>
-      </Box>
-
       {/* Box de rutina activa o mensaje de no rutina */}
       {activeRoutine ? (
         <ActiveRoutineBox

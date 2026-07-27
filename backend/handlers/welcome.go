@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // CreateWelcomeNotificationHandler crea una notificación de bienvenida para un nuevo usuario
@@ -24,7 +24,7 @@ func CreateWelcomeNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		SELECT COUNT(*) FROM notifications 
 		WHERE user_id = $1 AND type = 'welcome'
 	`
-	
+
 	var existingCount int
 	err := database.DB.QueryRow(checkQuery, userID).Scan(&existingCount)
 	if err != nil {

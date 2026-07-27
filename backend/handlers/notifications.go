@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gonzagramaglia/entrenate/backend/database"
 	"github.com/gorilla/mux"
-	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // Notification representa una notificación del usuario
@@ -38,13 +38,13 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	// Obtener parámetros de paginación
 	limit := 20
 	offset := 0
-	
+
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 			limit = l
 		}
 	}
-	
+
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
 			offset = o
@@ -91,8 +91,6 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		notifications = append(notifications, notification)
 
 	}
-
-
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(notifications)
@@ -227,7 +225,7 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		var id int
 		var title, message, notificationType string
 		var createdAt time.Time
-		
+
 		err := rows.Scan(&id, &title, &message, &notificationType, &createdAt)
 		if err != nil {
 			fmt.Printf("Error escaneando notificación del sistema: %v\n", err)
@@ -236,13 +234,13 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Convertir fecha a zona horaria de Argentina
 		createdAt = convertToArgentinaTime(createdAt)
-		
+
 		// Determinar prioridad basada en el tipo
 		priority := "medium"
 		if notificationType == "error" {
 			priority = "high"
 		}
-		
+
 		notifications = append(notifications, map[string]interface{}{
 			"id":         id,
 			"type":       "announcement",
@@ -253,8 +251,6 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 			"priority":   priority,
 		})
 	}
-
-
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(notifications)
@@ -296,5 +292,3 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
-
-

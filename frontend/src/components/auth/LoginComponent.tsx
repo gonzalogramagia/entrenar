@@ -63,7 +63,7 @@ export default function LoginComponent() {
     }}>
       <Box sx={{
         bgcolor: 'white',
-        mb: { xs: '8vh', md: 0 }, // Subir visualmente en mobile
+        transform: { xs: 'translateY(-5vh)', md: 'translateY(-3vh)' }, // Subir visualmente la caja blanca
         px: 3,
         pb: 3,
         pt: 2,
@@ -75,7 +75,7 @@ export default function LoginComponent() {
         <Box sx={{
           display: 'flex',
           justifyContent: 'center',
-          mb: 2,
+          mb: 0.5,
           height: '144px',
           overflow: 'hidden'
         }}>
@@ -106,21 +106,27 @@ export default function LoginComponent() {
           </Box>
         </Box>
 
+        <Typography variant="h4" sx={{ fontWeight: 800, textAlign: 'center', mb: 1.5, color: '#333', letterSpacing: '-0.5px', fontSize: '2.3rem' }}>
+          Entrenate.net
+        </Typography>
+
         {/* Google OAuth Login */}
         <Button
           onClick={handleGoogleSignIn}
           disabled={isSigningIn}
           variant="outlined"
-          fullWidth
           startIcon={<GoogleIcon />}
           sx={{
+            width: '82%',
+            mx: 'auto',
+            display: 'flex',
             py: 1.5,
             borderRadius: 3,
             borderColor: '#4285f4',
             color: '#4285f4',
             textTransform: 'none',
-            fontSize: '1rem',
-            fontWeight: 500,
+            fontSize: '0.95rem',
+            fontWeight: 'bold',
             '&:hover': {
               borderColor: '#357ae8',
               backgroundColor: 'rgba(66, 133, 244, 0.04)'
@@ -139,7 +145,7 @@ export default function LoginComponent() {
           {isSigningIn ? t.signingIn : t.continueWithGoogle}
         </Button>
 
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
           <Typography
             variant="body2"
             onClick={enterAsGuest}

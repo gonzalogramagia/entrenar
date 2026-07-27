@@ -7,20 +7,20 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 )
 
 // SocialWorkout represents a workout for the social view
 type SocialWorkout struct {
-	SessionID     int       `json:"session_id"`
-	UserID        string    `json:"user_id"`
-	UserName      string    `json:"user_name"`
-	UserAvatarURL string    `json:"user_avatar_url"`
-	WorkoutDate   string    `json:"workout_date"`
-	CreatedAt     string    `json:"created_at"`
-	TotalExercises int      `json:"total_exercises"`
-	TotalSeries   int       `json:"total_series"`
-	Exercises     []SocialExercise `json:"exercises"`
+	SessionID      int              `json:"session_id"`
+	UserID         string           `json:"user_id"`
+	UserName       string           `json:"user_name"`
+	UserAvatarURL  string           `json:"user_avatar_url"`
+	WorkoutDate    string           `json:"workout_date"`
+	CreatedAt      string           `json:"created_at"`
+	TotalExercises int              `json:"total_exercises"`
+	TotalSeries    int              `json:"total_series"`
+	Exercises      []SocialExercise `json:"exercises"`
 }
 
 // SocialExercise represents an exercise in the social view
@@ -46,13 +46,13 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	// Pagination parameters
 	limit := 10
 	offset := 0
-	
+
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 			limit = l
 		}
 	}
-	
+
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
 			offset = o
@@ -100,7 +100,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	rows, err := database.DB.Query(query, limit, offset)
 	if err != nil {
 		fmt.Printf("❌ Error consultando entrenamientos sociales: %v\n", err)
-		http.Error(w, "Error consultando entrenamientos sociales: " + err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error consultando entrenamientos sociales: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -113,7 +113,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		var exercisesJSON []byte
 		var totalExercises int64
 		var totalSets int64
-		
+
 		err := rows.Scan(
 			&workout.SessionID,
 			&workout.UserID,
@@ -172,4 +172,3 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Found %d social workouts\n", len(socialWorkouts))
 	json.NewEncoder(w).Encode(socialWorkouts)
 }
-

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/database"
 	"github.com/gorilla/mux"
 )
 

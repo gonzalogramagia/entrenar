@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/models"
 	"github.com/gorilla/mux"
-	"github.com/gonzagramaglia/entrenar/backend/database"
-	"github.com/gonzagramaglia/entrenar/backend/models"
 )
 
 // GetUserRoutinesHandler obtiene todas las rutinas del usuario actual
@@ -44,7 +44,7 @@ func GetUserRoutinesHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var routine models.RoutineWithExercises
 		var description *string
-		
+
 		err := rows.Scan(
 			&routine.ID,
 			&routine.UserID,
@@ -134,7 +134,7 @@ func GetUserRoutineHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var exercise models.RoutineExercise
 		var notes *string
-		
+
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.RoutineID,

@@ -10,9 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 
-	"github.com/gonzagramaglia/entrenar/backend/database"
-	"github.com/gonzagramaglia/entrenar/backend/handlers"
-	"github.com/gonzagramaglia/entrenar/backend/middleware"
+	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenate/backend/handlers"
+	"github.com/gonzagramaglia/entrenate/backend/middleware"
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 
 	// Health check
 	api.HandleFunc("/health", handlers.HealthHandler).Methods("GET")
-	
+
 	// Workouts endpoints
 	api.HandleFunc("/workouts", handlers.GetWorkoutsHandler).Methods("GET")
 	api.HandleFunc("/workouts", handlers.CreateWorkoutHandler).Methods("POST")
@@ -56,8 +56,6 @@ func main() {
 	// Exercises endpoints
 	api.HandleFunc("/exercises", handlers.GetExercisesHandler).Methods("GET")
 	api.HandleFunc("/exercises/{id}", handlers.GetExerciseHandler).Methods("GET")
-
-
 
 	// Users endpoints (usando Supabase Auth)
 	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")
@@ -75,11 +73,10 @@ func main() {
 	api.HandleFunc("/notifications/{id}/read", handlers.MarkNotificationAsReadHandler).Methods("PUT")
 	api.HandleFunc("/notifications/read-all", handlers.MarkAllNotificationsAsReadHandler).Methods("PUT")
 	api.HandleFunc("/notifications/{id}", handlers.DeleteNotificationHandler).Methods("DELETE")
-	
+
 	// Welcome notification endpoints
 	api.HandleFunc("/welcome-notification", handlers.CreateWelcomeNotificationHandler).Methods("POST")
 	api.HandleFunc("/welcome-notification", handlers.GetWelcomeNotificationHandler).Methods("GET")
-
 
 	// Admin endpoints (requieren permisos de administrador)
 	api.HandleFunc("/admin/notifications", handlers.AdminStaffOrTeacherMiddleware(handlers.GetAdminNotificationsHandler)).Methods("GET")
@@ -106,9 +103,9 @@ func main() {
 	if corsOrigins == "" {
 		// Dominios permitidos por defecto (incluyendo localhost para desarrollo)
 		// Se añade soporte para el dominio oficial de la app y subdominios de Railway
-		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenate.net,https://www.entrenate.net,https://entrenar.up.railway.app"
+		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenate.net,https://www.entrenate.net,https://entrenate.up.railway.app"
 	}
-	
+
 	// Limpiar y validar orígenes
 	rawOrigins := strings.Split(corsOrigins, ",")
 	var allowedOrigins []string
@@ -118,13 +115,13 @@ func main() {
 			allowedOrigins = append(allowedOrigins, trimmed)
 		}
 	}
-	
+
 	log.Printf("CORS configurado para los siguientes orígenes: %v", allowedOrigins)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   allowedOrigins,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowedHeaders:   []string{
+		AllowedOrigins: allowedOrigins,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders: []string{
 			"Accept",
 			"Authorization",
 			"Content-Type",

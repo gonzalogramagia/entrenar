@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gonzagramaglia/entrenate/backend/database"
 	"github.com/gorilla/mux"
-	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // SupabaseUser representa información básica del usuario de Supabase Auth
 type SupabaseUser struct {
-	ID       string                 `json:"id"`
-	Email    *string                `json:"email"`
-	Metadata map[string]interface{} `json:"user_metadata"`
-	IsAdmin  bool                   `json:"is_admin"`
-	Role     string                 `json:"role"`
-	ProfileName *string             `json:"profile_name"`
+	ID          string                 `json:"id"`
+	Email       *string                `json:"email"`
+	Metadata    map[string]interface{} `json:"user_metadata"`
+	IsAdmin     bool                   `json:"is_admin"`
+	Role        string                 `json:"role"`
+	ProfileName *string                `json:"profile_name"`
 }
 
 // GetCurrentUserHandler obtiene el usuario actual desde Supabase Auth
@@ -125,13 +125,13 @@ func GetUserStatsHandler(w http.ResponseWriter, r *http.Request) {
 
 // AdminUser representa información de usuario para el panel de administrador
 type AdminUser struct {
-	ID        string  `json:"id"`
-	Email     *string `json:"email"`
-	Name      *string `json:"name"`
-	IsAdmin   bool    `json:"is_admin"`
-	Role      string  `json:"role"`
-	CreatedAt string  `json:"created_at"`
-	LastLogin *string `json:"last_login"`
+	ID        string                  `json:"id"`
+	Email     *string                 `json:"email"`
+	Name      *string                 `json:"name"`
+	IsAdmin   bool                    `json:"is_admin"`
+	Role      string                  `json:"role"`
+	CreatedAt string                  `json:"created_at"`
+	LastLogin *string                 `json:"last_login"`
 	Settings  *map[string]interface{} `json:"settings"`
 }
 
@@ -170,7 +170,7 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		var lastSignInAt *string
 		var showOwnWorkoutsInSocial bool
 		var uncNotificationsEnabled bool
-		
+
 		err := rows.Scan(
 			&user.ID,
 			&user.Email,
@@ -182,22 +182,22 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			&showOwnWorkoutsInSocial,
 			&uncNotificationsEnabled,
 		)
-		
+
 		if err != nil {
 			continue // Saltar usuarios con errores
 		}
-		
+
 		// Formatear last_login
 		if lastSignInAt != nil {
 			user.LastLogin = lastSignInAt
 		}
-		
+
 		// Agregar configuraciones por defecto
 		user.Settings = &map[string]interface{}{
 			"has_configured_favorites": false,
-			"favorite_exercises": []int{},
+			"favorite_exercises":       []int{},
 		}
-		
+
 		users = append(users, user)
 	}
 
@@ -233,7 +233,7 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 	defer tx.Rollback()
 
 	// Eliminar registros relacionados en orden (por restricciones de clave foránea)
-	
+
 	// 1. Eliminar de notification_history
 	_, err = tx.Exec("DELETE FROM notification_history WHERE changed_by = $1", userID)
 	if err != nil {
@@ -284,7 +284,7 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 8. Eliminar de kudos (eliminar kudos de workout_days del usuario)
 	fmt.Printf("Eliminando kudos para usuario %s\n", userID)
-	
+
 	// Eliminar kudos que apunten a workout_days del usuario
 	_, err = tx.Exec(`
 		DELETE FROM kudos 
@@ -292,7 +292,7 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 			SELECT id FROM workout_days WHERE user_id = $1
 		)
 	`, userID)
-	
+
 	if err != nil {
 		fmt.Printf("Error eliminando kudos: %v\n", err)
 		fmt.Printf("Continuando sin eliminar kudos...\n")
@@ -383,7 +383,7 @@ func UpdateAdminUserRoleHandler(w http.ResponseWriter, r *http.Request) {
 			VALUES ($1, $2, NOW()) 
 			ON CONFLICT (user_id) DO UPDATE SET role = $2, updated_at = NOW()
 		`, userID, req.Role)
-		
+
 		if err != nil {
 			http.Error(w, "Error creando/actualizando perfil de usuario", http.StatusInternalServerError)
 			return
@@ -454,7 +454,7 @@ func UpdateAdminUserNameHandler(w http.ResponseWriter, r *http.Request) {
 			VALUES ($1, $2, NOW()) 
 			ON CONFLICT (user_id) DO UPDATE SET name = $2, updated_at = NOW()
 		`, userID, req.Name)
-		
+
 		if err != nil {
 			http.Error(w, "Error creando/actualizando perfil de usuario", http.StatusInternalServerError)
 			return

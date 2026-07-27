@@ -1,4 +1,4 @@
-module github.com/gonzagramaglia/entrenar/backend
+module github.com/gonzagramaglia/entrenate/backend
 
 go 1.21
 

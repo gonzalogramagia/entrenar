@@ -24,11 +24,11 @@ function AuthenticatedAppContent() {
   const t = translations[language]
   const { activeTab, setActiveTab } = useTab()
   const { userRole, isAdmin, isSigningIn, isLoggingOut, isGuest } = useAuth()
-  
+
   const { exercises, isLoading } = useGlobalData()
   const { unreadNotifications, loadUnreadNotificationsCount } = useNotificationsPoller()
   const [showConfetti, setShowConfetti] = useState(false)
-  
+
   const {
     activeRoutine,
     routineProgress,
@@ -104,22 +104,24 @@ function AuthenticatedAppContent() {
       />
 
       {isGuest && (
-        <Box 
+        <Box
           role="status"
           aria-live="polite"
-          sx={{ 
-          backgroundColor: '#ffb300', 
-          color: 'black', 
-          py: 0.8, 
-          textAlign: 'center', 
-          fontWeight: 600,
-          fontSize: '0.85rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          zIndex: 999
-        }}>
-          {language === 'es' 
-            ? 'Estás en Modo Invitado. Inicia sesión para guardar tus datos en la nube.' 
-            : 'You are in Guest Mode. Sign in to save your data to the cloud.'}
+          sx={{
+            backgroundColor: '#ffb300',
+            color: 'black',
+            py: 1.5,
+            textAlign: 'center',
+            fontWeight: 600,
+            fontSize: '0.85rem',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            zIndex: 999
+          }}>
+          {language === 'es' ? (
+            <>Estás en Modo Invitado. Inicia sesión para<br />guardar tus datos en la Nube.</>
+          ) : (
+            <>You are in Guest Mode. Sign in to<br />save your data to the Cloud.</>
+          )}
         </Box>
       )}
 
@@ -169,9 +171,9 @@ function AuthenticatedAppContent() {
       </Backdrop>
 
       <FloatingNavButton currentTab={activeTab} onTabChange={handleTabChange} activeRoutine={activeRoutine} />
-      
+
       <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} exercises={exercises} />
-      
+
       <NotificationsModal open={notificationsModalOpen} onClose={() => setNotificationsModalOpen(false)} onMarkAsRead={loadUnreadNotificationsCount} />
 
       {adminPanelOpen && <AdminPanel open={adminPanelOpen} onClose={() => setAdminPanelOpen(false)} />}

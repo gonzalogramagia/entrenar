@@ -312,7 +312,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       overflow: (!routines || routines.length === 0) ? 'visible' : 'visible'
     }}>
 
-      <Box sx={{ mb: 4, mt: 1.5, textAlign: 'center' }}>
+      <Box sx={{ mb: 2, mt: -0.5, textAlign: 'center' }}>
         <Typography variant="h5" sx={{ 
           fontWeight: 1000, 
           color: 'primary.main', 
