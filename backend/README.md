@@ -1,6 +1,6 @@
 # Entrenate.net Backend
 
-Go REST API for the gym workout tracking application.
+REST API in Go for the Entrenate.net gym workout logging application.
 
 ## 🚀 Setup
 
@@ -42,7 +42,7 @@ The server will be available at `http://localhost:3210`
 
 ```http
 GET /api/health
-```
+```http
 
 ### Workouts
 
@@ -51,7 +51,7 @@ GET    /api/workouts                 # List workouts
 POST   /api/workouts                 # Create workout
 PUT    /api/workouts/{id}            # Update workout
 DELETE /api/workouts/{id}            # Delete workout
-```
+```http
 
 ### Workout Sessions
 
@@ -59,21 +59,21 @@ DELETE /api/workouts/{id}            # Delete workout
 GET    /api/workout-sessions         # List sessions
 POST   /api/workout-sessions         # Create session
 PUT    /api/workout-sessions/{id}    # Update session
-```
+```http
 
 ### Exercises
 
 ```http
 GET    /api/exercises                # List exercises
 GET    /api/exercises/{id}           # Get exercise
-```
+```http
 
 ### Users (Supabase Auth)
 
 ```http
 GET    /api/me                       # Current user
 GET    /api/me/stats                 # User statistics
-```
+```http
 
 ## 🔐 Authentication
 
@@ -81,9 +81,9 @@ GET    /api/me/stats                 # User statistics
 
 ```http
 Authorization: Bearer <jwt_token_from_supabase>
-```
+```http
 
-See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for complete setup.
+See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for full configuration details.
 
 ## 📊 Data Structure
 
@@ -131,7 +131,7 @@ See [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) for complete setup.
 make test-setup
 ```
 
-### Unit Tests (Without DB)
+### Unit Tests (No DB)
 
 ```bash
 # Fast tests for development
@@ -179,18 +179,18 @@ backend/
 │   └── supabase_auth_migrations.sql    # Auth migrations
 ├── handlers/
 │   ├── health.go                        # Health check
-│   ├── workouts.go                      # CRUD workouts + sessions
-│   ├── exercises.go                     # Exercise endpoints
+│   ├── workouts.go                      # Workouts + sessions CRUD
+│   ├── exercises.go                     # Exercises endpoints
 │   └── users.go                         # Current user (from JWT)
 ├── middleware/
 │   ├── logging.go                       # Request logging
 │   └── supabase_auth.go                 # JWT validation
 ├── testutils/
 │   ├── testing_helpers.go               # Test utilities
-│   └── database.go                      # DB setup for tests
+│   └── database.go                      # Test DB setup
 └── scripts/
     └── test-setup.sh                    # Setup script
-```
+```text
 
 ## 🔄 Filters and Parameters
 
@@ -201,7 +201,7 @@ backend/
 
 ### Exercises
 
-- `?muscle_group=chest` - Filter by muscle group
+- `?muscle_group=pecho` - Filter by muscle group
 - `?search=press` - Search by name
 
 ## 🚦 HTTP Status Codes
@@ -216,16 +216,16 @@ backend/
 
 ## 📝 Logs
 
-The server logs all HTTP requests with:
+The server logs all HTTP requests including:
 
 - HTTP Method
 - Path
-- Status code
+- Status Code
 - Duration
 - Client IP
 
 Example:
 
-```text
+```http
 GET /api/workouts 200 15.2ms 127.0.0.1
-```
+```http

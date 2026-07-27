@@ -1,4 +1,4 @@
-# Entrenate App - Development and Deployment Commands
+# Entrenate.net - Development and Deployment Commands
 
 .PHONY: help dev build deploy clean test docker-build docker-run
 

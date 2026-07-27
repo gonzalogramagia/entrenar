@@ -23,7 +23,7 @@ function AuthenticatedAppContent() {
   const { language } = useLanguage()
   const t = translations[language]
   const { activeTab, setActiveTab } = useTab()
-  const { userRole, isAdmin, isSigningIn, isLoggingOut } = useAuth()
+  const { userRole, isAdmin, isSigningIn, isLoggingOut, isGuest } = useAuth()
   
   const { exercises, isLoading } = useGlobalData()
   const { unreadNotifications, loadUnreadNotificationsCount } = useNotificationsPoller()
@@ -102,6 +102,26 @@ function AuthenticatedAppContent() {
         onOpenAdminPanel={() => setAdminPanelOpen(true)}
         unreadNotifications={unreadNotifications}
       />
+
+      {isGuest && (
+        <Box 
+          role="status"
+          aria-live="polite"
+          sx={{ 
+          backgroundColor: '#ffb300', 
+          color: 'black', 
+          py: 0.8, 
+          textAlign: 'center', 
+          fontWeight: 600,
+          fontSize: '0.85rem',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          zIndex: 999
+        }}>
+          {language === 'es' 
+            ? 'Estás en Modo Invitado. Inicia sesión para guardar tus datos en la nube.' 
+            : 'You are in Guest Mode. Sign in to save your data to the cloud.'}
+        </Box>
+      )}
 
       <Box sx={{
         flexGrow: 1,

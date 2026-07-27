@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // UserSetupRequest representa la solicitud para configurar un usuario

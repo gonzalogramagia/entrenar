@@ -23,9 +23,52 @@ export function useGlobalData() {
 
   const loadData = useCallback(async () => {
     setIsLoading(true)
+    
+    // Migración de localStorage de entrenar-* a entrenate-* para compatibilidad hacia atrás
+    try {
+      const keysToMigrate = ['workouts', 'workout-days']
+      keysToMigrate.forEach(key => {
+        const oldKey = `entrenar-${key}`
+        const newKey = `entrenate-${key}`
+        const oldData = localStorage.getItem(oldKey)
+        
+        if (oldData) {
+          const currentData = localStorage.getItem(newKey)
+          if (!currentData) {
+            // No hay datos nuevos, migramos directamente
+            localStorage.setItem(newKey, oldData)
+            localStorage.removeItem(oldKey)
+          } else {
+            // Hay datos en ambas claves, intentamos unirlos
+            try {
+              const oldParsed = JSON.parse(oldData)
+              const currentParsed = JSON.parse(currentData)
+              
+              if (Array.isArray(oldParsed) && Array.isArray(currentParsed)) {
+                // Unimos evitando duplicados por ID
+                const currentIds = new Set(currentParsed.map((item: any) => item.id))
+                const itemsToAdd = oldParsed.filter((item: any) => !currentIds.has(item.id))
+                
+                if (itemsToAdd.length > 0) {
+                  const merged = [...currentParsed, ...itemsToAdd]
+                  localStorage.setItem(newKey, JSON.stringify(merged))
+                }
+                // Si la migración/merge fue exitosa, borramos la clave vieja
+                localStorage.removeItem(oldKey)
+              }
+            } catch (mergeError) {
+              console.warn(`Error fusionando datos de ${oldKey}`, mergeError)
+              // No borramos la clave vieja si falla el merge
+            }
+          }
+        }
+      })
+    } catch (migrationError) {
+      console.error('Error general en la migración de localStorage:', migrationError)
+    }
+
     try {
       console.log('Cargando datos...')
-      
       if (isGuest) {
         // Datos Mock para Modo Invitado
         let mockExercises: Exercise[] = []
@@ -339,17 +382,8 @@ export function useGlobalData() {
       console.error('Error cargando datos:', error)
 
       // Fallback a localStorage si el backend falla
-      let savedWorkouts = localStorage.getItem('entrenate-workouts')
-      if (!savedWorkouts) {
-        savedWorkouts = localStorage.getItem('entrenar-workouts')
-        if (savedWorkouts) localStorage.setItem('entrenate-workouts', savedWorkouts)
-      }
-
-      let savedWorkoutDays = localStorage.getItem('entrenate-workout-days')
-      if (!savedWorkoutDays) {
-        savedWorkoutDays = localStorage.getItem('entrenar-workout-days')
-        if (savedWorkoutDays) localStorage.setItem('entrenate-workout-days', savedWorkoutDays)
-      }
+      const savedWorkouts = localStorage.getItem('entrenate-workouts')
+      const savedWorkoutDays = localStorage.getItem('entrenate-workout-days')
 
       if (savedWorkouts) {
         setWorkouts(JSON.parse(savedWorkouts))

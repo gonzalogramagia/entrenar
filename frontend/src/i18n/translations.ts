@@ -11,9 +11,9 @@ export const translations = {
         },
         navigation: {
             appTitle: 'Entrenate.net',
-            workout: 'Registrar',
+            workout: 'Registrar día de hoy',
             routines: 'Mis Rutinas',
-            history: 'Entrenamientos',
+            history: 'Mis Entrenamientos',
             social: 'Feed Social',
             footer: 'Mens sana in corpore sano',
             userPanel: 'Panel de Usuario',
@@ -110,9 +110,9 @@ export const translations = {
         },
         navigation: {
             appTitle: 'Entrenate.net',
-            workout: 'Log',
+            workout: 'Log today',
             routines: 'My Routines',
-            history: 'Workouts',
+            history: 'My Workouts',
             social: 'Social Feed',
             footer: 'Mens sana in corpore sano',
             userPanel: 'User Panel',

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/gonzagramaglia/entrenate/backend/database"
+	"github.com/gonzagramaglia/entrenar/backend/database"
 )
 
 // SupabaseAuthMiddleware valida JWT tokens de Supabase

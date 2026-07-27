@@ -472,6 +472,103 @@ export default function WorkoutHistory() {
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}>
+        <Box sx={{ mb: 2, mt: 1.5, textAlign: 'center' }}>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 1000, 
+            color: 'primary.main', 
+            mb: 1,
+            letterSpacing: '-0.5px',
+            textTransform: 'uppercase',
+            fontSize: { xs: '1.25rem', sm: '1.5rem' }
+          }}>
+            {translations[language].navigation.history}
+          </Typography>
+          <Typography sx={{ 
+            fontSize: '0.800rem',
+            lineHeight: 1.43,
+            letterSpacing: '0.01071em',
+            color: 'rgba(0, 0, 0, 0.6)',
+            fontStyle: 'normal',
+            opacity: 1,
+            fontWeight: 500,
+            px: 2,
+            textAlign: 'center'
+          }}>
+            {language === 'es' ? 'Visualiza y filtra tu historial de sesiones' : 'View and filter your workout history'}
+          </Typography>
+        </Box>
+
+        {/* Calendario de Entrenamientos */}
+
+
+        {/* Calendario de Entrenamientos */}
+        <Card sx={{ 
+          mx: 0.5, 
+          borderRadius: 3, 
+          boxShadow: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          background: 'white',
+          minHeight: '360px',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <DateCalendar 
+            defaultValue={new Date()}
+            showDaysOutsideCurrentMonth
+            fixedWeekNumber={6}
+            shouldDisableDate={(date: Date) => {
+              const dateStr = getDateString(date);
+              return !trainingDates.has(dateStr);
+            }}
+            onChange={(newDate: Date | null) => {
+              if (newDate) {
+                const dayNum = newDate.getDate()
+                const monthName = newDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
+                const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)
+                
+                const searchString = language === 'es' 
+                  ? `${dayNum} de ${capitalizedMonth}`
+                  : `${capitalizedMonth} ${dayNum}`
+                
+                setSearchTerm(searchString)
+                setIsCalendarSearch(true)
+
+                setTimeout(() => {
+                  resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+              }
+            }}
+            slots={{
+              day: ServerDay,
+            }}
+            slotProps={{
+              day: {
+                highlightedDays: trainingDates,
+              } as any,
+            }}
+            sx={{
+              width: '100%',
+              flexGrow: 1,
+              '& .MuiPickersDay-root.Mui-selected': {
+                backgroundColor: 'primary.main',
+              },
+              '& .MuiDayCalendar-header': {
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                mb: 1
+              },
+              '& .MuiDayCalendar-monthContainer': {
+                minHeight: '240px'
+              },
+              '& .MuiPickersCalendarHeader-label': {
+                textTransform: 'capitalize'
+              }
+            }}
+          />
+        </Card>
+
         {/* Buscador y ordenamiento */}
         <Box sx={{
           p: 3,
@@ -546,74 +643,6 @@ export default function WorkoutHistory() {
             </Box>
           </Box>
         </Box>
-
-        {/* Calendario de Entrenamientos */}
-        <Card sx={{ 
-          mx: 0.5, 
-          borderRadius: 3, 
-          boxShadow: 2,
-          border: '1px solid',
-          borderColor: 'divider',
-          overflow: 'hidden',
-          background: 'white',
-          minHeight: '360px',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <DateCalendar 
-            defaultValue={new Date()}
-            showDaysOutsideCurrentMonth
-            fixedWeekNumber={6}
-            shouldDisableDate={(date: Date) => {
-              const dateStr = getDateString(date);
-              return !trainingDates.has(dateStr);
-            }}
-            onChange={(newDate: Date | null) => {
-              if (newDate) {
-                const dayNum = newDate.getDate()
-                const monthName = newDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long' })
-                const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)
-                
-                const searchString = language === 'es' 
-                  ? `${dayNum} de ${capitalizedMonth}`
-                  : `${capitalizedMonth} ${dayNum}`
-                
-                setSearchTerm(searchString)
-                setIsCalendarSearch(true)
-
-                setTimeout(() => {
-                  resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-              }
-            }}
-            slots={{
-              day: ServerDay,
-            }}
-            slotProps={{
-              day: {
-                highlightedDays: trainingDates,
-              } as any,
-            }}
-            sx={{
-              width: '100%',
-              flexGrow: 1,
-              '& .MuiPickersDay-root.Mui-selected': {
-                backgroundColor: 'primary.main',
-              },
-              '& .MuiDayCalendar-header': {
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                mb: 1
-              },
-              '& .MuiDayCalendar-monthContainer': {
-                minHeight: '240px'
-              },
-              '& .MuiPickersCalendarHeader-label': {
-                textTransform: 'capitalize'
-              }
-            }}
-          />
-        </Card>
 
         {/* Cards de entrenamientos */}
         <Box ref={resultsRef} sx={{ mx: 0.5, pb: filteredWorkoutDays.length > 0 ? 40 : 0 }}>

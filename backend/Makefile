@@ -1,7 +1,7 @@
 .PHONY: build run test clean deps
 
 # Variables
-BINARY_NAME=entrenate-api
+BINARY_NAME=entrenate-backend
 GO_FILES=$(shell find . -name "*.go" -type f)
 
 # Construir el binario

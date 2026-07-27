@@ -124,7 +124,8 @@ Whenever a PR is prepared, the AI assistant must generate a local markdown file 
 | #2 | `docs/project-documentation` | Initial project documentation structure | ✅ Merged |
 | #3 | `refactor/workout-history` | Extracted utilities, mock data, and sub-components | ✅ Merged |
 | #4 | `refactor/workout-form` | Extract routine box, form schema, subcomponents and hooks | ✅ Merged |
-| #5 | `refactor/authenticated-app` | Refactor AuthenticatedApp | ✅ Merged |
-| #6 | `feat/update-domain-and-name` | Update domain to entrenate.net and complete renaming | 🛠️ In Progress |
+| #5 | `refactor/authenticated-app` | Decompose AuthenticatedApp into hooks and router | ✅ Merged |
+| #6 | `feat/update-domain-and-name` | Update domain to entrenate.net and rename project | ✅ Merged |
+| #7 | `feat/ui-improvements-and-rebranding` | Improve dashboard layout, finalize rebranding and translate docs | 🔄 Open |
 
 *(Update this table every time a PR is opened or merged.)*

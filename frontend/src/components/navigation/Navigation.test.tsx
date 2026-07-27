@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render } from '../../test/test-utils'
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
@@ -15,6 +15,12 @@ describe('Navigation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+  })
+
+  afterEach(() => {
+    vi.runAllTimers()
+    vi.useRealTimers()
   })
 
   it('renderiza el menú hamburguesa y el título', async () => {
@@ -34,8 +40,8 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    expect(await screen.findByText('Registrar')).toBeInTheDocument()
-    expect(await screen.findByText('Entrenamientos')).toBeInTheDocument()
+    expect(await screen.findByText('Registrar día de hoy')).toBeInTheDocument()
+    expect(await screen.findByText('Mis Entrenamientos')).toBeInTheDocument()
     expect(await screen.findByText('Mis Rutinas')).toBeInTheDocument()
   })
 
@@ -46,7 +52,7 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    const entrenamientosButton = await screen.findByText('Entrenamientos')
+    const entrenamientosButton = await screen.findByText('Mis Entrenamientos')
     await user.click(entrenamientosButton)
 
     expect(mockOnTabChange).toHaveBeenCalledWith(TABS.HISTORY)
@@ -59,7 +65,7 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
 
-    const entrenamientosButton = await screen.findByText('Entrenamientos')
+    const entrenamientosButton = await screen.findByText('Mis Entrenamientos')
     expect(entrenamientosButton).toBeInTheDocument()
   })
 })
