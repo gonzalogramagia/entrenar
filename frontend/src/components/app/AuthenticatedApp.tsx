@@ -104,7 +104,10 @@ function AuthenticatedAppContent() {
       />
 
       {isGuest && (
-        <Box sx={{ 
+        <Box 
+          role="status"
+          aria-live="polite"
+          sx={{ 
           backgroundColor: '#ffb300', 
           color: 'black', 
           py: 0.8, 

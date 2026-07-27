@@ -14,6 +14,7 @@ Frontend for the Entrenate.net application - A comprehensive personal workout ma
 ## Commands
 
 ### Development
+
 ```bash
 yarn dev          # Start development server
 yarn build        # Build for production
@@ -21,6 +22,7 @@ yarn preview      # Preview production build
 ```
 
 ### Testing
+
 ```bash
 yarn test         # Run tests
 yarn test:watch   # Run tests in watch mode
@@ -29,6 +31,7 @@ yarn test:coverage # Run tests with coverage report
 ```
 
 ### Linting
+
 ```bash
 yarn lint         # Run ESLint
 ```
@@ -39,4 +42,3 @@ yarn lint         # Run ESLint
 2. Configure the required environment variables
 3. Run `yarn install` to install dependencies
 4. Run `yarn dev` to start the development server
-

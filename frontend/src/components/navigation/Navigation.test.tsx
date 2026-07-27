@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render } from '../../test/test-utils'
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
@@ -15,6 +15,12 @@ describe('Navigation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+  })
+
+  afterEach(() => {
+    vi.runAllTimers()
+    vi.useRealTimers()
   })
 
   it('renderiza el menú hamburguesa y el título', async () => {
